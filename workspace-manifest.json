@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "files": [
+    ".agents/skills/restarengine-context/agents/openai.yaml",
+    ".agents/skills/restarengine-context/SKILL.md",
+    ".agents/skills/restarengine-core/agents/openai.yaml",
+    ".agents/skills/restarengine-core/SKILL.md",
+    ".agents/skills/restarengine-delivery/agents/openai.yaml",
+    ".agents/skills/restarengine-delivery/SKILL.md",
+    ".agents/skills/restarengine-devlog/agents/openai.yaml",
+    ".agents/skills/restarengine-devlog/scripts/validate_media.py",
+    ".agents/skills/restarengine-devlog/SKILL.md",
+    ".agents/skills/restarengine-gui/agents/openai.yaml",
+    ".agents/skills/restarengine-gui/SKILL.md",
+    ".agents/skills/restarengine-rendering/agents/openai.yaml",
+    ".agents/skills/restarengine-rendering/SKILL.md",
+    ".codex/agents/restarengine_core.toml",
+    ".codex/agents/restarengine_gui.toml",
+    ".codex/agents/restarengine_rendering.toml"
+  ]
+}

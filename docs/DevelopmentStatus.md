@@ -1,0 +1,675 @@
+# 开发状态与事实入口
+
+## 私有工作区远端配置（2026-10-29）
+
+用户指定 `CaptainRex0428/RestArtEngine_Workspace` 并授权配置与推送。已通过GitHub API核实该新空库原为Public，按用户的私有用途改为Private并复核；可见性切换期间Git一度返回repository disabled，随后重查已可正常访问。local的origin已绑定对应HTTPS地址，使用main分支。本轮首次提交范围仅私库34个清单文件，不包含引擎工作区的其他未提交代码；推送是否完成以远端main与本地HEAD核对为准，下方“未绑定／未提交”描述保留为初始化时历史。
+
+README已补齐目录归属、原运行入口、新机安装、日常收集/安装、冲突与删除、Codex/补充模型共同读取规范及验证命令；同步规范改为真实远端。公开AGENTS及薄封装仍是引擎工作区独立的待提交改动，本轮不推送引擎库；新机文档提供直接从RAEngine根调用local/scripts的兼容方式。机器配置、同步状态、临时证据、缓存和正式媒体仍排除，当前16个skills/agents内容一致。
+
+## 双 Git 协作资料同步（2026-10-29）
+
+工程停止坚果云同步，`local/` 已初始化为独立私有 Git（main，无远端，尚未提交／推送）；公开引擎继续整体忽略 local、运行 skills 与角色。用户明确允许公开通用调用入口，因此根 AGENTS.md 改为轻量入口，完整原规则移至 local/docs/AgentEntry.md；公开 scripts/Sync-Workspace.ps1 只派发到私有同步工具。原 `.agents/skills/`、`.codex/agents/` 调用位置与名称保留，在 RAEngine 根继续使用。
+
+私库 docs 直接维护，workspace 镜像显式清单中的16个skill/agent文件；Status/Collect/Install与WhatIf可用。基线哈希检测单侧、双侧、缺失和首次冲突，批次预检、写入复核、独占同步锁、原子单文件发布；不传播删除，不处理用户级provider配置，不自动执行Git网络操作。机器写作路径已迁移到私库也忽略的 machine/Paths.md；原外部文章未移动。Codex与DeepSeek共用AgentDevelopment、WorkspaceSync与ZhihuSeries §9.4，不另建模型专属进度。位置/提交规范与context/devlog技能引用已同步。
+
+PowerShell 7与Windows PowerShell 5.1隔离测试各59项通过。公开入口额外验证：缺私库明确失败且不写文件，Install预演不创建运行文件，新工作区安装16文件哈希一致、公开AGENTS不变、父Git不列出私有路径、冲突错误码正确透传。当前16文件Status全部Synced，关键入口/技能相对链接可达，疑似凭据模式扫描无命中。测试证据 `local/maintenance/workspace-sync/entry-validation.txt`；临时测试目录只在本机。未构建引擎，本轮只改同步工具与规范。私库未配置GitHub remote，用户将创建空的Private仓库；绑定/首次提交/换机步骤见WorkspaceSync。
+
+## 硬件光追画质反馈与约束调整（2026-10-29）
+
+用户截图反馈红球与蓝方块缺少颜色联系，并确认硬件光追可放宽实时要求、优先真实光照。源码复核：当前是真实DXR求交，但间接漫反射只取程序化Environment，无场景漫反射GI／颜色溢出；反射为单理想方向＋粗糙度压权、仅一次命中着色，无随机采样／历史累积／降噪，等待不会收敛。此前48次dispatch／零错误／低粗糙高金属反射测试不能证明GI或粗糙反射物理正确。截图不能独立确认运行中的反射开关与草稿参数；饱和红蓝互相吸收亦需考虑，颜色溢出验收应包含白灰接收面。
+
+已将硬件模式画质优先、可放宽最终画面逐帧完成但仍自动响应调参记录到公开渲染要求；当前缺口补充到HardwareRayTracing。渐进式路径追踪（漫反射／粗糙镜面采样、反弹、累积、历史失效、后续降噪）作为建议路线，尚未实施或承诺具体采样预算。本轮仅答疑、源码与Epic官方资料核对和需求文档更新，没有修改运行时代码、构建或GPU测试。UE官方区分实时硬件光追与Path Tracer；噪点不是硬件光追定义。
+
+## 硬件光追与项目配置（2026-10-29）
+
+已实现独立同适配器 DX12／DXR1.1 RayQuery 通道，与 DX11 编辑器通过共享 RGBA8 图像及双向 fence 组合。全部可见网格构建 GPU BLAS／TLAS，几何缓存、平滑法线、镜像／双面和只读材质草稿生效；工程材质、光照、曝光、Debug 共用源码。主可见性、一次反射和方向光硬阴影已实现；工具预览继续光栅，非完整 DX12 后端切换、非路径追踪，其他 OS/API 尚未实现。技术契约见公开 HardwareRayTracing 文档。
+
+新增 Project → Project Settings... → Rendering 导航，移除顶部 Ray tracing 复选框，F3 打开配置。总开关／反射／阴影实时生效，能力／请求／实际状态分开显示；显式 Save project settings、Save All 和退出提示支持保存。可选 rendering 对象兼容 v1/v2/v3，严格 bool，原子更新保留未知字段与失败原文件。缺失 DXC 保留请求并显示原因。光栅专属导数材质在硬件关闭时仍可更新，硬件管线明确禁用，修复源码后恢复。
+
+验证：CMake Debug、Premake Debug 构建通过并复制匹配 DXC/DXIL DLL；CTest 6/6（包含 ProjectSettingsTests）通过。`artifacts/hardware-rt/final-debug/` 专项实测 RTX5060，48 次真实 DXR dispatch，GPU 像素、效果开关、实时参数／草稿、几何／空场景、双面／镜像、resize／前后向、热编译失败回退、相对／嵌套include及真实 Project 配置交互保存重载全部通过，图形错误0。配置截图已检查。完整编辑器回归 `artifacts/hardware-rt/editor-verified/` 退出0、D3D11错误0；发现并修正既有材质拖放测试选中被新版资产隐藏的旧 .ramat，选择可见 .rasset，用户资产未改。缺失DXC的隔离程序验证 `artifacts/hardware-rt/unavailable/` 退出0，硬件执行明确SKIP、dispatch0、配置请求保存与回退通过；不冒充硬件执行。
+
+安装包专项 `artifacts/hardware-rt/installed/` 同样通过48次DXR执行、错误0，验证分发的Shader与DXC/DXIL DLL。常用Premake Debug主程序已更新，显式执行 Validate-Render.ps1 于隔离工程，14帧图像比较全通过、D3D11错误0，证据 `artifacts/hardware-rt/raster-regression/`。没有Release或其他平台运行声明。
+
+首次验证发现HLSL保留字triangle和共享图像缺少render-target标志，均修正。独立审查修正fence旧事件误唤醒及关闭硬件时不应限制已有光栅材质。FXC不支持宏形式include，最终验证使用共用语言支持的字面量相对／嵌套include，未扩展预处理语义。过程与原始失败保留在 `artifacts/agent-tasks/hardware-ray-tracing.md`。本轮未提交，既有Sandbox/材质拖放/PBR-NPR未提交工作保留；AI/进度/截图仍只在本地忽略目录。
+
+## 诊断功能有序提交（2026-10-29）
+
+按用户授权仅提交本聊天的 Diagnostics，依赖顺序为：`50964d8` Core CPU Trace与主循环插桩；`c9342be` GPU计时、冻结捕获与Shader诊断；`5c23e42` Debug菜单、Profiler/Frame Inspector和视口键盘归属；`3f497f3` GPU/编辑器诊断自测及隔离Project验证入口；`5a5a729` 公开技术文档与Diagnostics白名单。当前master为5a5a729，未推送。下文“未提交”保留交付时状态，以本节为准。
+
+29个公开路径，索引最终tree `50cfd2ea7e004d3f43ddd7677572c89a98b0dc9a` 与隔离构建/运行的候选完全相同。共享文件按代码块排除材质拖放与PBR/NPR文档任务，未改工作区文件；提交前后35个修改/新文件原始字节SHA256全部一致。原Sandbox场景、4个未跟踪材质、材质拖放源码/测试/文档和PBR/NPR文档均继续留在工作区；暂存区空，本地AI/进度/截图/配置没有进入提交。
+
+排除其他任务后的源码独立导出至 `artifacts/diagnostics/commit-source/`：Debug构建退出0无warning/error，5组CTest退出0，完整编辑器自测退出0且D3D11 debug layer enabled/errors0。诊断原值、各通道、捕获冻结、双主题/300px和快捷键隔离均通过。证据 `artifacts/diagnostics/commit-build.log`、`commit-cpu-tests.log`、`commit-editor.log`；候选、分组blob、提交patch与提交号在 `commit-preparation/`。69个公开文档文件链接检查通过，未收录其他任务的新增说明。用户bin进程未关闭或覆盖。
+
+## 渲染长期目标确认（2026-10-29）
+
+用户明确最终目标为 PBR 与 NPR 两套渲染体系，允许部分管线共用，同时保留 Feature 差异。已写入公开 RenderingDevelopment 的“双体系目标”，Architecture 与 README 只保留目标摘要和链接；后续渲染方案须据此评估共享基础、专属材质／Pass／Feature、依赖和禁用边界。PBR／NPR、Forward／Deferred 与图形 API 是不同选择维度；具体特性清单、材质格式、选择粒度及同场景混合能力仍待设计。
+
+本轮只记录目标和架构约束，没有实现 NPR 或新增渲染开关，没有构建／GPU 测试。现有 PBR 着色基础和编辑器 outline 不作为完整双体系或 NPR 艺术描边的交付证据。本地进度继续忽略，公开文档不包含协作日志。
+
+## 统一诊断工具首版（2026-10-28）
+
+按用户确认的“方案加首版可用功能”完成 Profiler / Trace、Frame Inspector 和 Viewport Debug。统一技术契约与后续范围见公开 [Diagnostics.md](../../docs/Diagnostics.md)，任务/文件归属和原始证据见 `artifacts/agent-tasks/engine-diagnostics.md`。当前未提交。
+
+Core 提供线程安全、有界嵌套 CPU Trace、Frame ID、120帧 wall time 历史和 Chrome JSON 导出；DX11 提供异步 GPU Pass 计时与原采样帧标识。Debug 工具窗可停靠/关闭，支持录制、停止、清空、原生另存为。Frame Inspector 捕获下一有效主场景的事件和独立 SceneColor/Depth，Deferred 增加三张真实 GBuffer；RGB/R/G/B/A转换、显式raw像素和仅元数据JSON导出可用。单套捕获与显示缓存限256MiB，候选/旧图安全退役会暂时额外占用。工具预览不消费捕获；resize、热编译、下一帧不改旧快照。
+
+视口新增 Roughness、Metallic、Specular F0、Linear depth、Direct diffuse/specular；F0为材质模型派生反射率，不是新增Specular参数。数据视图不受曝光影响，直射贡献按现有显示变换输出。Apply补齐全部八个Shader候选发布，失败保留原活动版本。Diagnostics同帧焦点抑制视口F/W/E/R/Space及全局场景快捷键。
+
+CMake Debug最终构建成功无警告；5组CTest全通过（TraceProfilerTests实际19项检查）；完整编辑器自测与Validate-Render退出0，D3D11 debug layer enabled、errors=0。GPU原值、25种资源/通道显示、双管线模式5–10、草稿实时反馈、冻结跨preview/resize/Shader成功失败、异步GPU身份通过；Record/Stop、raw读取、双主题、300px窄窗和场景/Undo不变通过，最终截图已人工复核。证据 `artifacts/diagnostics/final.log`、`final/diagnostics/diagnostics-report.json`、`render-validation.log`、`cpu-tests.log` 和 `build-final.log`。
+
+测试使用HEAD导出的独立Sandbox与独立布局；27个预存工程/材质/Engine Content/材质Shader文件哈希不变，原Sandbox场景与4个未跟踪材质保留。初次测试模块构建的Windows near宏及ImVec2算术问题已修；前三轮GUI验证错误来自页签切换下一帧生效的测试假设，最终用稳定帧与文本日志定位修正，失败日志保留。原有材质投递等任务的工作区改动均保留，最终完整自测也覆盖其合并后路径。
+
+仅Windows/DX11有运行证据；Trace JSON不含GPU计时，帧JSON不含图像或重放。离线完整帧、逐Draw输出/重放、Pixel History、Shader单步、AO/阴影/其他材质与成本诊断按文档后续设计推进。两个新增原生导出对话框未单独做桌面自动化，导出API及真实JSON已验证。Premake生成成功；当前用户仍运行bin的旧EXE，未关闭或覆盖，本次可执行产物为 `build/cmake-vs2022/Debug/RestArtEngine.exe`。
+
+## Content 材质拖放赋予 Actor（2026-10-28）
+
+已实现从 Content List/Tiles 拖动 Project/Engine 材质到 Scene Viewport：按最近可见三角面命中实例，悬停只用既有 outline 标识当前目标，保留 Actor 选择；目标提示独立于选中描边开关并保持颜色/粗细，结束恢复偏好。释放只改目标 Actor 的 materialId，单条 `Assign Material` Undo/Redo；同ID、Esc、空白、工具栏与视口外取消不产生历史。共享 Mesh/材质资产与其他实例不变，场景保存持久化引用。
+
+本轮生产代码初次共享CMake Debug构建通过；后续工作区另一聊天并发加入诊断系统，未完成文件暂时阻断共享CMake生成，因此最终验证使用 `artifacts/material-drop/source/` 中的 `812c513 + 本任务源码` 独立快照。快照Debug构建成功，完整编辑器自测退出0、D3D11 errors=0；真实 Engine Grid/Project List、目标切换与GPU描边像素对照（关闭选中描边仍提示）、最近命中/实例隔离、保存重载、Undo/Redo/no-op与取消全部通过，原Mesh拖放/Alt复制/材质/布局回归通过。实际检查悬停与赋值截图。日志/截图 `artifacts/material-drop/run2/`，源码清单和构建隔离过程见 `artifacts/agent-tasks/material-drop.md`。
+
+自测重复拖同卡片曾被固定帧时钟识别为双击，修复测试按ImGui实际双击窗口推进帧，并增加非双击断言，未改生产双击行为。保护清单65文件中 Projects、assets、Engine Content及用户4个未跟踪材质哈希不变；唯一变化为另一任务负责的 `Shaders/Private/Scene.hlsl`，本轮未写Shader。未关闭用户bin进程或覆盖bin产物。公开EditorGuide/GuiDevelopment/UndoTransactions同步；本轮未提交。独立快照通过不代表并发诊断系统的合并后构建已验收；弹窗/浮窗遮挡沿用接收区保护，未新增专项GUI投递用例；其他平台未测。
+
+## 提交同步（2026-10-28）
+
+用户授权后按依赖和领域完成4个提交：`25e1c0b` 渲染预览隔离与材质ID修复；`9d0f194` Engine Content、资产加载/保存/复制与CPU测试；`960c1e9` Content交互、拖入场景、类型颜色、默认开启的负轴提示配置与编辑器回归；`812c513` 公开技术文档同步。当前HEAD为812c513，未推送。提交仅收录31个公开路径，原Sandbox Default.rascene修改及4个未跟踪材质均未提交且哈希不变；本地AI/进度/日志/截图未进入提交。下面“未提交”是实现交付时状态，以本节提交记录为准。源码未在提交环节改变，沿用verified2完整自测、两套CPU测试和Debug构建证据。
+
+## Engine Content 与默认材质（2026-10-28）
+
+已实现引擎根 `Content/Materials/DefaultMaterial.rasset`（中性灰、固定ID、64px缩略图），与Project Content分源挂载。新Actor默认引用引擎材质；New material继承默认参数生成项目GUID；旧Actor/项目材质保留。engine://浏览键支持来源导航/搜索/Details/只读提示，Copy to Project只保存单个新资产并选择副本，不自动改Actor引用。运行时来源由loader赋予，保留ID冲突拒绝；项目save排除engine，reload保留engine，v1/v2/v3场景兼容。GPU工具预览对clean/只读材质也持续存在；scene draft override语义保持不变。
+
+CMake Debug、EngineContentTests 59项和ContentBrowserTests通过；CMake安装后的Engine Content再次通过59项测试，Premake生成成功。最终完整编辑器自测退出0，D3D11 errors=0，新增真实只读/复制/保存操作、旧Content拖场景/撤销/Alt复制/材质/布局回归通过，截图检查完成。证据与中间失败处理见 `artifacts/agent-tasks/engine-content.md`，最终日志/截图为 `artifacts/engine-content/verified2/`。64个既有Projects/Shaders/assets文件前后哈希不变，原未提交工程和4个材质保留。
+
+最终Premake Debug常用bin主程序也已构建成功、无警告，日志 `artifacts/engine-content/premake-build.log`；CMake install刷新为最终构建。
+
+公开技术说明同步Architecture/AssetFormat/EditorGuide/GuiDevelopment/EngineDistribution/README；根Content是可公开发行资产，位置规范已同步RepositoryPolicy/LocalDevelopmentGuide，AI/日志/截图依旧本地忽略。首期只分发默认材质；内置网格仍走项目生成兼容路径。没有宣称引擎mesh/纹理/插件挂载、Release或其他平台已验证。本轮未提交。
+
+## Content Mesh 拖入场景（2026-10-28）
+
+按用户澄清实现从 Content 将物体拖入场景，未扩展目录迁移或新的物体移动方式。List/Tiles 共用现有路径payload，视口接收本帧图像区域（排除工具栏、遮挡窗口和弹窗）；拖动显示包围盒与接触点，最近可见三角面/未命中时Y=0地面，bounds支持偏移；释放创建一个Actor、选中Details、一条Place Mesh撤销/重做。Esc统一清payload并抑制source至释放；无效资产/落点给提示，拖动不抢相机/Gizmo/pick。场景选中描边borrowed span改在全部选择编辑之后绑定，避免新选择扩容失效。
+
+最终 Debug 构建退出0、无编译警告；两轮完整编辑器自测均退出0，新增真实Grid/List投递、表面/地面高度、释放前不创建、Details、Undo/Redo、Esc/outside/toolbar/Material拒绝及camera输入隔离通过，原Gizmo/Alt复制/材质/布局回归通过，D3D11验证错误0。最终实际截图已检查预览包围盒/落点/提示与放置选中效果，证据 artifacts/content-scene-drag/final/smoke.log 和同目录 PNG；测试跑在HEAD导出的独立工程副本（自测再次临时复制）、独立布局目录，21个原始工程/Shader文件哈希前后相同。导入偏心mesh、倾斜/负scale投递表面、浮窗遮挡/popup尚未单独新增拖放用例，不外推为逐项运行验证。
+
+本轮未关闭用户进程或覆盖bin产物；新产物为build/cmake-vs2022/Debug/RestArtEngine.exe。公开EditorGuide/GuiDevelopment/UndoTransactions同步；已有其他任务未提交改动及4个未跟踪材质容器均保留，本轮未提交。任务归属和初始差异备份见 artifacts/agent-tasks/content-scene-drag.md。
+
+## Gizmo 负方向提示可配置（2026-10-28）
+
+按用户后续要求，将上一节的固定关闭改为 UiPreferences.gizmoNegativeAxisHints，按用户最新要求默认 true。UI 菜单新增 Gizmo negative-axis hints 勾选项，即时切换并写入 RestArtEngine.ui.ini 的 gizmo_negative_axis_hints=on/off；旧文件缺项默认开启，已有显式开关选择保留。移动／缩放仍使用 ImGuizmo 的轴向和命中逻辑，开启采用原生 6px 条纹，关闭为 0。
+
+独立 Debug 构建已通过，证据目录 artifacts/gizmo-axis-preference/。自测已覆盖旧配置默认值、开／关保存读取及开关实际改变 Gizmo 图像；完整编辑器自测退出 0，移动／旋转／缩放／Alt 复制和撤销回归通过，D3D11 验证错误 0。实际截图确认 UI 菜单入口可见。继续保留用户运行中的 bin EXE，测试使用独立输出、工作目录和临时 Sandbox 副本。公开 GUI／操作／架构说明同步，不提交本地偏好或证据。
+
+## Gizmo 负向轴条纹关闭（2026-10-28）
+
+用户截图中的红黑虚线来自 ImGuizmo 的 DrawHatchedAxis：坐标轴自动翻向负方向时叠加黑色线段。引擎 ViewportInteraction 在绘制前设置 HatchedAxisLineThickness=0，移动／缩放轴改为连续实线，保留翻转和变换逻辑，vendor 未改。GUI 规范已同步。
+
+当前交互引擎进程占用 bin 下的 Debug EXE，常规链接报 LNK1104；保留用户进程，用 MSBuild OutDir 构建到 artifacts/gizmo-solid-axes/runtime，构建退出 0。自测使用隔离 Sandbox 夹具和独立工作目录，证据在 artifacts/gizmo-solid-axes/debug；反向观察截图已确认无条纹，完整编辑器自测退出 0，移动／旋转／缩放／Alt 复制与撤销回归通过，D3D11 验证错误 0。原 bin EXE 未更新，用户关闭后重新构建启动生效。
+
+## Content 类型色（2026-10-28）
+
+本轮在上一轮 Content 优化基础上增加类型色：Mesh 蓝 `#50B2EB`、Material 绿 `#64CD85`、Scene 琥珀 `#EEAF4F`、Shader 紫 `#B891EF`，Unknown 灰。统一入口为 `src/ImGui/EditorTheme.cpp` 的 `assetTypeColor`；卡片底条、列表左标、类型文字、筛选项和无预览图标共用映射。实际缩略图、材质数据和主题选中反馈保持原语义；未增加逐资产颜色编辑器。
+
+Debug 构建通过；最终完整编辑器自测退出 0，D3D11 错误 0。实际复核 Black／Dark Blue 四类型同屏卡片、列表与场景详情；最终证据见 `artifacts/content-asset-colors/final/smoke.log`。测试使用独立 HEAD Sandbox 夹具、独立工作目录和临时工程，夹具额外添加 Shader 显示样本；Projects／Shaders 27 文件哈希不变。GUI 规范与 EditorGuide 已同步。截图、进度仅本地，源码未提交。
+
+## 当前接续：Content 浏览器优化已实现并验证（2026-10-28）
+
+基于 `daa8859` 的工作区改动，未提交。详细行为、证据和剩余范围见 [Content 交付记录](ContentBrowser-2026-10-28.md)。已完成 UE 式 Sources／导航／搜索／筛选／Asset View、响应式卡片与列表、焦点隔离、递归资产加载和 GUID 文件路径保留、v3 初始化顺序、任意材质 ID 与独立预览纹理。
+
+Debug 构建、CPU 65 项检查、最终完整编辑器自测通过，D3D11 验证错误 0；实际检查双主题、低高度与 440px 浮窗截图。Projects／Shaders 27 文件前后哈希一致，4 个预存未跟踪材质保留。符号链接测试因系统权限跳过；Release／其他平台未测。
+
+P02-01～04 已有对应实现与定向运行证据；P02-07/08/09部分改善，详见交付记录。下一优先项仍为描边 Shader 热更新发布、Save As 资产闭环、普通保存刷新 sidecar；本轮没有扩展为完整 UE 资产管理器。公开说明、本地进度和 GUI 技能已同步，AI／日志材料继续仅本地。
+
+## 当前接续：DevLog02 标签后完整审计（2026-10-28）
+
+基线 `DevLog02(cc68a1b)..daa8859`，49个提交（不是下面资产子阶段的18个）。完整逐提交表、源码结论、经验和待办见 [标签后工程审计](DevelopmentChanges-AfterDevLog02.md)。截至本轮起始HEAD与origin/master一致；四个未跟踪Sandbox材质容器保留。本轮仅同步文档/技能，没有重建或运行引擎。
+
+已实现：选中描边与G/H、Scene/Details职责调整与眼睛撤销、双窗口启动、Premake运行配置、Content文件夹/List/Grid/资产详情、GUID `.rasset`/场景v3、CPU缩略图与GPU工具预览、自测临时工程隔离。
+
+优先待办为审计表P02-01～05：非1号材质球预览、同帧多窗口纹理生命周期、v3导入网格首次启动、材质子目录加载、描边Shader热更新发布。P02-06～13覆盖Save As资产落盘、sidecar刷新、取景限幅、测试盲区、隔离边界、原子保存、Rider/画面验收和旧样例问题。源码明确的缺口与尚待运行复现的风险已分开；未在本轮实现修复。
+
+历史PASS叙述不升级为本轮运行结果；现存临时截图只能证明对应画面。13个示例JSON本轮解析仍有RayTracing_Simple五个材质失败。检查结果见 `local/maintenance/devlog02-catchup/checks.json`。下文按日期保留历史状态，若与本节和新审计冲突，以新审计为当前口径。
+
+补充模型使用共同的本地进度/经验/技能体系，未发现独立项目内文档目录；不读取服务配置。DevLog03尚未开始，DevLog02的发布日期/链接与播放验收仍待回填。公开技术文档同步行为，本地规范、经验、任务管理和写作资料继续忽略。
+
+## 文档 / 技能同步审计（2026-10-28）
+
+原资产子阶段审计范围：包含两端的 `d3ea6d2^..98af7ea`，18个提交；它不是DevLog02标签后完整范围。完整49提交审计见页首，原记录中的完成与验证结论按当时取样保留。
+
+**已修正的过期事实**
+
+- `docs/AssetFormat.md` 从“设计提案、尚未实现”重写为已实现状态：容器/GUID/材质与网格资产/内置图元/缩略图/场景 v3/旧格式兼容；清单示例改为真实字段（16 位十六进制 GUID、`rgba8` 缩略图）；场景 v3 示例区分“JSON 数值 ID”与“容器十六进制”；新增 `<scene>.rthumb` sidecar 格式；迁移步骤与未决项按实际实现重排（纹理、压缩、原子保存仍未做）。
+- `docs/Architecture.md`：场景持久化改为 v3 GUID 引用 + v1/v2 兼容；材质改为 `.rasset` 容器并说明旧 `.ramat` 不删除；资产目录树、AssetRegistry 缓存字段与场景 sidecar 缩略图同步；删除“统一资产格式尚未实现”。
+- `docs/GuiDevelopment.md`：面板职责补 Content 浏览器与 `Asset Details`；新增“资产浏览与详情窗口”和“证据边界”两节，记录网格单元格尺寸、`Selectable` 忽略高度、独立 OS 窗口不能进自测截图等经验；测试要求补充临时工程副本。
+- `docs/EditorGuide.md`：Content 面板说明、场景缩略图来源、材质保存路径（`.rasset`，旧 `.ramat` 保留）、资产浏览能力边界同步。
+- `README.md`：示例工程目录树、材质保存磁盘列、文档索引（补 `AssetFormat.md`）。
+
+**技能同步（可复用经验，不复制进度快照）**
+
+- `restarengine-gui`：资产浏览器与详情窗口规则（网格尺寸、双击语义、`Open` 与 `Details...` 区分）；证据边界（独立窗口截图、测试不得写用户工程）。
+- `restarengine-rendering`：离屏工具预览约定：必须 `offscreenTarget=true`（只关 `editorViewport` 会画到交换链）、预览借用场景目标角落再复制、用 staging 回读验证。
+- `restarengine-delivery`：测试必须在临时工程副本上跑、夹具每轮清理、MSBuild 串行避免 tlog 锁；兼容路径示例（`.rasset` 不删 `.ramat`）。
+- `restarengine-core`：阶段收尾同时同步领域文档、进度索引和可复用技能经验。
+
+**实现修正**
+
+- `--editor-self-test` 现在把工程复制到 `%TEMP%/RAEngineSelfTest-<pid>` 再运行，退出时删除；验证 Sandbox `Content/**` 的 SHA256 前后一致、无残留临时目录。此前自测会对用户工程执行 `Save All`，是 `.ramat` 被转换/删除事故的根因。
+
+**仍未完成 / 待决**
+
+- 纹理载荷、数据块压缩、保存原子替换（当前直接覆盖写）、`--dump-asset` 调试工具。
+- DevLog03 尚未开始；本阶段素材与证据尚未整理成文章。
+- `Projects/Sandbox/Content/Materials/*.rasset` 是事故遗留的未跟踪文件，是否并入工程需用户决定。
+
+
+## 网格视图显示资产名（2026-10-27，提交 f86b357）
+
+用户反馈网格缩略图下方应显示名字。
+
+- 网格单元格文字用 `ImDrawList::AddText` + 裁剪矩形绘制在缩略图下方，居中，超宽截断并保留完整名 tooltip。
+- 单元格尺寸改为 `clamp(内容区高度 - 8, 64, 96)`：内容面板较矮时缩小格子，避免名字被面板底边裁掉（之前 96px 固定导致文字落在裁剪区外）。
+- 顺带修测试：`SceneV2RoundTrip` 临时目录每轮开始先 `remove_all`，避免上一轮遗留的旧 `.raasset` 让 `ensureBuiltinMeshes` 跳过生成 `.rasset`，导致 Release 下 `copy_file` 找不到文件。
+
+验证：Debug/Release 自测通过，截图确认 Cube / Plane / Sphere 名称居中显示在缩略图下方。
+
+
+## 可交互材质球 + GPU 场景缩略图（2026-10-27，提交 2062c35）
+
+- 材质预览支持轨道相机：`renderMaterialPreview(material, size, yaw, pitch, distance, error)`，旧三参数签名保留为默认视角包装。编辑器里 160px 预览改成 `InvisibleButton` + 拖拽/滚轮/双击；左键拖拽改 yaw/pitch（pitch 限制 ±1.4）、滚轮改距离（1.6–8）、双击复位；相机变化立即重渲，其余仍走 150ms 节流。
+- 场景缩略图改为 GPU 真实渲染：`renderScenePreview(world, assets, size)` 用可见 Actor 顶点的世界包围盒自动取景（中心 + 半径 ×2.6），走同一个离屏预览目标；保存场景时渲染 128px 并写 `<scene>.rthumb`（magic `RTHB` + 版本 + 宽高 + RGBA），路径已加入 .gitignore。
+- Content 浏览器对 `.rscene` 优先读 sidecar，缺失时回退到 Actor 布局的 CPU 缩略图；这样没保存过的场景仍有预览。
+- 抽出 `renderPreviewFrame`（建立/复用预览纹理 + 渲染 + region 拷贝）供材质与场景复用。
+- 修复 `readSceneThumbnail` 先 `valid()` 后 `resize` 的顺序错误（64×64 却判为非法尺寸）。
+- 测试：旋转相机后预览像素不同；场景预览亮像素 > 100；sidecar 写入/读回一致。
+
+验证：Debug/Release 0 warning，两配置自测通过。
+
+
+## GPU 离屏材质球预览（2026-10-27，提交 0f8cdac / fdc49b5）
+
+用户三项中的第三项完成。
+
+- `SceneSettings` 新增 `offscreenTarget`：把绘制定向到场景目标而不是交换链，同时保留 `editorViewport=false`（不跑 outline、不切回背缓冲）。之前只改 `editorViewport=false` 会画到交换链，`sceneTarget` 只剩清屏色，读回才会是 (6,9,14)。
+- `SceneRenderer::renderMaterialPreview(material, size, error)`：复用一个单球 Actor 的临时场景 + `defaultAssets` 副本，固定相机（yaw 0.65 / pitch 0.18 / distance 3）、Forward、关闭光追与阴影，渲染 64–160px 后把 region 复制到独立 `previewTexture`。
+- `readMaterialPreviewPixels`：staging 纹理回读，供测试断言颜色。
+- 材质编辑器顶部显示 160px 预览，参数变化立即重渲、否则每 150ms 一次，避免每帧渲染。
+- 测试：红/绿草稿球体中心像素分别以红、绿为主，证明预览确实使用草稿参数；Debug/Release 0 warning，D3D11 校验错误 0。
+
+已知限制：材质编辑器是独立 OS 窗口，`--editor-self-test` 的主窗口截图不包含它，所以证据用像素回读而不是截图；预览借用场景目标的一个角落，主渲染随后覆盖，属于一次 64–160px 的额外小渲染。
+
+
+## Content 网格视图 + 场景缩略图（2026-10-27）
+
+两项已落地，第三项（GPU 材质球预览）单独下一轮。
+
+- 网格视图：Content 工具栏新增 `List` / `Grid`；网格用 84px 单元格，手动定位（`Selectable` 会忽略高度参数，不能依赖 ImGui 光标推进），显示放大缩略图、悬停显示名称，支持拖拽、右键菜单、双击打开。
+- 场景缩略图：`.rscene` 是 JSON，不存图片；`AssetRegistry` 扫描时按 Actor 的 position/scale/meshId 生成 4 色方块布局图（固定 35° 偏航、画家排序），无需 GPU 也无需额外文件。`renderSceneThumbnail` 放在 `AssetThumbnail`，输入是 `ScenePreviewBox` 列表，不依赖 Scene 模块。
+- 测试：Content 网格截图、Scenes 文件夹网格截图、`Scenes/Default.rscene` 注册表条目缩略图有效。
+- 已知不足：场景缩略图是方块示意而非真实渲染；网格单元格没有内嵌名称（悬停才显示），因为子面板高度不足时文字被裁切。
+
+
+## 资产后缀改为 .rasset（2026-10-27，提交 ecace7c）
+
+用户觉得 `.raasset` 重复，统一改成 `.rasset`。
+
+- 全仓库替换扩展名字面量与文档；新增 `isAssetContainerFile()`（`kAssetExtension = ".rasset"`、`kLegacyAssetExtension = ".raasset"`），所有加载入口用它判断，因此旧的 `.raasset` 文件仍可只读加载；保存一律写 `.rasset`。
+- 本地生成的 `Content/Meshes/Builtin/*.raasset` 清掉后重新生成为 `.rasset`（生成物、gitignore 目录）。
+- 测试新增一条：把 `Cube.rasset` 复制成 `Cube.raasset`，`loadMeshes` 仍能读入并覆盖内置网格；其余路径字面量同步更新。
+
+验证：Debug/Release 0 warning，两配置自测通过。
+
+
+## 资产缩略图（2026-10-27，提交 4e86dd3）
+
+用户要求的第二步：给 `.raasset` 加缩略图并在 Content 面板显示。
+
+- `assets::renderMeshThumbnail` / `renderMaterialThumbnail`：CPU 光栅化 64×64 rgba8，不依赖 GPU/编码器。网格按**最大两个轴向**正交投影（解决地面 Plane 投影成一条线的问题），带 z-buffer 与 lambert；材质是着色球（roughness/metallic 参与高光）。
+- 容器：`attachThumbnail` 把像素追加到数据块区并在清单写 `thumbnail{offset,size,width,height,format}`；`extractThumbnail` 校验范围；`readAssetThumbnail` 只按偏移流式读取缩略图，不加载几何。
+- 保存：材质与网格写盘时自动附带缩略图；内置图元若文件缺 `thumbnail` 会被 `ensureBuiltinMeshes` 重写补上（旧文件自动升级）。
+- 浏览器：`AssetRegistry` 扫描时读缩略图，`drawAssetRows` 用像素块直接绘制（约 20px），缺缩略图回退线框图标；新增 `selectContentFolder` 便于测试与面包屑。
+- 测试：材质/网格缩略图非空且尺寸正确、容器往返像素一致、磁盘文件可读缩略图、注册表对生成的 Builtin 网格能取到缩略图；截图确认 Cube/Plane/Sphere 三种预览形状正确。
+
+验证：Debug/Release 0 warning，两配置自测多次通过（期间出现过已知的材质窗口/像素对比时序抖动，重跑即过）。
+
+
+## 内置图元生成 .raasset（2026-10-27，提交 40c9b2a）
+
+用户要求的第一步：内置图元也生成 raasset；第二步缩略图留待下一轮。
+
+- `AssetLibrary::ensureBuiltinMeshes(folder, error)`：把非 `Imported` 的网格写成 `<名称>.raasset`，已存在同 id 文件则跳过；`loadMeshes` 遇到与内置同 id 的文件时用文件覆盖内置几何（导入网格重复 id 仍报错）。
+- 编辑器打开工程时生成到 `Content/Meshes/Builtin/`（`Sphere/Plane/Cube.raasset`），并把 `loadMeshes` 改为递归扫描；该目录是生成物，已加入 `.gitignore`。
+- 实测生成结果：Sphere 297 KB、Plane 704 B、Cube 1.3 KB；Content 浏览器里显示为 `Meshes/Builtin` 文件夹下的三个网格资产。
+- 测试：生成后文件数为 3、重复调用不产生重复文件、重新加载后内置网格顶点/索引数与程序生成一致。
+
+验证：Debug/Release 0 warning，两配置自测全绿。
+
+
+## 启动器窗口居中（2026-10-27，提交 a678dba）
+
+用户要求 launcher 保持原来的相对大小、在主屏正中间打开。
+
+- `runProjectManager` 原来用 `CW_USEDEFAULT` 创建 1080×720 窗口；改为 `primaryMonitorRect()` + `centredWindowRect(monitor, 1080, 720, false)`，尺寸不变只改位置。
+- 实测（2560×1440）：窗口 `1080×720`、左上角 `(740,360)`，即 `(2560-1080)/2`、`(1440-720)/2`，标题 `RestArtEngine | Project Manager`。
+- 文档 `docs/ProjectManagement.md` 补充居中规则。
+
+验证：Debug/Release 0 warning，Release 自测通过。
+
+
+## 网格资产化 + 场景 v3（2026-10-27，提交 9843248）
+
+用户确认继续后完成：网格也进入 `.raasset`，场景只留 GUID 引用。
+
+- 容器新增 `staticMesh`：清单存 primitive/vertexCount/indexCount/stride/indexFormat/bounds/blobs 偏移，数据块存 `MeshVertex` 顶点与 u32 索引；`makeMeshAssetFile` / `readMeshAssetFile` 负责往返，读取时校验 blob 范围与元素数。
+- `AssetLibrary::saveMeshes` / `loadMeshes`：只把 `Imported` 网格写盘，内置图元保持程序生成；按名称写 `<name>.raasset`，保存时删除同 GUID 的旧文件；加载保留内置并追加文件网格。
+- `World` 场景格式升到 **v3**：`materials`/`meshes` 都只写 `{"id":guid}`；v3 加载要求库中已解析全部 GUID，缺失时报「Scene references mesh N that is not loaded from Content/Meshes」；v1（内嵌快照）与 v2（材质引用 + 内嵌网格描述）继续可读。
+- 编辑器：`initialize`/`openScene` 先加载 `Content/Materials` 与 `Content/Meshes` 再读场景；`saveScene` 依次落盘材质、网格、场景；`importMesh` 现在解析 OBJ 后生成 GUID 并写 `Content/Meshes/*.raasset`，不再复制 `.obj`；Content 里双击网格会选中它供 `Add Actor from mesh`。
+- 测试：网格容器往返（3 顶点/3 索引）、v3 场景磁盘往返（材质 + 网格解析）、缺网格引用必须失败；既有 v1/v2 兼容用例保持通过。
+
+验证：Debug/Release 0 warning，两配置自测全绿；`Projects/Sandbox` 未改动。
+
+
+## 场景 v2：材质改为 GUID 引用（2026-10-27，提交 368fbca / 5ca9841）
+
+用户确认「没问题」后继续：场景不再内嵌材质快照，只保存材质 GUID 引用。
+
+- `World::save` 写 `version: 2`，`materials` 数组每项只有 `{"id": guid}`；网格描述暂保持内嵌（下一步迁 `.raasset`）。
+- `World::load` 同时接受 v1/v2：v1 走旧的内嵌快照（替换材质库），v2 用传入的库解析引用、缺失 GUID 明确报错「Scene references material N that is not loaded from Content/Materials」，成功时只替换网格、保留材质库。
+- 新增 `World::createDefaultScene(const AssetLibrary&)`：默认场景按库里材质名（Copper/Ground，缺省取第一个）生成引用，避免写死 1/2。
+- 编辑器 `initialize`：先 `loadMaterials(Content/Materials)` 再加载场景，然后重建 `AssetRegistry`；`saveScene` 先落盘材质再写场景，保证引用可解析；`createScene` 用库建默认场景。
+- 测试：v2 场景磁盘往返（材质文件→GUID 引用→重新加载）、缺材质时必须失败、编辑器用临时工程初始化 v2 场景（演员数量与注册表材质数）。
+- 过程中修正：`initialize` 一度被整段替换时丢掉了注册表扫描，已恢复。
+
+验证：Debug/Release 0 warning，两配置自测全绿；仓库内 `Projects/Sandbox` 未改动（测试全部在临时目录）。
+
+
+## GUID 身份 + `.raasset` 容器（材质先落地，2026-10-27，提交 fcbabd8）
+
+用户决定：先用 GUID，UE 的路径身份以后再说；材质并入 `.raasset`。
+
+- `assets::AssetFile`（`include/.../AssetFile.h`、`src/Assets/AssetFile.cpp`）：`RAAS` magic、版本、flags、manifest 长度、JSON 清单、数据块区；`readAssetFileHeader` 只读头与清单，`readAssetFile` 连数据块一起读，`writeAssetFile` 写临时布局并把 format/version/type/id/name 写进清单。校验：magic、版本范围、清单长度上限、截断、JSON 格式、GUID 十六进制。
+- GUID：`generateAssetId()` 64 位随机（0 保留），`assetIdText()` 16 位十六进制，`parseAssetId()` 反向解析；内存仍是 `AssetId = uint64`。
+- 材质持久化改为 `.raasset`：`AssetLibrary::saveMaterials` 写 `<名称>.raasset`（名称过滤非法字符），并删除同 GUID 的旧文件（改名后不留重复）；`loadMaterials` 优先读 `.raasset`，再兼容只读 `.ramat`（同 GUID 已被容器占用时跳过旧文件）。
+- `AssetRegistry` 对 `.raasset` 读清单得到类型/GUID/显示名，`.ramat` 仍走旧的头解析；Content 面板因此能直接列出新材质。
+- 场景**仍内嵌材质快照**，改为 GUID + 路径引用是下一步；文档已注明。
+
+验证：新增容器往返、损坏 magic 拒绝、材质载荷往返、注册表从容器读 GUID 四组断言；Debug/Release 0 warning，两配置自测通过。
+
+
+## Content 系统第一步：AssetRegistry + 文件夹浏览器 + 活动场景（2026-10-27，提交 d3ea6d2）
+
+按用户列的五点推进：先做 1（AssetRegistry）、4（文件夹树 + 拖动移动）、5（场景可切换），2（ID 策略）与 3（.raasset 格式）留待下一轮评审。
+
+- 新增 `assets::AssetRegistry`：扫描 `<项目>/Content/**`，按扩展名分类 `.rascene` / `.ramat` / `.obj` / `.hlsl|.hlsli`，缓存显示名、相对路径、文件夹、大小与材质 ID（只读 `.ramat` 头部，不解码几何）；`inFolder` / `find` / `count` 供 UI 使用。
+- 新增 `assets::moveContentEntry`：在 Content 根内移动文件；移动场景时重算 `sourcePath`（相对新目录），保证导入 OBJ 引用不断。
+- Content 面板改成浏览器：文件夹树（根 + 递归）、面包屑、资产行（自绘类型图标、名称、类型与大小）、拖拽到文件夹移动、右键 Open/Rename/Delete、`New folder`/`Refresh`；保留 `Scene mesh library` 供 `Add Actor from mesh` 使用。
+- 场景活动化：`scenePath_` 替代写死的 `project_.defaultScene`；支持打开（双击场景或 Scene 面板 `Open...`，有未保存改动弹确认）、`Save as...`、`New`（生成 `Content/Scenes/Scene[_n].rascene`），保存写入当前场景路径。
+- `.raasset` 只出设计提案：`docs/AssetFormat.md`（magic/版本/清单/数据块、payload 结构、迁移步骤、未决的 ID 策略），代码未实现，文档明确标注。
+
+验证：新增注册表测试（临时内容根：分类计数、文件夹列表、材质头解析、场景移动到子目录后仍能加载导入网格）；Debug/Release 0 warning，自测两种配置均通过；截图确认文件夹树、资产行与空文件夹提示。
+
+
+## HLSL 纳入 solution 便于 IDE 编辑（2026-10-27，提交 6a3c2b2）
+
+需求：shader 代码要出现在 sln 里，方便在 Rider / Visual Studio 直接编辑；不参与引擎编译。
+
+- premake（`RestArtEngine.lua`）在 `files` 中加入 `Shaders/**.hlsl`、`Shaders/**.hlsli`；premake 默认把 `.hlsl` 映射成 `FxCompile`（构建时会尝试编译），因此加 `filter "files:Shaders/**.hlsl or files:Shaders/**.hlsli" buildaction "None"`，生成结果是 `<None Include="..\Shaders\...">`，并在 `.vcxproj.filters` 里形成 `Shaders` / `Shaders\Materials` / `Shaders\Private` 分组。
+- CMake 侧用 `file(GLOB_RECURSE ... CONFIGURE_DEPENDS)` + `target_sources` + `HEADER_FILE_ONLY TRUE` + `source_group(TREE ... PREFIX "Shaders")`，VS / CLion 里同样可见。
+- `settings/` 是 premake 生成物、已被 .gitignore 忽略，所以提交的是生成脚本；本地已重新生成，`RestArtEngine.sln` 打开即可看到 `Shaders` 分组。
+- README 构建章节补了一句说明。
+
+验证：重新生成 solution 后 Debug 构建成功（0 warning），`--editor-self-test` 连续 3 次全部通过。
+
+
+## Activity 状态移入 Details（2026-10-27，提交 6e92804）
+
+用户指出 Viewport settings 底部的 Activity 状态信息应该放到 Details。已把 `SeparatorText("Activity") + message(status_)` 从 Settings 面板移到 Details 面板**顶部**（在 Actor 属性之前），原因是 Details 内容较长，放底部要滚动才看得到。射线追踪摘要仍留在 Viewport settings。
+
+顺带加固了材质拖拽用例：按下后若 `ActiveId == 0` 补一帧重按；失败信息补上 mouseDown / activeId / preview / step，便于下次直接定位。
+
+验证：Debug 连续 6 次、Release 1 次自测全部通过；基线（stash 本次改动）6 次也全过。此前偶发的 1 次失败属于输入注入时序抖动（材质拖拽/Discard 像素对比），本次改动前后均偶现，非本功能回归。
+
+
+## Outliner 行内垂直对齐修复（2026-10-27，提交 ecd90be）
+
+用户指出眼睛与右侧文字没有对齐。实测两个控件矩形后确认原因：`Selectable(..., ImVec2(0, eyeSize))` 的高度参数未按其值生效（实测 28px，eyeSize 只有 18px），文字在该矩形内垂直居中；而眼睛按钮只有 18px 且顶对齐，于是眼睛偏上约 6px。
+
+改法：先画 `Selectable`（名称、选中、右键菜单），用 `GetItemRectMin/Max` 取到 **真实行矩形**，再把透明眼睛按钮放到同一行左侧（`SetCursorScreenPos(rowMin.x - eyeColumn - 8, rowMin.y)`），高度取 `rowMax.y - rowMin.y`，图标中心取按钮矩形中心；行末用 `SetCursorScreenPos(rowStart.x, rowMax.y + ItemSpacing.y)` 推进下一行。右键菜单改用 `BeginPopupContextItem(label)`，与 Selectable 的 ID 一致。
+
+实测：图标中心 y=180，文字中心 y=179（同一次截图内测量），差值 ≤1px。Debug/Release 0 warning，两配置自测全绿。
+
+
+## Outliner 眼睛图标返工（2026-10-27，提交 773976d）
+
+用户看图后认为不对。定位到两个真实原因：
+
+1. 空心瞳孔在 16px 行高下无法成像，环和眼形糊在一起，还容易被看成「圆圈套圆圈」；放大预览好看、真实尺寸失效。
+2. 眼形用二次贝塞尔时，曲线只到控制点偏移的一半，实际眼高只有预期的一半，形状被压扁成接近圆形的一道缝；改用三次贝塞尔（控制点偏移的 0.75 生效）。
+
+最终方案：图标按 20px 渲染（`max(18, 文本行高 + 4)`），杏仁眼形 halfWidth 0.44 / bend 0.32 / 线宽 0.09×size，实心瞳孔 0.145×size，隐藏时叠加斜线；行高与图标同高，名称用 `Selectable(..., ImVec2(0, eyeSize))` 对齐。可见态描边透明度提到 0.85（`TextDisabled` 太暗，20px 细线看不清），隐藏态 0.55 并加斜线。
+
+`assets/icons/outliner-eye` 的 SVG/PNG、README 的几何与线宽说明同步为最终参数；20px 以下不再使用空心瞳孔写入规范。Debug/Release 0 warning，两配置自测全绿。
+
+
+## Outliner 眼睛图标定稿 + 图标资源规范（2026-10-27，提交 6c7771e / 802c6c7）
+
+- 用户选定方案 B：空心瞳孔、纯线框，隐藏状态加斜线。`drawEyeIcon` 改为线框实现（`AddCircle` 空心瞳孔替代 `AddCircleFilled`，线宽 `max(1.0, size*0.075)`，斜线 `±0.34/0.30 * size`），仍是 `ImDrawList` 过程绘制，任意 DPI 清晰。
+- 图标资源统一放到 `assets/icons/<area>/`：`outliner-eye/` 下是选定方案的 `eye_visible.svg`、`eye_hidden.svg` 与 32/64px PNG；`variants/` 归档 A–F 六版方案和对比图 `contact_sheet.png`。命名与绘制规范写进 `assets/icons/README.md`（24 viewBox、圆头线、`#E6E6E6`、透明底、必须提供可见/隐藏两态）。
+- 原 `local/assets/outliner-eye` 保留为本地工作副本，仓库内以 `assets/` 为准；`docs/GuiDevelopment.md` 增加图标目录说明。
+
+验证：Debug/Release 均 0 warning，两配置 `--editor-self-test` 全部通过（Release 无 debug layer），截图确认空心瞳孔与斜线效果、图标列水平居中。
+
+
+## Outliner 可见性小眼睛（2026-10-27，提交 7c87f76 / bae6db9）
+
+需求：大纲列表每个物件前加小眼睛，标示是否隐藏，并且可点击切换显示/隐藏。
+
+- 每行结构改为：透明 `Button`（`##visible<id>`，尺寸约一个文本行高）+ `SameLine` + 原 `Selectable`。眼睛用 `ImDrawList` 自绘：可见时画眼形（两段二次贝塞尔 + 实心瞳孔），隐藏时画同样眼形加一条斜线；悬停时颜色变亮并显示 "Hide actor"/"Show actor" 提示，光标切手型。
+- 隐藏 Actor 的名称用 `ImGuiCol_TextDisabled` 呈现，去掉原来的 " (hidden)" 文本后缀。
+- 新增 `SceneEditor::setActorVisible(id, visible)`：一次点击产生一条可撤销记录（`Show Actor` / `Hide Actor`），并置脏标记；Details 的 `Visible` 复选框改走同一入口，两处行为一致。
+- 用透明 `Button` 而不是 `InvisibleButton`，因为后者不是 nav item，测试无法通过 `GetID` 定位；透明配色同时保持视觉上只有图标。
+
+测试与稳定性：新增 Outliner 眼睛点击断言（点击后 Actor 隐藏、一次撤销恢复）。为消除既有渲染对比用例的时序抖动：`capture` 在视口矩形退化为 0 时最多重试 3 帧；forward/deferred 对比前增加一帧预热；Details 材质断言改为只在 `--- Assigned material` 到 `--- Mesh` 区间内匹配，避免被 Outliner 文本干扰。
+
+验证：Debug/Release 各跑 `--editor-self-test` 全部通过（Release 无 debug layer），三连跑无 flake；截图确认眼睛图标、隐藏斜线、变暗名称与提示。
+
+
+## Scene / View 面板再分（2026-10-27，提交 d55b9da）
+
+用户要求把 Viewport settings 里的「Scene 统计、Key light、Direct-light shadows（含阴影方式与说明）」移入 Scene；Exposure 保留在 View 侧，作为所有光照与后处理之后的最终提亮。
+
+- Scene 面板现在：Project、Content、Overview（Actor / Mesh / Material 数量）、Saved、Environment（Sky / Black）、Lighting（Key light，临时场景级，后续迁到 direct-light Actor component）、Direct-light shadows（阴影方式下拉 + 说明）。
+- Viewport settings 只剩 View 相关：Exposure（附「最终提亮」说明）、VSync、Reset camera、Analytic GPU rays 状态、Activity。
+- 抽出 `drawSceneLighting(settings)`，Scene 面板在 `drawScene()` 之后调用；阴影说明文案原样保留。
+
+验证：Debug/Release 构建 0 warning，`--editor-self-test` 全部 PASS，D3D11 validation errors 0；编辑器截图确认两面板内容已按预期分离。未验证：Scene 面板在 980px 窄宽度下需要滚动才能看到阴影方式（未单独截图）。
+
+## 启动窗口布局：加载页无边框 + 编辑器 80%（2026-10-27，提交 b446f64）
+
+用户要求加载页去掉外边框、放在主屏中央并占横向 28%，启动后的编辑器界面占屏幕 80%、同样主屏居中。按此前选定的 Route A（双窗口 + 重建交换链）实现：
+
+- `SceneRenderer` 改为 `D3D11CreateDevice` + `IDXGIFactory2::CreateSwapChainForHwnd`：设备与交换链解耦，`attachWindow` 只重建交换链和窗口尺寸相关目标，`detachWindow` 在旧 HWND 销毁前释放，避免 DXGI 释放已销毁窗口的交换链。
+- 启动分两阶段：`WS_POPUP` 无边框加载窗口（28% 屏宽、按 `load.png` 836×471 比例、主屏居中）承载加载页，完成时销毁；随后创建 `WS_OVERLAPPEDWINDOW` 编辑器窗口（80% 屏宽高、主屏居中、保留原生边框与自定义标题栏），复用同一设备与已编译管线。自测仍走固定 1440×900 单窗口，保证截图可比。
+- 期间定位到一个非死锁问题：编辑器窗口创建后没有 `ShowWindow`，看起来像卡死，实际是隐藏窗口；补上后一切正常。
+
+实测（2560×1440 主屏，Release 与 Debug 各跑一遍）：
+
+- 加载窗口 `716×403` @ `(922,518)`，`style=0x94000000`（`WS_POPUP|WS_VISIBLE`，无标题栏），约 400ms 时为 16:9 占位、700ms 已按图片比例修正。
+- 编辑器窗口 `2064×1191` @ `(248,124)`，`style=0x14CF0000`（`WS_OVERLAPPEDWINDOW|WS_VISIBLE`），客户区 2048×1152 即 80%。
+
+验证：Debug/Release 构建 0 warning，`--editor-self-test` 全部 PASS，D3D11 validation errors 0；编辑器窗口截图确认面板与新 Scene/Details 分工正常。未截到加载页画面（窗口存活约 1 秒且被前台浏览器遮挡，只记录了矩形与样式）。
+
+## Scene / Details 职责重分（2026-10-27，提交 cdff41e）
+
+用户指出 Scene 里的名称 / 可见性 / 变换 / Mesh 都是 Actor 属性，应全部放到 Details；Scene 只保留场景级参数。改动：
+
+- `drawInstanceDetails()` 接管 Actor 编辑：名称输入、`Visible`、Transform（保留原有 700ms 合并与取消逻辑）、Mesh / Material 下拉、`Edit assigned material`、`Assigned material` 实例按钮，以及只读的 Mesh 几何信息。
+- `drawScene()` 改为场景级：工程与 Content 路径、Actor / Mesh / Material 数量、保存状态、`Environment` 的 Sky / Black 背景（新增 `setSceneBackground()`，一次切换记一条撤销并标脏）。
+- 自测中所有原先按 `Scene` 窗口定位 `##actorName` 与 `Edit assigned material` 的用例改到 `Details`，并在需要时先切到 Details 页签；全部套件恢复通过。
+- 文档同步 `GuiDevelopment.md` 与 `EditorGuide.md` 的面板职责描述。
+
+验证：Debug / Release 构建通过（0 warnings），`--editor-self-test` 全部 PASS，D3D11 validation errors 0。未截图核对新面板的实际观感。
+
+## 编辑器选中描边（2026-10-26）
+
+用户要求选中物体显示屏幕空间外描边，并明确这是编辑器功能而非运行时功能。实现提交 `4f6f87f`（已推送），位置设计：
+
+- 独立通道 `SelectionOutlinePass`：`include/RestArtEngine/Renderer/SelectionOutline.h`、`src/Renderer/SelectionOutline.cpp`，不继续堆进 `SceneRenderer.cpp`。
+- 帧内顺序：场景着色（前向／延迟）→ 遮罩通道（只重绘选中 Actor，深度只读 `LESS_EQUAL`，被遮挡部分不外溢）→ 合成通道（屏幕空间膨胀 + alpha 混合）→ 编辑器合成场景纹理。
+- 编辑器只写入 `SceneSettings.outlineActors`／`outlineActorCount`（借用当帧选中列表）、`outlineColor`（主题强调色）、`outlineThickness`；运行时 `render(settings, error)` 不填这些字段，遮罩纹理首次有选中时才创建。
+- 着色器入口 `PSOutlineMask`／`PSOutlineComposite` 加在 `Scene.hlsl`，新增 `OutlineConstants`（b4）与 `outlineMask`（t5），反射校验表同步登记，热重载与失败保留沿用原流程。
+
+验证：Debug 与 Release 均构建通过；`--editor-self-test` 全部套件 PASS，D3D11 validation errors 0；自测截图确认描边完整贴合球体轮廓（主题强调色，2px）。过程中发现并修复一个真实缺陷：合成通道原先用视口局部 `Input.uv` 采样全场景遮罩，描边被缩放并偏移到视口左上；改用 `SV_Position × texel` 后贴合。
+
+未验证项：没有自动化像素断言（只有自测截图人工核对）；多选同时描边、150% UI 缩放下的表现未单独截图；只覆盖 Windows/DX11 与 Sandbox 工程。本轮未改动 Sandbox 资产；工作区里 `Projects/Sandbox` 的 5 个既有改动（`twoSided` 与场景内容，22:29 早于本任务）不属于本次提交，保持未提交。
+
+### 描边设置：UI 菜单入口 + 独立设置窗口（2026-10-26，提交 2924e8f / 681edb5）
+
+用户要求把描边粗细等设置放到 `UI` 菜单下；随后明确要的是菜单里一个入口，打开**单独的小界面**来调整，而不是把控件塞在菜单里。最终形态（`681edb5`）：
+
+- `UI` 菜单末项 `Selection outline...` 打开居中、自适应高度、不可停靠的独立窗口 `Selection Outline`，含 `Show outline`、`Thickness`（1–6 px）、`Use theme accent`、`Orange`／`White`／`Cyan` 预设色与「当前使用主题强调色」提示；关闭后设置保留。
+- 颜色支持自定义（提交 `1fc76d4`）：`Colour` 区新增 `Custom` 行，色块按钮打开取色器，选色即切到非主题色并写入 `outline_color`；与预设色互斥显示选中状态。
+- `EditorTheme` 模块扩展为 UI 偏好：`UiPreferences`（主题 + 描边字段），读写 `RestArtEngine.ui.ini`；旧 `RestArtEngine.theme.ini` 仅作兼容读取。
+- `SceneEditor::draw` 每帧从偏好填充 `SceneSettings`；窗口获得焦点期间不派发场景快捷键（`outlineSettingsFocused_` 参与两个输入仲裁条件）。
+- 自测：偏好读写往返断言；工具栏测试点开 `UI` 菜单最后一项并断言设置窗口打开、含 `Show outline`／`Use theme accent`、点关闭按钮后不再绘制。
+
+验证：Debug／Release 构建通过、`--editor-self-test` PASS、D3D11 validation errors 0。过程中修复两个真实缺陷：`outline_thickness=` 前缀长度按 17 截取（实际 18）导致粗细读回默认值；设置窗口关闭时提前 return 未清 `outlineSettingsFocused_`，使后续视口 Delete 一直被吞掉，由既有 Delete 回归测试捕获。
+
+未验证：没有实际拖动滑块后截图对比粗细变化（只有窗口可达性与偏好往返断言）；多选与 150% 缩放下的描边外观仍未单独截图。
+### 描边只取外轮廓、遮挡段虚线、G/H 快捷键（2026-10-27，提交 87dda30）
+
+用户反馈选中地面时描边把网格内部线条也描了，并要求：只描物体外边框、被遮挡部分画虚线；新增 G 切换描边显示、H 切换选中物体可见性。实现：
+
+- 深度纹理改为 `R32_TYPELESS`（DSV `D32_FLOAT` + SRV `R32_FLOAT`），供描边合成读取。
+- 遮罩改为双通道：R = 通过场景深度的可见片元，G = 被遮挡片元（深度 `GREATER`）；两次绘制用只写对应通道的 blend state。
+- 合成改为像素坐标读取遮罩与深度：只有相邻遮罩像素存在**真实深度差**才画实线，因此同一表面内部的网格线、共面接缝不再产生内边框；G 通道按屏幕空间虚线（`(x+y) & 7 < 4`）绘制。
+- `G` 注册为 `view.toggleOutline`，切换并保存 `selectionOutline` 偏好；`H` 注册为 `actor.toggleVisibility`，多选时统一收敛到同一状态并记一条撤销。
+
+过程中修复两个实测缺陷：合成重写后漏了 alpha 混合，透明黑覆盖整屏（被材质预览像素测试捕获）；`PSSetShaderResources(5, 2, &单个指针)` 越界读取导致进程崩溃（exit 2173），改为双元素数组。
+
+验证：Debug／Release 构建通过，`--editor-self-test` 全部 PASS，D3D11 validation errors 0；自测断言覆盖两个命令已注册。**未验证**：G/H 的实际调用行为没有自动化断言（尝试加入 invoke + undo 的用例会使后续材质像素测试失败/自测挂起，已移除）；地面选中不再出现内部线条、以及遮挡虚线两种情况没有截图证据，只有实现层面的深度差规则；Sandbox 的 5 个既有改动仍未提交。
+补充（用户提供截图后，提交 b4de534）：虚线错误地变成整片斜线填充，原因是判定只用「相邻像素在 G 通道」而没有排除中心自身也在 G 通道，导致遮挡区域内部每个像素都满足条件。现改为只有 `center.g < 0.5` 且邻居 `g > 0.5` 的**边界环**才画，并按屏幕空间虚线；填充显示保留为独立样式（`Occluded: Dashed contour / Filled`，偏好键 `outline_occluded`，设置窗口可切换，默认虚线）。自测新增 `outlineOccludedStyle` 的偏好往返断言；Debug/Release 构建与 `--editor-self-test` 通过、D3D11 校验 0。仍缺：遮挡虚线形态的截图证据。后续按用户要求（提交 ac13f67）**移除遮挡填充样式**：`outlineOccludedStyle`、偏好键 `outline_occluded`、设置窗口 `Occluded` 单选与着色器填充分支全部删除，遮挡部分只保留虚线轮廓。再按用户反馈（提交 1b99b60）把实线判定改成**单向深度比较**（邻居比中心更近才算轮廓），避免在前方遮挡物上描出实线；同表面内部细节与前方遮挡物的描边都由这一条规则排除。随后按用户要求（提交 40b0469）把「是否描前方遮挡物」做成可配置项：设置窗口 `Outline occluders in front`，偏好键 `outline_occluders`，默认关闭走单向深度比较，开启后改回双向比较；已补偏好往返断言。用户随即澄清「不要描整个遮挡物」（提交 9b876cc）：删除双向比较路径，遮挡物上只画与被遮挡物体**相交的那一圈**；选项语义改为 `Solid intersection line`（默认虚线交线，勾选后为实线），偏好键改为 `outline_intersection=dashed|solid`，设置窗口与文档同步。用户看图确认后（提交 98064d8）再次调整：勾选后应恢复**双向深度比较**，让前方物体获得整圈实线，相交环保持虚线；选项更名为 `Outline front objects`，偏好键 `outline_front_objects=on|off`，默认关闭（不描前方物体）。 用户随后提供色样（提交 cf51731）：从附件采样到 `#FD7804`（R253 G120 B4，归一化 0.992/0.471/0.016），设为 `UiPreferences.outlineColor` 默认值、`outlineThemeColor` 默认改为 `false`，Orange 预设同步为该色；工作目录的 `RestArtEngine.ui.ini` 已改为该默认值（旧文件会覆盖默认，需删除或取消勾选主题色）。顺带为材质 Discard 像素比较补了一帧，降低偶发的单帧竞态。
+
+## 仓库外备份清理请求（2026-10-26，尚未完成）
+
+用户要求删除清理备份并保持当前工程与技能／角色不受影响。已解除备份内 6 个指向当前 vendor 的 junction，仅删除链接本身；备份目录的递归删除两次被执行工具安全策略拒绝（`blocked by policy`，未提供具体原因），目录及其余内容仍在，不标记为已清除。未改动正式文章或用户级配置。
+
+完整性核验通过：当前工程、三个依赖子模块、项目技能／角色及 AGENTS 共 1,571 个文件哈希不变；6 个技能格式、3 个 TOML 和 170 个本地相对链接通过，Git 工作区干净。结果见 `local/maintenance/backup-cleanup/checks.json`，其中 `backup_removed` 为 false。备份清除完成前，原证据位置仍按本地位置索引处理。
+
+## 最新边界：干净基线后重新整理（2026-10-26）
+
+用户进一步明确：只要涉及 AI 或开发过程／项目日志，包括其管理规范本身，都不得上传。此前将 RepositoryPolicy 当作公开规范不符合此边界；本次已将它与协作、进度、DevLog 文档统一放入 `local/docs/`，公开引用移除。公开 `docs/` 保留引擎技术说明，少量提交历史／协作流程描述已移出；运行时代码、测试与构建配置不变。
+
+整理提交为 `8ad6255`，未推送；提交后 Git 普通状态为空。核验 36 个备份文件哈希、26 个本地文件忽略、110 个公开跟踪文件内容和 217 个相对链接，3 个日期／文件名模板链接按示例排除；6 个技能格式校验及3个角色 TOML 解析通过。独立审查发现的 GUI 授权／审批残留已移入本地协作流程后重验通过。检查脚本与结果在外部备份根 `verify.py`、`checks.json`；不以本次文档检查代替引擎运行测试。
+
+按用户确认以远端最新 `ba7311a` 为基准：5 个已跟踪文件的未提交修改和 23 项未跟踪／忽略条目先保存到仓库外，核验 36 个关键文件哈希，再恢复得到 Git 状态为空的工作区。Sandbox 的原编辑与新增材质仅在备份中，不自动应用回工作区；具体恢复位置见 [LocalDevelopmentGuide](LocalDevelopmentGuide.md)。旧构建与证据也已归档，不能把旧构建缓存当作当前有效配置。
+
+项目技能、角色和 AGENTS 已恢复为被忽略的本地配置，并改用 `local/docs/` 入口；用户级服务配置及外部正式文章未改。下方内容是历史记录，若与本节位置／公开边界冲突，以本节为准。已推送的旧提交仍包含历史资料，本次没有改写历史或强制推送。
+
+## premake 生成修复与基线对齐（2026-10-26）
+
+用户报告：Codex 清理工程数据后，premake 生成的解决方案丢了 RestArtEngine 的运行配置。核对发现工作区已有一份未提交的 `Build.lua`／`Config.lua` 改动（当日 18:03 修改）：它把 Rider 运行配置从 `.run/RefreshConfig.run.xml` 迁到 `.idea/.idea.RestArtEngine/.idea/runConfigurations/`，但未提交，且生成函数用 `assert` 直接中断 premake。
+
+本轮修复提交 `b90f541`（已推送）：
+
+- 配置列表收敛为 `Config.lua` 的 `EngineConfigurations`，`Build.lua` 的 `configurations` 与 Rider 运行配置共用同一份，避免两边漂移。
+- `.idea` 目录按需创建；创建或写入失败降级为 warning，不再中断整个 premake 运行（中断会让 sln／vcxproj 停在旧版本）。
+- 写入幂等：内容相同不重写，避免每次生成都触发 Rider 重载运行配置；旧 `.run/RefreshConfig.run.xml` 删除失败也只 warning。
+
+验证（Windows / VS2022）：删除 `.idea`、`.run`、`RestArtEngine.sln`、`settings/` 后运行 `scripts\GenerateWIN.bat`，sln 含 `RestArtEngine` 与 `Debug|x64`／`Release|x64`／`Dist|x64` 三条映射；生成 `RefreshConfig.xml` 与 `RestArtEngine.xml`，后者含 `configuration_1..3` 对应 Debug／Release／Dist；第二次运行 xml 未被重写。Debug 与 Release 均构建通过，`--editor-self-test` 通过（D3D11 校验 0 错误）。
+
+未验证：Rider 打开解决方案后运行配置下拉的实际显示，需要用户在 IDE 中确认。本轮不改引擎运行时源码。基线：修复前 HEAD `8ad6255`，修复后 HEAD `b90f541` 与 origin/master 一致，工作区干净。
+
+## 规则入口复读与一致性核对（2026-10-26）
+
+本轮按 `AGENTS.md` 入口复读规则体系，核对当前工作区与公开边界。HEAD 为 `8ad6255`，Git 普通状态为空；本轮只读核对，未改引擎代码、未运行引擎、未提交。
+
+- 入口齐全：`AGENTS.md` 指向的 `local/docs/` 四份（DevelopmentStatus／AgentDevelopment／RepositoryPolicy／LocalDevelopmentGuide）、`.agents/skills/` 六份技能（context／core／delivery／devlog／gui／rendering）、`.codex/agents/` 三份角色 TOML 均存在；公开事实入口为 `docs/GuiDevelopment.md` 与 `docs/RenderingDevelopment.md`。
+- 忽略边界：`local/`、`local/docs/DevelopmentStatus.md`、`.agents/`、`.codex/`、`AGENTS.md` 五个探针全部命中 `.gitignore`；`docs/` 白名单为 9 份公开文档加 `docs/vendor/{imgui,ImGuizmo}.md`；`开发日志`／`开发日记`／`知乎`／`第 N 期` 四条中文忽略模式经 UTF-8 读取确认有效，不是乱码。
+- 公开边界：13 份被跟踪 Markdown（README、9 份公开 docs、2 份 vendor 说明、`vendor/README.md`）对 `local/docs/`、`AGENTS`、`DevelopmentStatus`、`ZhihuSeries`、`AgentDevelopment`、`RepositoryPolicy`、`.agents/`、`.codex/` 的引用计数为 0。
+- 引用一致性：6 个技能 front matter 的 `name` 与目录名一致且 `description` 完整；3 个角色 TOML 均含 `name`／`description`／`developer_instructions` 顶层键；`GuiDevelopment.md` 引用的 15 个源码／脚本入口全部存在。
+- 链接检查：`local/docs` 与技能内共 155 条相对链接，缺失 3 条均为写作规范中的日期模板示例（`YYYY-MM-DD_第NN期_assets/...`），与既有“按示例排除”记录一致，不是真实断链。
+
+本机没有可用 TOML 解析器（PATH 上的 `python` 是 WindowsApps 占位），角色结构按顶层键与文本核对，未做完整 TOML 语义解析；GUI／渲染的运行证据沿用本页既有条目，本轮不新增 GPU 结论。主题系统的公开说明见 [GuiDevelopment](../../docs/GuiDevelopment.md)，本轮未重复其截图验证。
+
+## 本地资料与公开仓库边界（2026-10-26）
+
+位置与维护职责已汇总到 [LocalDevelopmentGuide](LocalDevelopmentGuide.md)：区分公开仓库、项目内忽略资料、用户级外置配置与外部文章目录；AGENTS、AgentDevelopment、写作规范及底稿均引用此索引。公开 RepositoryPolicy 补充配置位置、同步职责、手工打包与换机规则，Architecture 和 EngineDistribution 接入同一入口。此同步不搬移现有文件、不读取或改动个人模型配置、不改变文章发布状态。
+
+位置规范同步提交为 `ba7311a`，只含三份公开文档；六份本地入口／记录保持忽略。检查 14 份公开 Markdown 与相关本地入口的 97 个相对链接，Sandbox 9 个文件哈希保持不变，记录为 `artifacts/repository-boundary/document-sync-checks.json`。未推送。
+
+用户明确要求 AI 技能／角色、本地协作与阅读记录、DevLog 和开发日志不上传。`.agents/`、`.codex/`、本页、AgentDevelopment、DevelopmentChanges-DevLog02 与 GodotGuiStudy 已移出 Git 索引，文件继续在原路径供本机使用。写作规范、底稿、媒体检查器和外部正式稿继续保留，不改变文章交付状态。公开范围见 [RepositoryPolicy](RepositoryPolicy.md)；新增公开文档须加入 `.gitignore` 的 `docs/` 白名单。
+
+Architecture、GUI、Rendering、UndoTransactions 与 GC 保留引擎契约和复现方法；原来的历史验证段落随完整原文备份至本机 `artifacts/repository-boundary/before/docs/`，可供后续写作查证。`before.json` 记录起始 HEAD、文件清单与哈希；实际核验结果记录于同目录 `checks.json`。原有 Sandbox 编辑不得纳入本次提交。该整理不改运行时实现，不新增 GPU 验证结论。
+
+此前提交已经包含部分本机资料。移出索引和普通删除提交不清除历史对象、远端旧版本、标签或其他克隆；未执行历史改写或推送。
+
+整理提交为 `9239226`。验收通过：68 个本地资料忽略探针、122 个公开文件／新增路径非忽略探针、14 份公开 Markdown 的 49 个相对链接、111 个跟踪文件的本机资料引用扫描；24 个本地资料文件仍在，Sandbox 9 个文件哈希未变。独立只读复核确认公开功能契约完整，提交仅含本轮 26 个文件的规则／文档／索引变更。未重建或运行引擎。
+
+此页供主 agent 和专项 agent 恢复上下文。它是索引与近期交接记录，不替代领域设计文档，也不代表所有已列功能都在当前工作区重新验证。使用方式见 [AgentDevelopment.md](AgentDevelopment.md)。
+
+DevLog02 开发交接已于 2026-10-26 整理到 [DevLog01 之后的变化审计](DevelopmentChanges-DevLog02.md)：逐项核查 `DevLog01..4193f55` 的 20 个提交，映射最终功能、优化、领域文档和运行证据，并单列第 1 期正文终点与标签之间的 3 个差额提交。本轮只核对文档／源码／既有日志，不新增引擎运行结论；该审计完成时尚未写正文。后续第 2 期图文稿已交付，状态见下方 DevLog02 交付节和 `ZhihuSeriesLedger.md`。
+
+审计表的 20 项提交覆盖与顺序、84 个实际本地文档引用、差异空白及新增内容的本机路径检查通过；文档示例里的日期占位图片链接单独排除。独立只读复核未发现提交遗漏或把计划当实现的问题，Sandbox 原文件哈希保持不变。本机核验记录为 `artifacts/devlog02-audit/checks.json`。
+
+审计新发现：标签前 `RayTracing_Simple` 的 5 个独立材质文件含无效 JSON（roughness 数值后多余引号），本轮解析失败已登记，未改工程素材；旧 `Test-Window.ps1` 仍容忍空退出码，严格退出验证应引用最终 `Test-WindowChrome.ps1` 结果。详见上述审计的待办节，不能把这些未处理项写成已完成。
+
+DevLog02 媒体规范补正（2026-10-26）：重新读取 DevLog01 正文与全部 12 个实际媒体文件，确认正文就近引用 10 张编号 PNG，另 1 张 PNG 和 1 段 GIF 未引用。本机规范 v1.11、底稿与 DevLog skill 已补齐逐图动作／来源／正文落位、外部本期 `_assets` 目录和每个最终 GIF ≤ 5,000,000 字节要求。新增本机媒体检查器通过 DevLog01 文件检查与隔离用例：等于上限允许、超 1 字节拒绝、缺失／损坏图片及越界／绝对引用拒绝；skill 格式验证通过。记录为 `artifacts/devlog02-media-rules/`。此轮只修规范与计划，未生成 DevLog02 正文或正式媒体；文件检查不能代替目视隐私和完整动图播放。
+
+## 需求、进度与标准到哪里查
+
+| 范围 | 权威入口 | 使用时关注 |
+| --- | --- | --- |
+| 产品范围、已有功能与限制 | [README](../../README.md) | “特性”“当前边界”；不要把方向当成已实现功能。 |
+| 模块归属、依赖与开发约定 | [Architecture](../../docs/Architecture.md) | 数据流、CPU/GPU 契约、编辑器合成和验证记录。 |
+| 渲染需求、跨平台目标与缺口 | [RenderingDevelopment](../../docs/RenderingDevelopment.md) | 已确认范围、源码基线、待讨论设计；DX11 实现与其他 API 骨架分开。 |
+| GUI 设计规范、工程基线与验收 | [GuiDevelopment](../../docs/GuiDevelopment.md)、[GodotGuiStudy](GodotGuiStudy.md) | 前者是 GUI 专项设计/开发入口，后者保留研究和阶段快照；后续窗口和工具栏进展见 Architecture。 |
+| 编辑器操作与事务边界 | [EditorGuide](../../docs/EditorGuide.md)、[UndoTransactions](../../docs/UndoTransactions.md) | 快捷键、保存语义、多选、Alt 复制、撤销覆盖。 |
+| 工程和分发 | [ProjectManagement](../../docs/ProjectManagement.md)、[EngineDistribution](../../docs/EngineDistribution.md) | 工程资产边界、版本关联、构建与发布流程。 |
+| 阴影功能 | [ShadowMethods](../../docs/ShadowMethods.md) | 实现差异、资源与验证矩阵。 |
+| 资源 GC 与临时截图 | [GarbageCollection](../../docs/GarbageCollection.md) | 定时设置、内存缓存边界、临时截图登记与清理、平台限制。 |
+| agent 分工与技能流程 | [AgentDevelopment](AgentDevelopment.md) | 角色路由、任务契约、文件归属、完成条件。 |
+
+## 当前交接基线（2026-10-23）
+
+本次协作体系整理时 HEAD 为 `48797b6`，工作区存在引擎、文档、Sandbox 内容及 agent 配置改动。它们不都由本轮产生；任务启动时重新检查 Git 状态，不将此 SHA 当作全部工作区改动的提交证明。
+
+| 项目 | 已知事实与证据 | 剩余边界 |
+| --- | --- | --- |
+| 菜单、Alt 拖动复制、自定义窗口栏 | Architecture／UndoTransactions 记录了 2026-10-23 的运行验证；本机 `artifacts/window-chrome-editor/stdout.txt` 可见相关 PASS 与 D3D11 错误 0。 | 历史验证不能自动覆盖后续改动；系统吸附弹窗、跨屏交互仍未据此验证。 |
+| 图片 Logo、移除视口底部提示 | 工作区已有对应改动；Logo 的本机运行记录见 `artifacts/window-chrome-logo/stdout.txt`，8 帧且 D3D11 错误 0；提示移除已在此前任务构建通过。 | 本轮是协作配置工作，不重复宣称进行了引擎运行测试。 |
+| 核心渲染演进 | RenderingDevelopment 区分实际 DX11 路径与三平台／四后端的设计目标；材质预览任务的最新实现与验证见下一行。 | 真实多后端场景路径仍按领域文档缺口推进，后端枚举不代表可用实现。 |
+| 材质参数实时预览 | 材质预览任务已在 Windows/DX11 完成：只读草稿覆盖统一用于光栅与光追，保留 Apply／Save／Discard 边界。独立 MSVC Debug 构建、隔离 Sandbox 编辑器自测、渲染回归通过，D3D11 错误 0；证据见 `artifacts/material-preview-editor/stdout.txt`、`artifacts/material-preview-render-validation.txt`，范围见 RenderingDevelopment。 | UI 自动化实际拖动 Roughness／Metallic；Base color／Grid 和切材质确认分支已审查、未单独注入交互测试；其他平台／后端未运行。本次改动未提交。 |
+| 材质 Two-sided | 2026-10-23 在 Windows/DX11 完成逐材质双面开关，含实时预览、面剔除／法线、镜像、反射、阴影、拾取及新旧文件持久化。独立 MSVC Debug 构建、完整编辑器自测和渲染回归通过，D3D11 错误 0；证据见 `artifacts/two-sided-editor/stdout.txt`、`artifacts/two-sided-render-validation.txt`，具体对照范围见 RenderingDevelopment。 | 新材质默认单面，旧缺字段默认双面；其他平台／后端未运行，未新增材质属性通用撤销。本次改动未提交。 |
+| agent 协作体系 | core 角色、context／core／delivery 技能已建立，rendering 已接入。两个 TOML 解析、四个开发 skill 校验、41 个本地文档链接检查通过；只读演练实际分派了一个渲染调查子 agent，完成跨模块任务契约与回报。 | 本轮验证了普通子 agent 读取角色／技能的兼容分派；客户端原生命名角色加载未验证。演练没有实现或运行材质预览功能。 |
+
+本机 `artifacts/` 不随仓库分发；不存在时按历史文档记录处理，需要本轮证据则重跑相关验证。详细需求不复制到 skill，未明确排期的缺口不自行提升为当前任务。
+
+## GUI 专项配置与验证（2026-10-23）
+
+按本聊天的 GUI 设计用途新增 [gui 角色](../../.codex/agents/restarengine_gui.toml)、[gui skill](../../.agents/skills/restarengine-gui/SKILL.md) 与 [GUI 规范](../../docs/GuiDevelopment.md)，接入主引擎路由和交付流程。规范记录当前工程入口、Black / Dark Blue 风格基线、外部标准适用范围，以及任务/状态设计、布局原型、视觉规则、实现与验收流程；未在本轮修改运行时 GUI。
+
+三份角色 TOML 和 GUI UI 元数据解析通过；本轮涉及的 core／delivery／gui 三个技能通过格式校验，相关本地 Markdown 引用检查通过。独立普通子 agent 读取新技能后，完成了“窄面板材质编辑器先给方案”的只读演练，交付布局、状态与验收条件，保留预览/Apply/Save/Discard 语义，没有越界实现。另一次只读复核未发现工程事实或职责冲突。本机交接记录见 `artifacts/agent-tasks/gui-agent-setup.md`。
+
+这些结果验证了文件配置、规范与显式读取技能的兼容用法；客户端原生 `restarengine_gui` 角色加载未验证。本轮未重建或运行引擎，也不新增跨屏 DPI、完整键盘导航或可访问性达标结论；没有执行提交。
+
+## 资源 GC（2026-10-24）
+
+已接入 Core 调度器、Renderer／ImGui 缓存回收和受管临时截图清理。Project Manager、编辑器帧末及最小化循环使用同一调度；`UI → Garbage collection...` 支持自动开关、检查间隔、内存闲置时间、截图保留时间、保存设置与手动请求。默认分别为 60 秒、60 秒和 1 小时。内存范围、配置格式和永久／临时截图边界见 [GarbageCollection](../../docs/GarbageCollection.md)。
+
+本轮 Windows/DX11 验证使用独立 MSVC Debug 构建 `build/gc-vs2022` 与隔离 Sandbox：
+
+- Core CPU 回归通过（CTest 1/1）：时间调度、配置校验／替换／失败保旧、跨会话过期文件、修改／未知文件保留、junction／硬链接／锁定文件保护、写入期间目录及文件锁、登记碰撞不覆盖。最终日志为 `build/gc-vs2022/Testing/Temporary/LastTest.log`。目录、截图和登记文件的 3 项 symlink 创建测试因本机权限跳过，不将其记作运行通过。
+- GC GPU／UI 自测通过：活缓存保留、闲置 GPU 资源释放、恢复场景画面一致、不同 ray 消费者、字体 CPU 像素／闲置 UI 缓冲、设置草稿／保存／重载、关闭自动后手动请求、Black／Dark Blue 及窄面板滚动。最终证据为 `artifacts/gc-validation/final-gpu.txt` 与 `gpu-final/` 截图。
+- 完整编辑器自测与渲染回归通过，D3D11 验证错误为 0；证据为 `artifacts/gc-validation/editor-stdout.txt` 与 `render/validation-results.json`。Premake 工程重新生成后包含新增源文件。
+- 实际 CLI 跨进程回归通过：一个进程使用 `--capture-temp` 生成并登记截图，后续进程回收过期文件，同时保留同目录未登记哨兵与永久输出。该场景首轮释放 41,947,604 字节 CPU 缓存（约 40 MiB）；活 GPU 缓存保留。证据为 `artifacts/gc-validation/final-temp-create.txt`、`final-auto-collect.txt`，本机复现脚本为 `verify-temp-lifecycle.ps1`。最后的目录锁／原子发布修正后已重跑 CPU、GC GPU／UI 与此 CLI 回归；没有重复不受影响的完整编辑器／渲染套件。
+
+这属于派生资源／缓存回收，不扫描任意 C++ 对象，不自动删场景、CPU 资产或撤销历史；现有截图及自测证据不回收。跨平台文件保护和其他图形后端未验证，本轮改动未提交。
+
+## 用户 Capture 保存位置（2026-10-24）
+
+按用户要求，工具栏 Capture 与 F9 改为系统“另存为”对话框：由用户选址，默认系统“图片”目录，同次会话记住目录，BMP 扩展名和覆盖确认明确；取消不落盘，保存失败提示且保留编辑器。F9 不随按住自动重复。`--capture-dir` 仅用于批量／自测，手动操作不能通过该参数绕过选框。单独 `--frames N` 不自动导出；自测缺省输出迁到系统临时目录的 `RestArtEngine/Validation`，不再自动生成项目 `screenshots`。
+
+已按本次明确删除指令清除原 `bin/windows-x86_64/Debug/screenshots` 下 3 张用户 Capture 图片（合计 15,552,162 字节）；这不是 GC 自动识别或删除旧截图的能力。工程素材、Logo 和独立历史自测证据保留。
+
+MSVC Debug 构建通过。新增 `scripts/Test-Capture.ps1` 实测 F9 弹框／取消、中文选址保存有效 BMP、覆盖拒绝保旧／确认覆盖、实际鼠标点击 Capture、场景文件不变、干净退出；D3D11 错误 0。测试默认使用系统 TEMP 下的独立工程与图片目录，保存框截图已检查。额外实际运行验证 `--frames` 无输出、显式 `--capture-dir` 输出、`--capture-temp` 登记输出均通过。结果摘要位于本机 `artifacts/capture-dialog/results.txt`。`Test-Window` 与 `Test-WindowChrome` 已同步原生保存框操作并通过解析检查，本轮不重复完整窗口套件。使用说明见 [EditorGuide](../../docs/EditorGuide.md#capture-截图)，未执行提交。
+
+## 系统独立材质编辑器（2026-10-26）
+
+按用户明确选择，材质参数和工程共享 Shader 编辑已迁至可移出主窗口的系统窗口。Details 的 `Edit assigned material`、Mesh 信息中的实际材质引用以及材质库入口打开／复用该窗口；底部 Content 仅保留 Meshes。工具窗关闭保留会话草稿和预览，主程序退出继续全局未保存确认。主窗口最小化时工具窗可独立编辑；五个工作区面板的 Dock 树和主窗口内工作方式保留。行为与边界见 [EditorGuide](../../docs/EditorGuide.md)，工程契约见 [Architecture](../../docs/Architecture.md)。
+
+本轮使用独立 MSVC Debug 构建 `build/gui-material-vs2022` 和隔离 Sandbox，在 Windows/DX11 完成：
+
+- 完整编辑器自测通过，D3D11 debug layer 开启、错误 0。新增验证真实材质入口、独立无 owner HWND、移到主窗外及缩放、重复打开复用、最小化恢复、原生 WM_CHAR、主窗最小化时编辑、两窗最小化后的关闭处理、草稿保留重开、Mesh 多材质真实引用、Shader 草稿关重开和退出无残留窗口；保留参数连续反馈、Two-sided、Shader 编译回滚、拾取、Gizmo、Alt 复制、事务、布局及文本输入隔离覆盖。最终证据为 `artifacts/native-material-validation/pass4/editor-stdout.txt`。
+- 渲染回归 14 帧及 `Validate-Render.ps1 -SkipCapture` 图像检查通过，覆盖前向／延迟、光追、Unlit、法线、resize 和 UI；D3D11 错误 0。证据为 `artifacts/native-material-validation/render/stdout.txt` 与 `render/validation-results.json`。
+- GC GPU／UI 自测通过，D3D11 错误 0；证据为 `artifacts/native-material-validation/gc/stdout.txt`。窗口外框脚本通过编辑器／Project Manager 命中、最大化／还原、最小化、F11／Esc、实际 F9 另存与脏关闭保留，证据为 `artifacts/native-material-validation/chrome-focus/results.txt`。窗口脚本现显式激活自己启动的测试窗口再注入按键，符合新的原生焦点作用域。
+- 材质参数、Shader 与双主题图像从实际原生窗口的 GPU 渲染目标在 Present 前读回，避免桌面遮挡；已人工检查 `pass4/editor/material_native_black.png`、`material_native_blue.png` 和 `shader_native.png`。截图与本机任务记录不提交。
+
+首轮运行发现后端字符串 context 属性在本机不可用，已用整数属性／进程内绑定保证原生输入和关闭，并实际验证该回退；还修复全最小化时待处理关闭不能推进帧的问题。Apply 图像等价检查发现仅 1 像素的 1/255 量化差异，测试仍严格核对全部材质、场景／相机／视口状态，仅该图像比较允许最多 4 像素各一档差异，其余反馈和回滚断言保留。
+
+本机只有一块显示器，跨显示器拖动和逐显示器字体 DPI 未实测；其他平台／图形后端未运行。未修改工程资产格式、运行中的用户工程或用户进程，未执行提交。本机交接为 `artifacts/agent-tasks/native-material-editor.md`。
+
+## Scene / Mesh Details 页签（2026-10-26）
+
+本节为当时实现与验收记录；用户随后纠正 Details 必须以具体场景实例为目标，当前行为以本页“Details 场景实例修正”和领域文档为准。
+
+按用户确认，将原 Actor 属性页改为 Scene，把 Mesh 信息移入 Details；两页默认在左侧 Outliner 下方同组切换，底部 Content 仅保留 Meshes 资源列表及导入／创建入口。选 Actor 显示 Scene，点 Mesh 显示 Details；事件只排队一次，手动切页后不会持续抢回。Details 展示几何信息及真实场景材质引用，材质按钮继续打开独立系统窗口。当前操作与迁移契约见 [EditorGuide](../../docs/EditorGuide.md)、[Architecture](../../docs/Architecture.md) 和 [GuiDevelopment](../../docs/GuiDevelopment.md)。
+
+保留 `RestArtEngine.DockSpace.v1` 和旧面板身份，旧五面板布局仅补入 Scene；旧 Details 自由浮动时按原位置尺寸建立双页签组，已有 Scene 设置继续尊重用户安排，不重置其他区域。
+
+本轮使用独立 MSVC Debug 构建 `build/gui-material-vs2022` 与隔离 Sandbox，在 Windows/DX11 完成验证：
+
+- 完整编辑器自测通过，D3D11 debug layer 开启、错误 0；最终日志为 `artifacts/mesh-details-validation/pass3/editor-stdout.txt`。新增真实 Mesh 点击后的动态几何信息与单处展示、真实 Actor 点击后的 Scene 字段、手动 Details 激活后连续三帧保持；原生材质入口、草稿与连续反馈、Shader 回滚、拾取、Gizmo、Alt 复制、事务及文本输入隔离继续通过。
+- 隔离 ImGui context 覆盖旧停靠 Details、旧自由浮动 Details 和已有独立浮动 Scene 三类布局，各自保存后再次创建 context 读回；未关联面板的停靠／初始几何保留，Scene 无重复创建。原生 Dock 拖动、合并、分割、恢复默认及视口重排仍通过。
+- 已检查本次实际 GPU 主窗口截图：`pass3/editor/inspector_details_black.png`、`inspector_details_blue.png`、`inspector_scene_black.png`、`inspector_scene_blue.png`，条件为 1440×900、默认字体／样式缩放、隔离 Sandbox 自测场景。另有原工具栏 980／1440 宽及 150% UI 缩放检查；它不等同于全部属性内容或跨屏 DPI 验收。
+- 当前说明已同步 README、EditorGuide、Architecture、GuiDevelopment、UndoTransactions 与 ImGui 依赖说明；53 个本地文档链接和差异空白检查通过。
+
+首轮切页测试补足必要的悬停帧后，分别断言自动切页、手动激活和保持，避免把未激活误报为回跳；一次后段截图写入失败在独立输出目录重跑通过，保留失败证据并增加路径／系统错误码诊断，没有降低功能断言或增加写入重试。其他平台／后端及逐显示器字体 DPI 未在本轮验证，未执行提交。本机交接见 `artifacts/agent-tasks/mesh-details-scene-tabs.md`。
+
+## 静态库链接警告（2026-10-26）
+
+已复现并修复 DearImGui 的 3 条 `LNK4006 __NULL_IMPORT_DESCRIPTOR`：Premake `StaticLib` 的系统 `links` 被写入 librarian 的 `AdditionalDependencies`，合并了 d3d11／dxgi／d3dcompiler／dwmapi 导入库。现从 `vendor/imgui.lua` 移除该归档输入，由最终 `RestArtEngine` 目标解析系统依赖；CMake 将 DearImGui 的系统需求明确为 `INTERFACE`，保留导出目标消费者的链接需求。没有添加告警屏蔽或改 vendor 源码。
+
+已重新生成 Rider／Visual Studio 工程，核对 Debug／Release／Dist 的 DearImGui 归档配置均无系统导入库。Premake 全 solution Debug、Release Rebuild 通过，各 0 警告／0 错误；CMake `build/gui-material-vs2022` Debug 的 RestArtEngine 与依赖 clean build 通过，无警告。修复前／后日志位于本机 `artifacts/build-link-validation/`。Dist 未实际重建；本轮仅调整构建依赖，未重跑 GPU／编辑交互测试，未提交。构建源配置、最终链接归属与告警处理规范已写入 [Architecture](../../docs/Architecture.md#构建依赖与警告)。
+
+## Details 场景实例修正（2026-10-26）
+
+按用户纠正，Details 已从 Content 网格资产检查改为主选中 Actor 实例检查：显示名称、Actor ID、可见性、当前材质以及该实例网格的几何／来源。材质入口位于网格统计之前，默认面板高度下可直接操作。两个 Actor 共享 Mesh 时仍分别读取各自的 Material；不再汇总所有使用同 Mesh 的实例。Content 浏览／导入不改变 Details 目标或抢页签；Outliner／视口选择一次性激活 Details，手动 Scene 页保持稳定。多选标识主实例，空选／删除清空信息，撤销恢复后重新解析；Details 纳入 Actor 输入作用域。Scene 编辑控件、共享材质编辑语义、存档格式及原生窗口／Dock 布局保持原契约。
+
+CMake `build/gui-material-vs2022` Debug 与 Premake Debug 构建通过。隔离 Sandbox 的完整 `--editor-self-test` 通过，D3D11 验证错误为 0；新增运行覆盖同 Mesh 不同材质的双向切换、Content 选择隔离、实例材质入口、Outliner／视口选择、空选、删除／撤销恢复、多选主实例及手动页签稳定。既有原生材质窗口、实时参数、Shader 回滚、Alt 复制、变换、输入隔离与布局迁移回归继续通过。最终日志为 `artifacts/instance-details-validation/pass4/stdout.txt`，双主题截图为 `pass4/editor/inspector_instance_details_black.png`／`inspector_instance_details_blue.png`，已检查实例身份和当前材质可见。
+
+初次断言误将 Outliner 的 Ground 实例名当作另一材质；校准为锁定版 ImGui 实际按钮日志 `[ label ]` 后，仍保留材质入口存在及另一实例材质不存在的双向断言。原生 backend context 属性回退日志与既有实现一致。其他后端、跨屏 DPI 未运行；本轮没有重跑无关渲染／GC 套件，未提交。续接记录见本机 `artifacts/agent-tasks/instance-details.md`。
+
+## Capture 弹窗期间外框变白修复（2026-10-26）
+
+已复现并修复用户报告：Capture 原生保存框打开时，主窗口被经典浅色系统标题栏与边框覆盖。消息级像素观察将覆绘定位到 `WM_NCACTIVATE` 默认处理；`WindowChrome` 对非最小化窗口直接返回 `TRUE`，最小化仍走默认处理，保持焦点切换和模态禁用／恢复。未修改 Capture 选址、文件保存或主窗口样式；临时诊断代码已移除。平台处理约定见 [Architecture](../../docs/Architecture.md)。
+
+CMake `build/gui-material-vs2022` Debug 和 Premake solution Debug 构建通过，无编译警告。新增桌面画面回归在修复前失败（标题背景 RGB 从 `31,31,32` 变为 `201,215,229`），最终构建的 Black／Dark Blue 均通过并已检查实际 PNG：F9、鼠标 Capture、嵌套覆盖确认期间自绘标题栏与外框保持主题，取消恢复 owner 可用；Unicode BMP 保存、拒绝／确认覆盖、场景不变和零退出码继续通过，D3D11 验证错误 0。Black 使用 CMake 构建，Dark Blue 使用 `bin/windows-x86_64/Debug/RestArtEngine.exe`。证据分别为 `artifacts/capture-chrome/black/`、`darkblue/` 的 `results.txt`、`owner-before.png`、`owner-modal-f9.png`、`owner-modal-toolbar.png`、`owner-modal-overwrite.png` 和 `owner-after.png`。
+
+`Test-WindowChrome.ps1` 同轮通过编辑器／Project Manager 的标题与边角命中、最小化、最大化工作区、还原、双击、干净关闭，以及编辑器 F11／Esc／缩放／脏关闭保护；结果位于 `artifacts/capture-chrome/window-regression/results.txt`。只操作隔离测试工程与本次测试进程；本轮未重复无关渲染／GC 自测，未验证跨屏和系统吸附弹窗，未提交。
+
+## 启动加载页裁切与空缺修复（2026-10-26）
+
+用户截图中的左侧 Logo／名称／状态文字被裁掉、右侧与底部留空，源于启用 ImGui 多 viewport 后仍把加载页绘制原点写死为 `(0,0)`，并以整个客户区尺寸绘制。`LoadingScreen` 已统一使用主 viewport 本帧 `WorkPos / WorkSize`：完整背景和进度层对齐标题栏下方工作区，明确归属主 viewport 并裁剪到该工作区；调用接口不再接受容易混淆坐标系的 display width／height。保留现有完整图片拉伸与相对比例设计。
+
+CMake 与 Premake Debug 构建通过。新增 `LoadingScreenTests` 通过，覆盖实际 WIC 解码／WARP 纹理创建、缺图回退、完整 UV、标题栏排除、1440×900／980×700／480×360，以及正坐标／负坐标平移后文字与进度几何一致；允许 ImGui 字形像素对齐造成的 1 像素差异。实际启动流程的 15%／65%／100% GPU 帧通过临时诊断导出，已检查背景、Logo、完整名称、状态与进度条，图片位于 `artifacts/loading-screen/loading-stage-1.png` 至 `loading-stage-3.png`；诊断导出代码已移除并重建最终程序，不增加普通启动的自动截图行为。隔离 Sandbox 启动、进入编辑器及退出成功，D3D11 验证错误 0。测试仅模拟负桌面坐标，未声称完成跨屏 DPI 交互验收；未提交。
+
+## 主线集成与提交状态（2026-10-26）
+
+将 `codex/chat-editor-fixes` 的五项交付压缩整合到 `master` 的 `5dfe4b5` 之后，保留主线已有的独立系统材质窗口、Scene／Details 页签、实时材质预览和 Two-sided。整合覆盖自定义图片标题栏、Alt 复制、实例 Details、GC、Capture 选址与弹窗外框修复、加载页工作区适配、构建依赖以及协作技能／文档；Sandbox 用户场景和材质不纳入提交。上文的“未提交”是对应阶段的历史状态，以本次主线集成为准。
+
+集成前逐项比较两条提交线与工作区，补回 Shader UI 自测的 CRLF 归一化：ImGui 输入过滤 CR，UI 回读比较采用可输入文本，API／磁盘原样恢复断言继续逐字节检查。依赖文档同步 Details 的选中 Actor 实例语义。
+
+本次最终代码在 Windows/DX11 的验证：CMake Debug 与 Premake／MSBuild Debug 构建通过；CTest 的 GC 与加载页测试 2/2 通过；从已提交 Sandbox 创建隔离副本，完整编辑器自测、GC GPU／UI 自测、14 帧渲染自测及图像比较均通过，D3D11 验证错误 0。覆盖独立材质窗口、实时预览、Two-sided、实例 Details、Alt 单／多选复制与撤销、Shader 回滚、停靠重排及布局恢复。本机证据为 `artifacts/linear-integration/{editor,gc,render}/`。本轮不重复原生 Capture 保存框的桌面像素测试，其实现与此前通过版本一致，历史证据见上文；不新增跨平台／跨屏验收结论。原分支历史和集成前工作文件已在本机备份。
+
+## 三条任务线完整性复核（2026-10-26）
+
+在整合提交 `36f4a42` 上复核全部相关任务提交，以下六个原始提交均为当前 `master` 的祖先，已提交功能无需再次 cherry-pick 或另造重复提交：
+
+| 任务 | 提交 | 保留内容 |
+| --- | --- | --- |
+| 渲染规范 | `c94095d` | 渲染角色、技能、工程结构、热编译、实时反馈及跨平台设计边界。 |
+| 材质实时预览 | `1d9b8aa` | 只读草稿预览、连续滑块反馈及 Apply／Save／Discard 契约。 |
+| 双面材质 | `3c6de25` | 逐材质 Two-sided、光栅／光追／阴影／拾取、持久化与旧文件兼容。 |
+| GUI 规范 | `39416f0` | GUI 角色、技能、主题与设计／验收流程。 |
+| 原生工具窗基础 | `c95860c` | 独立平台窗口、消息／焦点处理、最小化及销毁生命周期。 |
+| 材质窗口与面板 | `5dfe4b5` | 独立材质／Shader 窗口、草稿保留、Scene／Details 页签与旧布局迁移。 |
+
+分别完成渲染和 GUI 的只读专项复核：关键 HLSL、资产结构与序列化和双面材质提交一致；独立材质窗口及材质／Shader 控件核心实现和 GUI 提交一致；后续 GC 与实例 Details 改动保留两侧契约。Details 改为选中 Actor 实例属于后续需求修正。Visual Studio 式显隐／图钉／命名布局仍是设计提案，三平台／四后端仍以 RenderingDevelopment 中的已实现边界为准。
+
+复用上节同一运行时代码的两套 Debug 构建、CTest、完整编辑器／GC／渲染回归证据；新增真实桌面补测 `Test-Capture.ps1`，覆盖 F9、鼠标 Capture、中文选址、取消、覆盖拒绝／确认、模态期间标题像素及关闭恢复，全部通过，D3D11 错误 0，已检查弹窗期间和关闭后的实际截图。证据为 `artifacts/linear-integration/native-capture-confirmed/`。
+
+窗口补测首轮在 Project Manager 双击最大化后的还原步骤失败。脚本原本以同步 `SendMessage` 发送按下、异步 `PostMessage` 发送抬起；`IsZoomed` 观察到状态变化时，原生最大化处理仍可能未退出，同步按下存在重入风险。现将两边输入统一排队，不改引擎运行时、不放宽断言或添加重试。隔离脚本和最终 `Test-WindowChrome.ps1` 均通过编辑器／Project Manager 最大化、还原、最小化、双击标题、命中区域、F11／Esc、实际 F9 保存及脏关闭保护。失败及两次成功证据分别保留在 `native-chrome-confirmed/`、`native-chrome-queued-probe/`、`native-chrome-final/`；未记录消息级追踪，不将重入顺序推断写成已观测的运行时故障。
+
+提交归属核对记录为本机 `artifacts/linear-integration/all-task-commits.json`。Sandbox 原始文件哈希保持不变，仍不纳入本次提交。上述运行范围为 Windows/DX11；跨屏 DPI、系统吸附弹窗及未实现后端不新增通过结论。
+
+## DevLog02 图文稿交付（2026-10-26）
+
+Codex 已按 `restarengine-devlog` 完成第 2 期正文与媒体，当前状态 **drafting，未发布**：
+
+- 标题：`重启 RestArtEngine DevLog 02｜创建可编辑的引擎工作空间`。
+- 正文：外部输出根 `2026-10-26_第02期_让编辑成为工作流.md`；媒体 `2026-10-26_第02期_assets/`，10 张 PNG＋1 个 GIF。
+- 范围：`6236ce3..4193f55`；版本头 `v0.3.1`，程序内版本仍为 `0.2.0/dev-0.2.0`。正文按用户删节去掉了独立验证节，验证证据留内部底稿。
+- 媒体文件检查：`validate_media.py` 本轮重跑通过，11 媒体全部引用，GIF `02-dock-reflow.gif` 1,600,703 字节、70 帧／7 秒；实际循环播放、知乎编辑器和手机预览仍是发布前待验项。
+- 原始运行日志在本机清理备份，不在当前工作区；写作状态与证据索引以 `local/docs/ZhihuSeriesLedger.md` 为准。
+
+## 维护方式
+
+协调者在阶段完成或任务交接时更新本页，领域执行者回报证据并更新获准范围内的领域文档。记录日期、实现／验证／提交状态、证据入口和下一步；结果变化时修正当前条目，历史验证保持日期与范围，不以旧结果覆盖新失败。
+
+进行中的复杂任务使用 `artifacts/agent-tasks/` 里的本机记录；共享页保留稳定里程碑与明确的未完成事项。新会话先读本页，再按任务选读领域文档与源码，不依赖私人聊天或旧会话才能工作。

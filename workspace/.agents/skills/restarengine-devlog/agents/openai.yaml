@@ -1,0 +1,4 @@
+interface:
+  display_name: "RestArtEngine DevLog"
+  short_description: "Write evidence-based RestArtEngine development logs"
+  default_prompt: "Use $restarengine-devlog to turn the current engine phase into a verified Zhihu development log."
