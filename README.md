@@ -1,6 +1,8 @@
 # RestArtEngine Workspace
 
-RestArtEngine 的**私有开发协作仓库**，保存项目 skills、agent 定义、开发规范、进度、经验与 DevLog 底稿。仓库地址为 [CaptainRex0428/RestArtEngine_Workspace](https://github.com/CaptainRex0428/RestArtEngine_Workspace)，主分支为 `main`，必须保持 **Private**。
+RestArtEngine 的**开发协作仓库**，保存项目 skills、agent 定义、开发规范、进度、经验与 DevLog 底稿。仓库地址为 [CaptainRex0428/RestArtEngine_Workspace](https://github.com/CaptainRex0428/RestArtEngine_Workspace)，主分支为 `main`，当前可见性为 **Public**。
+
+协作资料在本仓库公开，但仍与引擎源码库分开管理。历史记录中的“私库／必须 Private”描述原始设计，以当前公开规则为准；机器配置、凭据、聊天数据库和未纳入清单的媒体仍不上传。历史中的机器路径仅作旧环境证据，不是可用安装配置。
 
 本仓库放在引擎目录的 `local/` 中，是独立 Git 仓库。引擎源码由 [RestArtEngine](https://github.com/CaptainRex0428/RestArtEngine) 管理；两边分别提交、拉取、推送。本仓库不是 submodule，不参与引擎构建或发行。工程不再依赖坚果云同步。
 
@@ -10,11 +12,11 @@ RestArtEngine 的**私有开发协作仓库**，保存项目 skills、agent 定�
 
 ```text
 RAEngine/                           引擎仓库与日常工作目录
-├─ AGENTS.md                        公开轻量入口，读取私有 AgentEntry
+├─ AGENTS.md                        公开轻量入口，读取协作 AgentEntry
 ├─ scripts/Sync-Workspace.ps1        公开同步薄封装
 ├─ .agents/skills/                  原技能运行目录，引擎 Git 忽略
 ├─ .codex/agents/                   原角色运行目录，引擎 Git 忽略
-└─ local/                          本私有仓库
+└─ local/                          本协作仓库
    ├─ .git/
    ├─ README.md
    ├─ docs/                        直接编辑的规范、进度与底稿
@@ -38,7 +40,7 @@ RAEngine/                           引擎仓库与日常工作目录
 
 ## 新电脑安装
 
-需要 Git、可用的 GitHub 私库访问权限，以及 PowerShell 7 或 Windows PowerShell 5.1。认证通过 Git 凭据工具完成，不将 token 写入仓库、URL 或脚本。
+需要 Git，以及 PowerShell 7 或 Windows PowerShell 5.1。Public 仓库可公开克隆；推送仍需仓库写入权限，认证通过 Git 凭据工具完成，不将 token 写入仓库、URL 或脚本。
 
 以下命令在新目录执行。若目标 `local/` 已有资料，先检查并合并，不能直接覆盖或清空。
 
@@ -55,7 +57,7 @@ git clone https://github.com/CaptainRex0428/RestArtEngine_Workspace.git local
 
 直接调用 `local/scripts/` 可兼容尚未带公开同步薄封装的引擎版本；已有薄封装时也可使用 `./scripts/Sync-Workspace.ps1`，行为相同。Install 不生成或覆盖公开 `AGENTS.md`。若引擎版本暂缺该入口，在聊天中显式读取 `local/docs/AgentEntry.md`；后续采用含公开入口的引擎版本即可自动接入。
 
-安装后确认原 `.agents/skills/` 与 `.codex/agents/` 文件存在。客户端未刷新发现列表时重新打开会话。引擎编译仍按引擎 README 执行，完全不依赖此私库。
+安装后确认原 `.agents/skills/` 与 `.codex/agents/` 文件存在。客户端未刷新发现列表时重新打开会话。引擎编译仍按引擎 README 执行，完全不依赖此协作库。
 
 本机文章输出路径单独写入忽略的 `local/machine/Paths.md`。缺少该文件时先确认本机路径；不要复制历史记录中的绝对路径。写作前仍须确认目标目录有 `head.png` 和 `head.psd`。
 
@@ -63,12 +65,12 @@ git clone https://github.com/CaptainRex0428/RestArtEngine_Workspace.git local
 
 | 命令模式 | 用途 |
 | --- | --- |
-| `Status`（默认） | 只读比较运行副本、私库副本及上次同步基线 |
-| `Collect` | 将运行目录的 skills／agents 改动收集到私库 |
-| `Install` | 将私库中的版本安装到原运行目录 |
+| `Status`（默认） | 只读比较运行副本、协作库副本及上次同步基线 |
+| `Collect` | 将运行目录的 skills／agents 改动收集到协作库 |
+| `Install` | 将协作库中的版本安装到原运行目录 |
 | `-WhatIf` | 预演 Collect／Install，不写文件或同步状态 |
 
-**开始工作前**，先查看状态；有运行副本改动时先 Collect 并审查、提交，再拉取私库：
+**开始工作前**，先查看状态；有运行副本改动时先 Collect 并审查、提交，再拉取协作库：
 
 ```powershell
 git status --short
@@ -77,14 +79,14 @@ git -C local status --short
 
 # 仅在存在待收集的运行副本改动时执行
 ./local/scripts/Sync-Workspace.ps1 -Mode Collect
-# 有私库改动时先按下方流程提交，随后拉取
+# 有协作库改动时先按下方流程提交，随后拉取
 git -C local pull --ff-only
 ./local/scripts/Sync-Workspace.ps1 -Mode Install
 ```
 
-引擎自身按其工作区状态独立拉取；私库更新不会更新引擎代码。合并或切换版本后，核对开发记录引用的引擎 commit 与实际源码。
+引擎自身按其工作区状态独立拉取；协作库更新不会更新引擎代码。合并或切换版本后，核对开发记录引用的引擎 commit 与实际源码。
 
-**完成工作后**，将进度、经验及待办写回私库 docs；skill／agent 在原运行目录修改后执行 Collect，再审查并提交：
+**完成工作后**，将进度、经验及待办写回协作库 docs；skill／agent 在原运行目录修改后执行 Collect，再审查并提交：
 
 ```powershell
 ./local/scripts/Sync-Workspace.ps1 -Mode Collect
@@ -106,13 +108,13 @@ git -C local push
 
 遇到冲突时保留两份文件，比较并合并内容，确认需要的版本后将两侧统一，再重新运行同步。不要通过删除 `.sync/`、reset/clean 或直接覆盖来绕过冲突。Git 拉取分叉也按普通合并流程解决，不强推。
 
-工具不传播删除。新增文件需审查并加入 `workspace-manifest.json`；删除或改名需同时核对清单、运行副本和私库副本。多个聊天共享工作区时，由一个协调者在文件编辑完成后执行同步。
+工具不传播删除。新增文件需审查并加入 `workspace-manifest.json`；删除或改名需同时核对清单、运行副本和协作库副本。多个聊天共享工作区时，由一个协调者在文件编辑完成后执行同步。
 
 每个文件使用独立临时文件发布和哈希校验；发生 I/O 故障时可能已有部分文件复制，不能把它当成跨文件原子事务，应先 Status 再处理。
 
 ## Codex 与补充模型共用的阅读顺序
 
-1. 引擎根 `AGENTS.md` → [私有入口](docs/AgentEntry.md)。
+1. 引擎根 `AGENTS.md` → [协作入口](docs/AgentEntry.md)。
 2. [开发状态](docs/DevelopmentStatus.md)与[协作规范](docs/AgentDevelopment.md)。
 3. 本任务对应的原运行目录 skill，以及引擎的公开领域文档和源码。
 4. 写作任务额外读取[知乎规范](docs/ZhihuSeries.md)、[底稿](docs/ZhihuSeriesLedger.md)与本机输出路径。
@@ -131,7 +133,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File local/scripts/Test-Workspace
 测试创建独立临时夹具，覆盖安装／收集、双侧冲突、删除保护、WhatIf、非法路径、链接与锁竞争，不操作真实工程的技能内容。
 
 - [同步设计与换机说明](docs/WorkspaceSync.md)
-- [公开／私有／仅本机内容边界](docs/RepositoryPolicy.md)
+- [引擎库／协作库／仅本机内容边界](docs/RepositoryPolicy.md)
 - [文件位置索引](docs/LocalDevelopmentGuide.md)
 
 本库中的 `docs/` 按安装到引擎 `local/` 后的相对路径引用公开源码或运行 skills；部分跨仓库链接只在完整本地工作区可达。`workspace/` 中的技能引用也按其安装后的原位置解析。

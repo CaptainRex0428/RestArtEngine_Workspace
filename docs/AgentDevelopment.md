@@ -4,7 +4,7 @@
 
 ## 使用入口
 
-公开根 `AGENTS.md` → 私有 [AgentEntry.md](AgentEntry.md) 是统一入口，使用位置仍是 RAEngine 根。同步按 [WorkspaceSync.md](WorkspaceSync.md) 执行：引擎库与 `local/` 私库分别管理，skills／agents 保持 `.agents/skills/`、`.codex/agents/` 原运行位置。Codex 与 DeepSeek（补充模型）共用此流程；任务前核对同步状态，收尾收集运行副本改动，进度不按模型分叉。
+公开根 `AGENTS.md` → 协作 [AgentEntry.md](AgentEntry.md) 是统一入口，使用位置仍是 RAEngine 根。同步按 [WorkspaceSync.md](WorkspaceSync.md) 执行：引擎库与 `local/` 协作库分别管理，skills／agents 保持 `.agents/skills/`、`.codex/agents/` 原运行位置。Codex 与 DeepSeek（补充模型）共用此流程；任务前核对同步状态，收尾收集运行副本改动，进度不按模型分叉。
 
 先按 [本地位置索引](LocalDevelopmentGuide.md) 确认资料属于公开仓库、项目内忽略文件还是仓库外配置；公开范围以 [RepositoryPolicy](RepositoryPolicy.md) 为准。项目根 `.codex/agents/` 与用户目录 `~/.codex/` 分开管理，不复制个人模型配置到角色或技能。新增任务的文件归属须同时说明写入者和公开／本地属性。
 
@@ -28,7 +28,7 @@ $restarengine-gui 为 Details 面板设计布局和交互状态，先给方案�
 | 项目需求和进度 | [DevelopmentStatus.md](DevelopmentStatus.md) 是统一索引；需求、设计、当前边界仍在各领域文档；[context skill](../../.agents/skills/restarengine-context/SKILL.md) 负责核对源码与证据。 |
 | 引擎流程和专项特性 | [Architecture.md](../../docs/Architecture.md) 定义模块与数据契约；[delivery skill](../../.agents/skills/restarengine-delivery/SKILL.md) 定义开发、验证、集成交付；专项 skill 定义领域特有约束。 |
 
-公开 `AGENTS.md` 与通用同步脚本只承载调用指针；完整 AgentEntry、技能、角色、本规范、开发状态、研究记录和写作底稿进入私库，不提交到公开引擎仓库。公开内容边界见 [RepositoryPolicy.md](RepositoryPolicy.md)。不复制本机模型配置、凭据或当前机器写作路径；写作路径在忽略的 `local/machine/Paths.md`。写作流程不因开发任务自动触发。
+公开 `AGENTS.md` 与通用同步脚本只承载调用指针；完整 AgentEntry、技能、角色、本规范、开发状态、研究记录和写作底稿进入协作库，不提交到公开引擎仓库。公开内容边界见 [RepositoryPolicy.md](RepositoryPolicy.md)。不复制本机模型配置、凭据或当前机器写作路径；写作路径在忽略的 `local/machine/Paths.md`。写作流程不因开发任务自动触发。
 
 ## 角色路由与边界
 
@@ -61,7 +61,7 @@ $restarengine-gui 为 Details 面板设计布局和交互状态，先给方案�
 
 任务状态采用“待执行 → 执行中 → 待验收 → 完成”，另可标注“阻塞”及具体依赖；子 agent 完成只进入待验收，主 agent 检查实际结果后才完成。源码实现与运行验证是独立事实。文档任务的完成条件是文档／配置验证，不要求 GPU 验证。
 
-临时任务记录可放 `artifacts/agent-tasks/<任务标识>.md`，跨机续接所需的用户目标、引擎基线、依赖、写入者、进度、证据位置和下一步必须摘要到私库 `local/docs/`。进程或聊天中断后先核对记录与实际 diff，不假定旧子 agent 仍运行。引擎稳定行为写回公开领域文档，开发过程与验证历史写入 DevelopmentStatus。私库 clone 可恢复已提交文字；原始日志和截图不随之恢复，必须分别核验，迁移规则见本地位置索引。
+临时任务记录可放 `artifacts/agent-tasks/<任务标识>.md`，跨机续接所需的用户目标、引擎基线、依赖、写入者、进度、证据位置和下一步必须摘要到协作库 `local/docs/`。进程或聊天中断后先核对记录与实际 diff，不假定旧子 agent 仍运行。引擎稳定行为写回公开领域文档，开发过程与验证历史写入 DevelopmentStatus。协作库 clone 可恢复已提交文字；原始日志和截图不随之恢复，必须分别核验，迁移规则见本地位置索引。
 
 ## 续接与证据管理经验
 

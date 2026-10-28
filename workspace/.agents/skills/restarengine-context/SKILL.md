@@ -5,11 +5,11 @@ description: "Recover RestArtEngine requirements, current implementation, progre
 
 # RestArtEngine 项目上下文
 
-先读公开根 `AGENTS.md` 及其指向的私有 [AgentEntry.md](../../../local/docs/AgentEntry.md)，再读 [DevelopmentStatus.md](../../../local/docs/DevelopmentStatus.md)，按索引定位领域事实；结构与现有行为以 [Architecture.md](../../../docs/Architecture.md)、[README.md](../../../README.md) 及相关源码为准。
+先读公开根 `AGENTS.md` 及其指向的协作 [AgentEntry.md](../../../local/docs/AgentEntry.md)，再读 [DevelopmentStatus.md](../../../local/docs/DevelopmentStatus.md)，按索引定位领域事实；结构与现有行为以 [Architecture.md](../../../docs/Architecture.md)、[README.md](../../../README.md) 及相关源码为准。
 
 ## 建立当前基线
 
-先读 [位置与提交边界](../../../local/docs/LocalDevelopmentGuide.md)。完整协作内容、进度和日志进入 `local/` 独立私库，根 AGENTS 与通用同步脚本是允许公开的轻量入口。同步按 [WorkspaceSync.md](../../../local/docs/WorkspaceSync.md) 检查；在 RAEngine 根使用原 skill/agent 路径，不从存储镜像执行。两仓库分别检查状态，模型凭据和本机路径不纳入同步。
+先读 [位置与提交边界](../../../local/docs/LocalDevelopmentGuide.md)。完整协作内容、进度和日志进入 `local/` 独立协作库，根 AGENTS 与通用同步脚本是允许公开的轻量入口。同步按 [WorkspaceSync.md](../../../local/docs/WorkspaceSync.md) 检查；在 RAEngine 根使用原 skill/agent 路径，不从存储镜像执行。两仓库分别检查状态，模型凭据和本机路径不纳入同步。
 
 - 读取用户本轮目标和已经确认的约束，再查看 `git status --short`、相关 diff 与必要的提交记录。保留用户和其他任务的未提交改动，不默认 HEAD 代表整个工作区。
 - 调查期间相关文件发生外部变化时，注明取样范围，重新核对受影响接口与结论；旧分析不能直接授权覆盖新实现。无法得到稳定快照时交付暂定结论与待复核项，不持续追逐变化或阻塞无关工作。

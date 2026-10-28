@@ -1,10 +1,10 @@
-# RestArtEngine 私有协作入口
+# RestArtEngine 协作入口
 
-本文件随 `local/` 独立私有仓库同步，由引擎根公开 `AGENTS.md` 引用。完整 AI 角色／技能、开发状态、经验、DevLog 规范与底稿禁止加入公开引擎仓库；根 `AGENTS.md` 和通用同步脚本是明确允许的公开调用入口。边界见 [RepositoryPolicy.md](RepositoryPolicy.md)，同步设计见 [WorkspaceSync.md](WorkspaceSync.md)。引擎开发约定以 [Architecture.md](../../docs/Architecture.md) 和 [README.md](../../README.md) 为准。
+本文件随 `local/` 独立协作仓库同步，由引擎根公开 `AGENTS.md` 引用。完整 AI 角色／技能、开发状态、经验、DevLog 规范与底稿禁止加入公开引擎仓库；根 `AGENTS.md` 和通用同步脚本是明确允许的公开调用入口。边界见 [RepositoryPolicy.md](RepositoryPolicy.md)，同步设计见 [WorkspaceSync.md](WorkspaceSync.md)。引擎开发约定以 [Architecture.md](../../docs/Architecture.md) 和 [README.md](../../README.md) 为准。
 
 ## 文件位置与同步入口
 
-完整协作规范、开发过程与日志在私有 `local/docs/` 维护；公开 `docs/` 仍仅放引擎技术说明。公开根入口可以指向可选私有入口，但不能复制私有正文或让引擎构建依赖它。继续在 RAEngine 根调用原有 skills／agents，不从私库镜像运行。
+完整协作规范、开发过程与日志在协作 `local/docs/` 维护；公开 `docs/` 仍仅放引擎技术说明。公开根入口可以指向可选协作入口，但不能复制协作正文或让引擎构建依赖它。继续在 RAEngine 根调用原有 skills／agents，不从协作库镜像运行。
 
 开发资料、项目技能／角色、用户级外置配置、文章与媒体的位置及传输规则统一见 [`local/docs/LocalDevelopmentGuide.md`](LocalDevelopmentGuide.md)。本地维护的提交规范见 [`local/docs/RepositoryPolicy.md`](RepositoryPolicy.md)。新文件先确定公开／项目内本地／仓库外三类归属；每次更新按位置索引同步对应文档，不把本地进度和个人配置写回公开技术说明。
 
@@ -42,7 +42,7 @@ Windows、Linux、macOS 均纳入首轮架构；图形后端范围为 DX11、DX1
 
 本项目的 Codex 技能是 [`.agents/skills/restarengine-devlog/SKILL.md`](../../.agents/skills/restarengine-devlog/SKILL.md)。触发写作时先读取该技能、[`local/docs/ZhihuSeries.md`](ZhihuSeries.md)、[`local/docs/ZhihuSeriesLedger.md`](ZhihuSeriesLedger.md) 和本文件，再按技能执行：确定阶段与日期 → 采集 commit/源码/命令/截图证据 → 先更新底稿 → 写正文 → 自检 → 发布后回填。
 
-本机文章输出根读取 [local/machine/Paths.md](../machine/Paths.md)，该文件不进入公开或私有 Git；不存在时先确认当前机器路径，不从历史记录推断。
+本机文章输出根读取 [local/machine/Paths.md](../machine/Paths.md)，该文件不进入公开或协作 Git；不存在时先确认当前机器路径，不从历史记录推断。
 
 - 换机器先确认该机器的文章存储根目录；不要沿用另一机器的绝对路径。
 - 目标目录应有 `head.png` 和 `head.psd`；没有就停止写入并重新确认目录。

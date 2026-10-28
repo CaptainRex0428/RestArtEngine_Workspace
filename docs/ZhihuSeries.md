@@ -7,9 +7,9 @@
 
 ## 0. 这套规矩解决什么
 
-本规范当前位于独立私库 `local/docs/`。公开 `docs/` 不承载写作、协作、进度或这些流程的管理规则；公开根 `AGENTS.md` 只指向私有 [AgentEntry.md](AgentEntry.md)。正式稿输出根以本机忽略文件 `local/machine/Paths.md` 为准，此次同步整理不移动已完成稿件。
+本规范当前位于独立协作库 `local/docs/`。公开 `docs/` 不承载写作、协作、进度或这些流程的管理规则；公开根 `AGENTS.md` 只指向协作 [AgentEntry.md](AgentEntry.md)。正式稿输出根以本机忽略文件 `local/machine/Paths.md` 为准，此次同步整理不移动已完成稿件。
 
-资料位置和传输边界见 [LocalDevelopmentGuide.md](LocalDevelopmentGuide.md)，双仓库流程见 [WorkspaceSync.md](WorkspaceSync.md)。本规范、底稿、变化审计与写作技能只能进入独立私库；正式文章和媒体在仓库外。文中“仓库里的文件”如指写作过程记录，是私库资料，必须检查是否已提交和推送；公开引擎 clone 不恢复它们。机器输出路径不进入任一Git仓库。
+资料位置和传输边界见 [LocalDevelopmentGuide.md](LocalDevelopmentGuide.md)，双仓库流程见 [WorkspaceSync.md](WorkspaceSync.md)。本规范、底稿、变化审计与写作技能只能进入独立协作库；正式文章和媒体在仓库外。文中“仓库里的文件”如指写作过程记录，是协作库资料，必须检查是否已提交和推送；公开引擎 clone 不恢复它们。机器输出路径不进入任一Git仓库。
 
 这个系列写的是「一个技术美术和 AI 一起，把 RestArtEngine 从零做出来」。
 
@@ -148,7 +148,7 @@ tag 比 commit hash 好记，也比「上个月那版」可靠。如果历史被
 <同步盘根>/TuringTechLab/运营内容/内容/知乎-RestArtEngine/开发日记/
 ```
 
-这台机器的绝对路径记在 `local/machine/Paths.md`，该目录被私库忽略。这份规范只写逻辑路径；公开 `AGENTS.md` 不保存私人路径。
+这台机器的绝对路径记在 `local/machine/Paths.md`，该目录被协作库忽略。这份规范只写逻辑路径；公开 `AGENTS.md` 不保存私人路径。
 
 | 部分 | 值 |
 | --- | --- |
@@ -262,7 +262,7 @@ git check-ignore -v .zhihu/example.zhihu.md
 
 这条宽匹配用于检查遗漏；全部开发审计、过程记录、AI技能与写作资料均只保留本地，不因为可复用就允许提交。发现误跟踪时保留本地副本并按本地RepositoryPolicy处理，不用 `git add -f`。
 
-- `local/docs/ZhihuSeries.md`、`local/docs/ZhihuSeriesLedger.md` 和 `.agents/skills/restarengine-devlog/` 是本机流程文件，当前不随仓库分发；正文和配图仍在外部目录。跨机器技术事实从公开领域说明恢复；本地开发/写作记录需要单独私有迁移。
+- `local/docs/ZhihuSeries.md`、`local/docs/ZhihuSeriesLedger.md` 和 `.agents/skills/restarengine-devlog/` 是本机流程文件，当前不随仓库分发；正文和配图仍在外部目录。跨机器技术事实从公开领域说明恢复；本地开发/写作记录需要单独协作迁移。
 
 ## 3. 底稿：把变化拆成正文的骨架
 
@@ -876,7 +876,7 @@ Codex 的结构不复杂：它每次会话先读 `AGENTS.md`，然后按需要�
 
 ```text
 AGENTS.md                     公开轻量入口，保持在RAEngine根使用
-local/docs/AgentEntry.md       私有触发规则、红线与文件指针
+local/docs/AgentEntry.md       协作触发规则、红线与文件指针
 local/machine/Paths.md         本机输出根，两个Git仓库均忽略
 .agents/skills/restarengine-devlog/SKILL.md
                               Codex 可复用执行流程；触发后先读，再按本规范取证和写作
@@ -891,8 +891,8 @@ local/docs/ZhihuSeriesLedger.md     写作底稿，拆正文前用，不发布
 
 | 文件 | 角色 | 谁改 | 什么时候改 |
 | --- | --- | --- | --- |
-| `AGENTS.md` | 公开通用入口、私库调用指针 | 人 | 调用方式变化时改 |
-| `local/docs/AgentEntry.md` | 私有触发器、红线、文件指针 | 人 | 工作流变化时改 |
+| `AGENTS.md` | 公开通用入口、协作库调用指针 | 人 | 调用方式变化时改 |
+| `local/docs/AgentEntry.md` | 协作触发器、红线、文件指针 | 人 | 工作流变化时改 |
 | `local/machine/Paths.md` | 本机文章输出根 | 人 | 换机器后确认并配置，不提交 |
 | `.agents/skills/restarengine-devlog/SKILL.md` | Codex 可复用执行流程，引用本规范和底稿 | 人 | 工作流或边界变了 |
 | `local/docs/ZhihuSeries.md` | 写作规范 | 人 | 规范变了才改 |
@@ -901,11 +901,11 @@ local/docs/ZhihuSeriesLedger.md     写作底稿，拆正文前用，不发布
 
 输出根是机器相关配置，只写在忽略的 `local/machine/Paths.md`，不写进会提交的入口或 docs。
 
-公开 `AGENTS.md` 只放通用调用指针；私有 `AgentEntry.md` 也不复制写作规范全文，避免多处漂移。
+公开 `AGENTS.md` 只放通用调用指针；协作 `AgentEntry.md` 也不复制写作规范全文，避免多处漂移。
 
 ### 9.3 Codex 执行契约
 
-下面这段是执行契约的正文参考。项目实际技能入口是 `.agents/skills/restarengine-devlog/SKILL.md`；公开 `AGENTS.md` 指向私有 `AgentEntry.md`，后者保留触发词、文件指针和红线；机器输出根独立放 machine/Paths.md，避免契约漂移。如果只能留三条，留第 1、4、7 条。
+下面这段是执行契约的正文参考。项目实际技能入口是 `.agents/skills/restarengine-devlog/SKILL.md`；公开 `AGENTS.md` 指向协作 `AgentEntry.md`，后者保留触发词、文件指针和红线；机器输出根独立放 machine/Paths.md，避免契约漂移。如果只能留三条，留第 1、4、7 条。
 
 ```markdown
 ## 知乎连载
@@ -936,11 +936,11 @@ local/docs/ZhihuSeriesLedger.md     写作底稿，拆正文前用，不发布
 
 ### 9.4 Codex 与 DeepSeek（补充模型）的同步
 
-1. 按 [WorkspaceSync.md](WorkspaceSync.md) 分别拉取引擎与 `local/` 私库；先处理运行副本修改，再 Install。仍从 RAEngine 根使用 `.agents/skills/restarengine-devlog/`，不改工作目录、不从镜像执行。
-2. 根 `AGENTS.md` 指向私有 `AgentEntry.md`；两个模型共读本规范、底稿及 DevelopmentStatus，不各建一套副本。当前机器文章路径单独确认并填入忽略的 `local/machine/Paths.md`。
-3. 新会话按本期真实任务启动，先检查输出根、最新文章、底稿、上一期正文及引擎基线；不把私库 commit 当成引擎功能 commit，也不把历史截图当成本轮验证。
-4. 写作完成后规范与底稿直接保存在私库 docs；修改了技能则 Collect 收集，分别审查两个仓库的 diff。正式稿与配图仍在外部目录，不随私库同步。
-5. 无法读取私库、路径或证据时说明具体缺失，不能直接编写“已完成”。每条变化要有真实源码、命令或画面证据。
+1. 按 [WorkspaceSync.md](WorkspaceSync.md) 分别拉取引擎与 `local/` 协作库；先处理运行副本修改，再 Install。仍从 RAEngine 根使用 `.agents/skills/restarengine-devlog/`，不改工作目录、不从镜像执行。
+2. 根 `AGENTS.md` 指向协作 `AgentEntry.md`；两个模型共读本规范、底稿及 DevelopmentStatus，不各建一套副本。当前机器文章路径单独确认并填入忽略的 `local/machine/Paths.md`。
+3. 新会话按本期真实任务启动，先检查输出根、最新文章、底稿、上一期正文及引擎基线；不把协作库 commit 当成引擎功能 commit，也不把历史截图当成本轮验证。
+4. 写作完成后规范与底稿直接保存在协作库 docs；修改了技能则 Collect 收集，分别审查两个仓库的 diff。正式稿与配图仍在外部目录，不随协作库同步。
+5. 无法读取协作库、路径或证据时说明具体缺失，不能直接编写“已完成”。每条变化要有真实源码、命令或画面证据。
 
 这套规范不依赖某个模型。DeepSeek、GPT、Claude 都按同一套文件读。换模型无需复制进度或改规范；模型服务设置由工具自身管理，本同步流程不读取或更改它。
 
@@ -968,7 +968,7 @@ local/docs/ZhihuSeriesLedger.md     写作底稿，拆正文前用，不发布
 
 ### 9.7 如果不想公开这份规范
 
-当前规范、底稿、开发审计位于 `local/docs/`，DevLog skill 位于项目 `.agents/skills/`，全部被Git忽略。新机器公开技术事实从README/docs恢复；私有写作状态另行迁移，不能假定clone会恢复。
+当前规范、底稿、开发审计位于 `local/docs/`，DevLog skill 位于项目 `.agents/skills/`，全部被Git忽略。新机器公开技术事实从README/docs恢复；协作写作状态另行迁移，不能假定clone会恢复。
 
 不要复制成两份。一份在仓库、一份在本地，早晚会漂移。
 

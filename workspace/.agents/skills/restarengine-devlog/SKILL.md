@@ -11,13 +11,13 @@ Use this skill for the repository's ongoing development-log series. It defines t
 
 Read these before collecting changes or drafting:
 
-1. The public repository `AGENTS.md`, its private `local/docs/AgentEntry.md`, and the machine-local output root in ignored `local/machine/Paths.md`. If the machine path file is missing, confirm the current machine's output root before writing; never infer it from historical notes.
+1. The public repository `AGENTS.md`, its collaboration entry `local/docs/AgentEntry.md`, and the machine-local output root in ignored `local/machine/Paths.md`. If the machine path file is missing, confirm the current machine's output root before writing; never infer it from historical notes.
 2. [`local/docs/ZhihuSeries.md`](../../../local/docs/ZhihuSeries.md) for the normative format, evidence rules, privacy rules, and publishing checklist.
 3. [`local/docs/ZhihuSeriesLedger.md`](../../../local/docs/ZhihuSeriesLedger.md) for the current issue, previous coverage, evidence inventory, and commitments.
 4. The relevant `README.md`, `docs/Architecture.md`, source files, tests, logs, and screenshots for evidence.
 5. The previous issue's actual Markdown and referenced media in the configured external root. Inspect its section structure, image placement, captions, filenames, and media dimensions; do not infer these from the ledger alone. DevLog01 was prepared with the supplementary model; reuse the series conventions, not unverified historical claims or model configuration.
 
-Private workspace synchronization for Codex and supplementary models follows [`WorkspaceSync.md`](../../../local/docs/WorkspaceSync.md). Keep invoking this skill from the engine root at its original path; the private Git mirror is storage, not another execution location. Writing rules and ledgers are versioned only in the private workspace; final articles and media stay external.
+Collaboration workspace synchronization for Codex and supplementary models follows [`WorkspaceSync.md`](../../../local/docs/WorkspaceSync.md). Keep invoking this skill from the engine root at its original path; the collaboration Git mirror is storage, not another execution location. Writing rules and ledgers are versioned only in the collaboration workspace; final articles and media stay external.
 
 If this issue actually uses a project or global skill, agent, or `agents/openai.yaml`, read that file and record the real file path. Do not claim a skill or agent that was not used in this run. Model/provider configuration is execution infrastructure, not article content; never copy tokens, gateway URLs, or machine configuration into either repository or the article.
 
