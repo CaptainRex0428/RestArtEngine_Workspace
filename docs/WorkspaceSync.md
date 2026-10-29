@@ -53,6 +53,8 @@ git -C local push -u origin main
 
 ## 日常同步与换机
 
+Codex 与 DeepSeek 统一采用 [任务闭环](TaskWorkflow.md) 和 [经验索引](DevelopmentExperience.md)。`docs/tasks/` 的任务索引／vN 修复日志、`docs/experience/` 的主题经验是协作库文本，直接编辑并按授权单独提交；不复制到引擎 `docs/`。换机读取最新版本和经验，原始 artifacts 不存在时标明证据缺失。
+
 **开始工作**：先 Status 检查运行副本；若有本机修改，先 Collect、审查并提交协作库，再进行拉取。分别查看两个仓库的 `status` 后使用 `git pull --ff-only` 和 `git -C local pull --ff-only`；引擎自身有并发修改时按正常 Git 流程处理。随后 Install，确认 Status 全部 Synced，再在原目录开发。拉取遇到分叉或冲突时人工合并，不使用 reset/clean 丢弃修改。
 
 **完成工作**：更新 `local/docs/DevelopmentStatus.md` 及领域规范，记录实际引擎 commit、未提交范围和验证证据；修改 skill／agent 后 Collect，再检查协作库 diff。使用显式路径分别提交两个仓库。证据路径指向 `artifacts/` 不表示截图也已同步，跨机无法读取的证据保留“历史验证”身份。长期任务交接应写入 `local/docs/`；临时 `artifacts/agent-tasks/` 仍只在本机。

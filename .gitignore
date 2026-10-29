@@ -7,6 +7,15 @@
 !/docs/
 /docs/*
 !/docs/*.md
+# Versioned task narratives and reusable experience: Markdown only.
+!/docs/tasks/
+/docs/tasks/**
+!/docs/tasks/**/
+!/docs/tasks/**/*.md
+!/docs/experience/
+/docs/experience/**
+!/docs/experience/**/
+!/docs/experience/**/*.md
 !/scripts/
 /scripts/*
 !/scripts/Sync-Workspace.ps1

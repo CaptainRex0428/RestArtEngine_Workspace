@@ -23,6 +23,8 @@ $restarengine-gui 为 Details 面板设计布局和交互状态，先给方案�
 
 ## 两类标准
 
+所有开发任务遵守 [TaskWorkflow.md](TaskWorkflow.md)。版本日志在 `local/docs/tasks/<日期-任务>/vN.md`，可复用经验入口为 [DevelopmentExperience.md](DevelopmentExperience.md)。小任务可用短记录，但四步闭环不能因未使用子 agent 而省略；主 agent 收尾时核验日志和经验处理。
+
 | 标准 | 事实来源与职责 |
 | --- | --- |
 | 项目需求和进度 | [DevelopmentStatus.md](DevelopmentStatus.md) 是统一索引；需求、设计、当前边界仍在各领域文档；[context skill](../../.agents/skills/restarengine-context/SKILL.md) 负责核对源码与证据。 |

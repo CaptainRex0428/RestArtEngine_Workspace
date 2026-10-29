@@ -1,3 +1,39 @@
+## 剩余开发改动分类提交（2026-10-29）
+
+用户授权整理提交剩余改动，并明确保留 R8 测试模型及引用它的 Sandbox 改动在本地。本轮引擎提交：b7f77fe（公开轻量协作入口与同步 wrapper）、769f192（PBR／NPR 目标和 GPU 裁剪统计说明）、f6e3295（统一导入、六个 Engine 网格、材质拖放及配套测试／文档）。此前 2c84e99、d7d2fe6、933e2d7 的性能、统计、材质状态提交保留。引擎库剩余工作区仅为 Sandbox 用户资产和配置；未提交 R8 或任何协作正文／原始证据，未推送。
+
+f6e3295 的实际暂存源码独立 Debug 无警告构建、9/9 CTest、完整编辑器自测通过，D3D11 errors=0；六个内置网格由工具重建逐字节一致，测试前后8个用户文件哈希不变。四步任务规范、经验、历史任务进度在协作库单独整理提交。完整本轮闭环见 [任务记录](tasks/2026-10-29-remaining-commits/README.md)；历史段落的“未提交”描述其当时状态，以本段和最新提交记录为准。
+
+## 材质深度／剔除与千万面验收已提交（2026-10-29）
+
+已提交 `933e2d73d9a5361c6b4754aea06a2b6ad28982e5`（feat(renderer): add material depth and cull controls with 10M DXR GI validation），26个公开源码／测试／技术文档文件，未推送。基于分别提交的性能缓存 `2c84e99` 和统计 `d7d2fe6`，仅加入本任务材质 Cull／ZTest／ZWrite、序列化与实时预览、光栅／射线／拾取契约、相机与阴影视锥剔除、硬件深度兼容恢复及千万三角形基准；排除导入、Engine mesh迁移、材质拖放、Sandbox资产与协作配置。工作文件未被候选覆盖，其他任务dirty保留，提交后暂存区为空。
+
+证据 `artifacts/render-scale-commit/`：从HEAD按片段构造候选并独立导出；Debug构建和8/8 CTest、材质GPU专项、完整Editor、10,000,024三角形DXR＋RealtimeGI（66 dispatch、errors0）通过。期间统计任务提交后做三方合并，保留全部统计UI/接口，更新CPUfrustum开启input0／关闭input2断言与新材质截图raw-readback前缀；最终v2重新构建和完整Editor通过（31 geometry cases、errors0），已检查真实材质窗口截图。v1与v2渲染器实现相同；最终26文件blob与manifest-v2.json一致。提交阶段Debug规模样本median46.41ms/P95 47.0751ms，不替代先前Release测量，均非通用FPS承诺。候选、manifest、review-v2.patch、build-v2.log、cpu.log、material-state.log、editor-v2.log、scale.log保留，可复核提交边界与验证版本。
+
+## 每次开发任务四步闭环（2026-10-29）
+
+已统一分析原因 → 修改与验证 → v1/v2/后续版本日志 → 总结经验的流程；Codex 与 DeepSeek 共用入口，保持 RAEngine 根调用 skills／agents。完整规范见 [TaskWorkflow](TaskWorkflow.md)，经验入口见 [DevelopmentExperience](DevelopmentExperience.md)，本次实施与文档验证见 [任务记录](tasks/2026-10-29-task-workflow/README.md)。三个运行 skills 已 Collect 且全部 Synced；新增任务／经验目录在协作库仅放行 Markdown，引擎库继续整体忽略 local。未修改引擎实现，未提交／推送本轮规范改动。
+
+## 面数统计已分类提交（2026-10-29）
+
+已提交 d7d2fe65f9adf63a3958b5307e8f8840b1143f7f（feat(editor): show scene and post-clipping triangle statistics），仅13个公开源码／测试／技术文档路径，未推送。提交以当时HEAD 2c84e99为父，精确tree 2b2fd9d89071192c13656040eb23f6dfc6f1124e；将本任务增量从Material/Import/frustum/渲染缓存等工作区改动中剥离，用独立index和HEAD导出源码验证后提交。独立Debug构建通过，完整editor-self-test退出0、29 geometry cases全PASS、D3D11错误0，证据 artifacts/triangle-statistics/commit-validation/；对应产物 build/triangle-statistics-commit/Debug/RestArtEngine.exe。先前31case是混合其他任务CPUfrustum的集成证据，提交树本身只含GPU裁剪统计、不含CPUfrustum。提交过程77个已记录工作文件字节未变，真实暂存区已按这13路径同步，其他dirty保留。详细提交结果见 artifacts/triangle-statistics/commit-result.json。
+
+## 千万三角形＋实时硬件 GI、材质深度与剔除（2026-10-29）
+
+用户确认首轮规模验收要求视锥内至少一千万三角形，同时开启硬件光追和实时 GI，帧率先实测；culling 包含材质 Off／Front／Back 和相机视锥，不含遮挡剔除。已实现后端无关 MaterialCullMode／MaterialDepthTest，兼容 twoSided，新增 ZTest 九种模式与 ZWrite，现代/旧材质稳定字符串持久化和失败不污染；材质面板统一 Cull 组合框，参数、材质球与详情即时预览，Apply／Discard／Save契约保留。光栅六种镜像×Cull状态、深度状态缓存、解析／三角形／DXR普通和反向阴影面筛选、背面法线与CPU拾取同步。ZTest Never不截获拾取，其他特殊深度模式仍为几何最近拾取，不模拟最终绘制顺序。
+
+主视图和各阴影级联按自身裁剪矩阵保守剔除完全在外的网格包围盒；SceneSettings.frustumCulling默认true，可供验证关闭。DXR保留相机外几何供阴影、反射和GI使用。硬件最近主命中仅兼容Less／LessEqual且ZWrite On；其他状态保留请求、effective inactive并给原因，恢复后更新GI history epoch。阴影贴图始终Less／Write On。本轮为DXR打包添加精确topology reserve，避免千万面时vector增长峰值。并行R8任务提供MeshGeometryKey、geometry cache、scene-input缓存和MeshQuery BVH；本轮在这些新接口上集成剔除和Cull Front，没有把其全部工作计成本轮独立修改。
+
+独立 build/cmake-render-scale Debug／Release构建通过，9/9 CTest通过。新 --material-render-state-self-test 实际GPU验证九类用例，Cull硬件12 dispatch，视锥输入4→2且画面相同，相机后方donor在反射和GI分别影响2704像素，errors0。完整editor-self-test最终通过，包括真实Cull/ZTest/ZWrite交互、预览／Discard／Apply／保存、诊断统计和热编译失败保留；硬件专项206 dispatch、GI专项1181 dispatch均通过且errors0。首次编译碰到测试helper near/far与Windows宏冲突，已改名；首次editor测试新raw截图stem漏注册，补齐后通过；并行任务同步增加CPU剔除和GPU-only的统计对照，未放松可见像素验证。
+
+--render-scale-test 使用2500×2000非退化独立地形网格（10,000,000tri，5,004,501vertices）加两彩色方块；1080p／Deferred／DXR＋Realtime GI／双贡献／1SPF／3次表面着色／32历史，场景所有bounds在视锥内。Debug和Release均确认主GPU input/postclip与DXR场景为10,000,024tri，33帧66真实dispatch，静态重复gather和mesh upload为0。Debug validation开启、errors0，首次build+frame10,259.0081ms，稳态24帧中位15.4586ms/P95 31.2473ms。Release首次3,273.4376ms，稳态均值15.5341ms／中位15.5152ms／P95 16.0087ms，DXGI进程local2,137,751,552B、nonlocal760,205,312B。测量从CPU提交至GPU同步完成，排除UI/Present/VSync，不是独立GPU执行时间或任意场景FPS承诺；Release不启debug layer，错误验证由Debug覆盖。AS仍是全场世界空间BLAS，运动／几何变更成本不外推为静态结果。
+
+证据均在 artifacts/render-scale-depth-cull：material-state/、editor-final/、hardware/、gi/、scale-debug/、scale-release/及日志；已看过1080p场景和真实材质窗口截图。测试工程为ff65873原始Sandbox资产的隔离副本，未保存用户Sandbox。常用bin/windows-x86_64/Debug四个运行文件已与通过验证的Debug产物逐项哈希匹配并校验--help；原exe运行中无法覆盖，已将旧文件保留到before-runtime并安装新文件，未终止用户进程，重开后使用新版。源码快照与哈希见verified-sources.json。本轮未提交／推送，其他导入、统计、R8性能与用户资产修改保留，后续提交需按真实文件归属处理这些依赖。
+
+## 场景与视口三角面数统计（2026-10-29）
+
+Scene Overview、视口角落与Profiler已加入场景总三角数和主geometry GPU裁剪输出，按实例累计含隐藏；异步query排除shadow/outline/fullscreen/tool preview，纯硬件成图N/A，RealtimeGI有效，明确sample来源与Pending/Unavailable/NoViewport。固定源码快照Debug构建通过；delivery完整editor-self-test退出0，31项GPU统计case全PASS，D3D11错误0，实际截图已检查；23个原工程文件哈希不变，用户bin进程/资产保留。新产物build/triangle-statistics-verified/Debug/RestArtEngine.exe。实现、统计口径、并行构建交错与修正证据详见 [交付记录](TriangleStatistics-2026-10-29.md)；原始日志位于artifacts/triangle-statistics/delivery/。未提交，其他导入/材质/性能任务改动保持。
+
 ## R8 大网格运行与拾取性能优化（2026-10-29）
 
 实际 Sandbox Audi R8 容器包含 3,877,264 三角形、11,631,792 顶点／索引，约 325.7 MB。本轮针对导入后持续卡顿：GPU 网格每个 Pass 重哈希约 311 MiB 数据；DXR 静态帧反复展开、变换和哈希约 562 MiB 临时数据；鼠标查询逐面变换／求交；包围盒与静态 Details 预览重复计算。保留用户模型、场景、材质和采样设置。
@@ -14,7 +50,93 @@
 
 提交验收：`2c84e99`（`perf(engine): cache static mesh geometry and accelerate viewport picking`）仅含本轮性能优化、测试和公开技术文档，共 16 文件。以 HEAD 为基准按片段暂存，排除未提交的导入器、Engine 网格、材质 Cull／Depth、视锥剔除和三角面数统计；相关缓存键对新增材质状态的适配与集成测试修补仍保留在工作区，随对应功能后续提交。R8／Sandbox 用户资产未纳入。单独导出暂存候选与固定子模块源码，Debug 构建无警告、7/7 CTest、硬件光追 206 dispatch／errors=0；证据 `artifacts/r8-commit/{build.log,cpu.log,hardware.log,manifest.json}`。修正新拾取测试的 C++20 u8path 弃用警告，不改变测试行为。提交操作未覆盖当前完整工作区或用户运行程序。
 
-# 开发状态与事实入口
+## Blender FBX 退化面与可选导入配置（2026-10-29）
+
+用户反馈 Blender 导出的 Audi FBX 被 `degenerate triangle after static mesh conversion` 拒绝，随后明确要求处理行为可选。已新增 `AssetImportOptions.skipDegenerateTriangles`，默认true；Content → Import options... → Skip degenerate triangles 复选框控制并保存到 `RestArtEngine.ui.ini` 的 `import_skip_degenerate_triangles=on/off`。选择文件／外部拖入共用设置。开启仅跳过存储float位置后cross恰为0的三角形，保留任意非零小面；关闭整源严格拒绝。全部退化仍失败，坏索引／非有限值／非法变换等原错误边界保持。保留三角形的零法线可用几何法线修复；成功的清理计数通过 MeshImportDiagnostics → AssetImportResult.warnings → 黄色结果提示流转。仅警告也会打开 Import results，仍为 Imported，不改 Actor／undo／scene dirty。
+
+真实原文件只读验证：源SHA256 `68115239AAE4AB914EB9F19CE47E70F214710793CE0C51D2D8B648D627618BBD` 前后一致，保留3,877,264三角形（11,631,792 corners），跳过162退化三角形，修复8角点法线，最小保留cross长度3.01657723027e-18。严格模式正确拒绝且输出不变／诊断归零。完整统一服务生成325,707,485字节自包含rasset于隔离artifacts工程，材质与scene GUID保存重载通过；RTX5060／D3D11实际4帧绘制退出0，errors0。画面包含原文件所有可见Mesh，未声称与Blender材质／隐藏视图等价。
+
+验证：CMake Debug和常用Premake Debug通过（后者0warning/error且已更新bin程序），7/7 CTest、导入专项157 checks通过；符号链接夹具因Windows创建权限SKIP。完整隔离editor-self-test退出0，实际鼠标点击Import options按钮／checkbox、检查保存后的偏好、严格false与跳过true原生文件投递、仅警告成功／两主题结果窗、既有编辑器与6种Engine网格拖放回归均通过，D3D11 errors0。首轮并行构建碰到PDB C1041锁冲突，串行重试通过，无源码回避。证据根 `artifacts/importing/blender-degenerate/`（parser-model-probe.log、model-service.log、model-render/、cpu-tests.log、editor.log及editor/、build-retry.log、premake.log）。公开Importing／EditorGuide和vendor说明已更新。本轮未提交／推送；真实源模型未修改，Sandbox工程未被本任务写入，期间另一任务的Engine Plane挂载／Sandbox引用修改保留。
+
+额外只读核查：源场景89nodes／74meshes，全部mesh与祖先可见、无display layer。图中大圆筒对应可见源对象Cylinder.001（mesh Cylinder.002、4096triangles、原点半径约1m高2m）。Guide aktuell 1,323,008三角形与Audi aktuell 314,560三角形车身范围几乎重叠，可能解释表面闪烁，但未做Blender／逐面对应验证；未发现whole-node几何哈希完全重复组，未擅自过滤节点。证据parser-node-review.log。用户后续若要求按对象选择导入，可基于此继续，不能把当前默认所有mesh合并误称为只导入车体。
+
+## 资产来源显示名称简化（2026-10-29）
+
+按用户最终确认，浏览器来源名称由 `Engine Content` 改为 `Engine`，`Project Content` 改为 `Content`。来源树、根菜单、路径栏、`Show Engine` 开关及相关只读／来源提示同步；内部 `engine://` 键、资产 GUID、目录和读写权限保持原有语义。EditorGuide／GuiDevelopment 与原有 UI smoke 的文案断言同步。
+
+本次提交限定名称调整：从 HEAD 构造文案差异暂存，保留工作区中的网格资产、Sandbox 迁移、导入和其他未提交开发改动。提交为 `dc3ceeb`（`fix(editor): rename asset sources to Engine and Content`），共 5 文件、24 行替换，未推送。验证使用独立 `build/cmake-sandbox-meshes`，当前工作区构建及完整 `--editor-self-test` 通过，D3D11 errors=0；已查看更新后的来源树与路径栏截图，证据在 `artifacts/content-source-labels/{build.log,editor.log,editor/content_grid.bmp}`。验证针对包含其他未提交功能的当前工作区，未另行构建纯提交快照；本提交本身仅替换显示文案和匹配断言。
+
+## Sandbox 统一使用 Engine 网格（2026-10-29）
+
+按用户要求将 Sandbox 默认场景的 Sphere／Cube／Ground 引用切换为 Engine Sphere／Cube／Plane，保留全部 Actor ID、变换、材质、名称与可见性。增加 `Content/Meshes/Plane.rasset`，固定 ID `0010000000000106`，几何与旧 Plane 一致（24×24，Y=0）；删除前逐一核对旧 Sphere／Plane／Cube 的几何及缩略图 blobs 与 Engine 文件字节一致，已删除 Sandbox `Content/Meshes/Builtin` 三个生成物及空目录。
+
+SceneEditor 初始化不再调用 `ensureBuiltinMeshes`，默认新场景和 `+ Sphere`／`+ Cube` 均引用 Engine 资产；旧 1/2/3 仍作为内存兼容数据供旧场景使用，保存不附带未使用的旧图元引用。显式生成 helper 仅保留给兼容工具／测试，不参与普通启动。Content／拖拽 smoke 改为直接使用 `engine://Meshes`，没有为了旧测试恢复自动生成。
+
+本轮 7/7 CTest 通过；第一次 Debug 引擎构建遇到 C1041 PDB 占用（日志保留），串行重试并设置本次编译进程 `/FS` 后成功，未修改全局环境或构建政策。随后共享构建目录再次发生 tlog 占用，最终改用独立 `build/cmake-sandbox-meshes` 构建成功，无警告。证据位于 `artifacts/sandbox-engine-meshes/{build.log,build-retry.log,build-final.log,build-isolated.log,cpu.log}`。
+
+第一次编辑器 smoke 暴露两处仍按旧 Content 网格 ID 点击的测试，已迁移为 Engine GUID，并增加名称过滤确保行可见，没有恢复项目 Builtin 来迁就旧测试。最终完整隔离 `--editor-self-test` 退出 0，六种网格实际拖拽／Undo／Redo、新建 Engine Sphere／Cube、默认 Engine Sphere／Plane、保存重载与兼容测试通过，D3D11 errors=0。已查看 `editor-final/content_grid.bmp`，Engine Meshes 正确列出六种资产，项目侧无 Builtin；检查本机 Sandbox 目录也仍不存在 Builtin。Details 下拉隐藏未被 Actor 使用的旧兼容图元，并标明 Engine 来源。安装验证确认 Engine Plane 随包存在且 Sandbox 不携带 Builtin。证据为 `editor-final.log`／`editor-final/`／`install.log`。公开文档已同步六种 Engine Mesh 与不再生成 Builtin 的规则；没有提交／推送。
+
+## 引擎内置 StaticMesh 资产（2026-10-29）
+
+按用户要求提供 Cylinder、Cube、Cone、Sphere、Torus 五个正式 `.rasset`，位于引擎 `Content/Meshes`，含完整几何与 64px 缩略图。固定 ID `0010000000000101`～`0010000000000105`（依次 Cube、Sphere、Cylinder、Cone、Torus），可信挂载赋予 Engine 只读归属；旧项目 Sphere/Plane/Cube 的 1/2/3 不变。可从 Engine Content 拖入场景或 Add Actor，实例使用默认材质，支持原有材质拖放、变换、放置撤销／重做。
+
+`loadEngineMeshes` 在启动与切换场景时挂载；项目加载拒绝占用保留 ID，项目保存和旧图元生成跳过引擎网格，场景只写实际使用的引擎网格引用。v1/v2 加载保留引擎挂载，v3 不复制几何。网格容器自包含，World 保存不再要求导入来源文件存在；导入网格 GUID 避开保留区。Cube/Sphere 复用精确解析标记，其他三种走通用三角网格路径，未引入新后端或 UV 格式。
+
+资产重建工具为 `tools/GenerateEngineMeshes.cpp`（CMake 可选 `GenerateEngineMeshes` 目标，运行时不依赖）；CMake 安装整个 Content 与 Premake 的既有通配已覆盖五个文件。公开约定同步到 AssetFormat、EditorGuide、Architecture、EngineDistribution。
+
+验证：CMake Debug 构建与 7/7 CTest 通过，CPU 验证五种闭合拓扑／法线／绕序、缩略图、保留 ID 冲突、损坏挂载回滚、保存排除和旧版本兼容。完整隔离 `--editor-self-test` 退出 0：五种资源通过实际 Content 卡片拖入、放置、Undo/Redo，逐一检查场景截图；D3D11 validation errors=0。证据在 `artifacts/engine-meshes/editor.log` 和 `editor/engine_mesh_drop_*_placed.bmp`。用户正在运行的 Premake 编辑器未关闭；使用 CMake 独立产物验证，常用 bin 下旧进程需重新构建／启动才能获得新挂载代码。本轮未提交、未推送。
+
+最终复核：补充挂载 Engine 网格后直接 importObj 的 ID 分配与删源后重载回归；最终 Debug 重建和 7/7 CTest 通过（`build.log`／`cpu.log`）。CMake install 成功，安装包五个网格与源码资产 SHA256 逐一一致（`install.log`）。最后仅清理失效的顺序网格 ID 字段及只读／类型提示，未改变已通过的拖拽逻辑；GPU 全套运行与截图为此前同轮功能验证。
+
+## 统一 Import 与 FBX 静态网格（2026-10-29）
+
+按用户要求完成首版统一导入：Content 的 `Import...` 多选与外部文件投递共用 `Assets/AssetImport`，当前支持 OBJ／ASCII 与 binary FBX。导入到当前项目 Content 根／子目录，逐源独立校验、GUID、重名编号、临时文件与排他发布，只写新资源；未知格式、损坏内容、目录、越界／链接目标及只读 Engine 均明确拒绝，混合批次保留成功项并在 Import results 保留详情。导入本身不建 Actor、不改场景 dirty 或撤销记录。网格加载与保存按整个 Content 查找原 GUID 位置，Builtin 仍在 Meshes/Builtin。公开技术契约为 [Importing.md](../../docs/Importing.md)，接口为 AssetImport.h。
+
+FBX 使用 vendored ufbx 0.23.1（固定 commit 与 MIT 许可），合并默认姿态静态节点，烘焙层级与 geometric transform、转换左手 Y-up 米制，处理缺失法线、非均匀缩放及镜像绕序；不加载外部依赖。不迁移 UV／材质／贴图／骨骼／动画，蒙皮仅保留默认控制几何。资源与输入边界见公开规范和 vendor/ufbx/README.rae.md。未来贴图扩展同一服务与两种入口，当前贴图仍拒绝。
+
+本轮 CMake Debug、Premake Debug（0 warning/error）、安装及 ufbx license 分发检查通过；7/7 CTest 通过，导入专项 65 checks，符号链接夹具因 Windows 创建权限 SKIP。隔离 MSVC parser probe 覆盖真实 binary FBX、中文路径、双实例、Y/Z-up、层级／geometric／镜像／非均匀缩放，检查的 cross·normal 均为1，并验证坏索引／伪装OBJ／奇异／退化失败保持原输出。完整 `--editor-self-test` 在自动隔离 Sandbox 副本运行退出0：原生 WM_DROPFILES 注入验证 OBJ+FBX+不支持文件混合、重复名、Engine／区域外／重叠独立材质窗口拒绝、Actor／undo不变、删源重载与保存不重复，导入FBX立方体提交GPU并检查实际截图，两主题结果窗口已检查，D3D11 errors=0。证据为 `artifacts/importing/{build-accepted.log,premake-final.log,cpu-reviewed.log,editor-accepted.log,editor-accepted/,fbx-probe/,install.log}`。
+
+过程修正保留在 `artifacts/agent-tasks/importing.md`：新smoke最初缺ImGui context、随后新建目录未刷新registry导致目标断言失败，均修正而非删断言；独立审查发现仅坐标会误接收覆盖Content的原生工具窗口投递，已传递并校验来源viewport ID并通过重叠用例。未进行物理鼠标拖拽或原生文件选择器自动操作，运行证据为同一平台消息／共享导入通路与截图。常用 `bin/windows-x86_64/Debug/RestArtEngine.exe` 已更新；本轮未提交、未推送。7个无关已修改路径包括Sandbox资产及ViewportInteraction字节SHA256保持；共享SceneEditor／EditorSmoke／文档的既有材质拖放与其他任务改动保留。协作16副本Status均Synced，没有改动skill/agent。
+
+## Sandbox 红蓝涂漆与实时 GI 预设（2026-10-29）
+
+用户已明确选择“改成红、蓝涂漆材质，优先呈现可见的互染效果”。已提交 `ff65873`（未推送），仅 4 路径：Red.rasset、Copper.rasset、Sandbox.raproject、GlobalIllumination.md。红色 RGB=(.75,.04,.04)，蓝色=(.04,.10,.75)，均 metallic=0、roughness=.4；保留 GUID 4/1、名称、grid、twoSided 及所有其他字段。现代容器覆盖同 GUID 的旧 .ramat，旧文件保留。Sandbox 默认请求 hardware=true、PathTracing/Realtime、两种间接贡献开启，4 SPF／512 历史／4 次表面着色；引擎通用默认值未改。
+
+使用常用 Premake Debug、Windows／RTX 5060，在当前 Sandbox 的隔离副本分别验证“旧材质＋同样 GI”“涂漆＋GI”“涂漆＋两种间接贡献关闭”，各 144 帧、退出 0、D3D11 debug layer errors=0。实际截图显示 GI: Realtime，新材质有涂漆高光、相邻面可见偏色；关闭贡献后背光面变暗。证据位于 artifacts/gi-paint-tuning/ 的 variants、captures 与三份日志。该轮为资产／配置调整，复用既有引擎构建，没有新增 Shader／算法／增益或固定 FPS 承诺。
+
+两个容器除 baseColor／metallic／roughness 外的 manifest、头部版本／flags 和 blob 尾部逐项核验一致；17 项无关工作文件 SHA256 保持，场景位置、金球、地面及其他任务改动保留。项目 index 使用独立 blob，仅提交新预设，保留工作树原排序和显式 reflection／shadow=true 偏好；其有效配置与实际 GPU 验证一致。独立范围审查及 cached diff --check 通过，提交后暂存区空。备份与基线见 artifacts/gi-paint-tuning/before/、baseline.json、changes.json。已打开的编辑器不监听磁盘材质修改，需要重新加载资产或重新打开 Sandbox；勿用旧内存资产覆盖。下节“尚未修改资产”为此前诊断阶段的历史状态，本节为当前交付。
+
+## GI 颜色互染诊断与实际状态提示（2026-10-29）
+
+用户反馈红球／蓝立方互染弱。本轮已核对实际优先加载的材质：蓝R=0、metallic .867、roughness .744；红G/B=0、metallic .313、roughness .638；saved项目GI method=disabled、hardware=true。保存状态不能证明截图会话的实际状态。独立Shader审查未见丢失bounce／PDF问题；当前BRDF使纯色异色diffuse为0，spec仍可传色，其强度受F0、粗糙度、几何与环境填充影响。保持物理输运，不增加gain或强制串色；原项目、场景、材质保留，涂漆外观选择尚未修改资产。
+
+提交 9db4815（未推送），5个公开路径：SceneEditor只加入41行实际GI状态按钮／tooltip；ProjectSettings就近说明GI关闭或diffuse关闭时没有颜色溢出；HardwareSmoke验证真实980/1440宽度、状态导航、暂停／不可用和保存；GISmoke增加320×240彩色接收面双向donor因果对照；GlobalIllumination文档补材料吸收与UE官方PBR依据。工具栏可区分GI Off／Realtime／Progressive／Paused／Inactive，点击仅打开既有配置，不重写开关。
+
+候选tree ce80dead6effc6a3bea20ba66336b17c911d12b3 独立raw blob导出178文件校验一致，CMake Debug、6组CTest、GI1181真实dispatch、硬件／UI204dispatch及完整编辑器回归全部通过，RTX5060图形错误0。painted接收面Progressive蓝→红.0121107／红→蓝.0115329，Realtime .0122527／.0115403（显示通道均值增量）；两贡献关闭的固定receiver差0，纯饱和异色diffuse增量严格0。原高metal参数独立参考测得spec可传色，无强制增强阈值。GPU mask经albedo/normal分割并侵蚀2px，排除5×5滤波边缘泄漏。图像、JSON、UI截图见 artifacts/gi-colour-transfer/candidate-gi/、candidate-hardware-rt/；工作区first/为早期复现。缺DXC的unavailable/明确SKIP真实硬件、dispatch0，保存和状态解释通过。常用Premake Debug已更新。
+
+本轮仅提交上述5路径，原材质拖放／PBR-NPR／协作同步、19个无关基线文件及全部用户项目数据保持原始字节；暂存区空。初次候选导出遭遇Node默认buffer不足，改用直接fd输出，最终源码逐blob精确匹配；没有放松测试。原参数／保存配置的诊断快照为 artifacts/gi-colour-transfer/material-analysis.json。
+
+### 实时 GI 与贡献控制已实现并提交（2026-10-29）
+
+本轮沿用 PathTracing 算法，将算法选择、Progressive／Realtime 更新模式与间接 diffuse／specular 贡献独立配置。实时通道在光栅之前生成线性 HDR 间接光，由 Forward／Deferred 实际消费并与各自直接光及阴影合成；跳过原近似环境项和解析反射，避免重复计光。两个贡献开关分类相机接收面的 BRDF，次级路径保留完整光传输。共用 API 与项目 JSON 无 DirectX 依赖，具体生成仍仅 Windows 同适配器 DX11+DX12 DXR 1.1，未来算法可沿相同消费契约替换。
+
+实时每帧持续采样，有界样本历史＋独立序列，在相机／物体／材质／光照／Shader／模式／贡献变化时全失效；5×5 几何和材质边缘感知空间滤波，近镜面不模糊，当前无运动重投影。内部FP32均值及引导，共享FP16间接输出，资源60B/px、4K约475MiB。初验FP32共享图像被DX11拒绝，改FP16并补齐对应能力检查，不能称所有设备支持或保证固定帧率。
+
+工作区 CMake Debug、6组CTest、GI专项（含边界）781真实dispatch、硬件与配置真实UI145dispatch、完整编辑器回归已通过，RTX5060图形错误0；灰地面4577像素颜色传递0.01545，直接光墙色影响0，两条光栅路径GI差异>0.24，满历史后仍有2873像素变化。运动后图与显式reset同seed图严格相同，非零viewport偏移两路径逐像素一致；热编译失败保留活动管线及历史。配置截图已检查。证据位于 artifacts/gi-realtime/，最终交付21个路径：eb833a6仅修正旧编辑器测试从可见材质query选择夹具，8c9ae9d为14个GI功能／测试文件，dda510c为6份技术文档；未推送。另一任务的材质拖放、PBR/NPR、协作同步和Sandbox资产均排除，20个冻结工作文件提交前后SHA256一致，暂存区空。最终HEAD tree 414ca9808ad07db61d08f3ccfb2a78f9efcdba7c 与独立验证候选一致。
+
+ 开发状态与事实入口
+
+最终原始blob独立导出178个文件逐一校验一致，Debug构建及6组CTest、完整编辑器、GI781dispatch、配置145dispatch、14帧Validate-Render全部通过，图形错误0；对应证据 raw-cpu.log、raw-editor/、raw-gi/、raw-hardware-rt/、raw-render/。无DXC隔离程序 unavailable/ 明确SKIP硬件执行、dispatch0，Realtime及贡献偏好保存重载通过。常用Premake Debug和DXC/DXIL已更新。隔离初验分别暴露旧隐藏.ramat测试夹具及Git archive换行转换：前者仅提交最小fixture修正，后者以cat-file原始blob解决，不降低源码或像素断言。当前无运动重投影／固定FPS承诺；Windows结果不外推其他平台。
+
+## 渐进式 GI 已实现并提交（2026-10-29）
+
+按用户授权完成并提交：`b79d9bc` 为硬件DXR基础、共用GI请求／状态、路径积分、HDR累积、项目配置与测试（23路径）；`4f16de6` 为公开引擎技术文档／白名单（9路径）。未推送。最终tree `e6f546fc44b5f2d6025da81877cb8c5c81c7041b` 与隔离验证候选一致，暂存区空。其他材质拖放／PBR-NPR规划、协作入口／同步工具和Sandbox资产改动未纳入；32个生产文件提交前后字节不变，未覆盖工作区。AGENTS及本地状态期间被其他任务更新，均保留。
+
+已实现Disabled／PathTracing共用契约，Forward／Deferred均可组合DXR渐进路径。Lambert／GGX、多次表面反弹、方向光估计、环境逃逸和漫反射颜色传递；FP32线性HDR均值、严格样本目标、相机／材质／几何／光源／Shader／选项失效，曝光仅显示、debug暂停、工具预览隔离。配置页提供算法、每帧采样、目标、反弹、进度和重启，严格schema与原子保存。技术事实见引擎公开GlobalIllumination／HardwareRayTracing文档。
+
+待提交源码排除其他任务后独立导出并干净构建通过；6组CPU、GI专项、硬件／GI配置交互、完整编辑器回归、14帧Validate-Render全通过，图形错误0。RTX5060 GI182次实际dispatch；灰地面4577像素直接光改墙色误差0、间接色差0.01544；1／16／64样本对256参考误差0.07238／0.01262／0.00557。镜面／粗糙反射及配置图已检查。证据 `artifacts/gi/commit-gi/`、`commit-ui/`、`commit-editor/`、`commit-render/`；总结 `artifacts/agent-tasks/global-illumination.md`。
+
+常用Premake Debug及匹配DXC/DXIL已更新；干净CMake安装通过；缺失编译器分支明确SKIP并保留请求，不算硬件执行。干净配置发现并修正GNUInstallDirs晚于DXC install；隔离源码使用原始blob避免CRLF改变Shader源码字节断言。未实现降噪、透明／折射、发光材质、体积、其他实时GI或其他平台后端；无Release验证声明。下方此前阶段“未实现／未提交”以本节最终交付为准。
 
 ## 协作库公开规则（2026-10-29）
 

@@ -9,6 +9,8 @@ description: "Recover RestArtEngine requirements, current implementation, progre
 
 ## 建立当前基线
 
+开发任务先读 [任务闭环](../../../local/docs/TaskWorkflow.md)、该任务最新 vN 记录及 [经验索引](../../../local/docs/DevelopmentExperience.md) 中相关条目，恢复原因假设、失败尝试和未验证项；不要从头重复已排除的方案。
+
 先读 [位置与提交边界](../../../local/docs/LocalDevelopmentGuide.md)。完整协作内容、进度和日志进入 `local/` 独立协作库，根 AGENTS 与通用同步脚本是允许公开的轻量入口。同步按 [WorkspaceSync.md](../../../local/docs/WorkspaceSync.md) 检查；在 RAEngine 根使用原 skill/agent 路径，不从存储镜像执行。两仓库分别检查状态，模型凭据和本机路径不纳入同步。
 
 - 读取用户本轮目标和已经确认的约束，再查看 `git status --short`、相关 diff 与必要的提交记录。保留用户和其他任务的未提交改动，不默认 HEAD 代表整个工作区。

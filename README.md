@@ -63,6 +63,8 @@ git clone https://github.com/CaptainRex0428/RestArtEngine_Workspace.git local
 
 ## 日常操作
 
+每次开发执行 [四步任务闭环](docs/TaskWorkflow.md)：分析原因 → 修改与验证 → 记录 `docs/tasks/<日期-任务>/vN.md` → 更新或复用 [经验文档](docs/DevelopmentExperience.md)。Codex 与 DeepSeek 共用任务索引，不维护模型专属副本。
+
 | 命令模式 | 用途 |
 | --- | --- |
 | `Status`（默认） | 只读比较运行副本、协作库副本及上次同步基线 |

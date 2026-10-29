@@ -18,6 +18,8 @@ Codex 负责协作编排；具体模型/provider 属于本机 `~/.codex/` 配置
 
 ## 主引擎 agent 与协作流程
 
+每次开发任务执行 [TaskWorkflow.md](TaskWorkflow.md) 的四步闭环：分析原因、修改与验证、记录 v1／v2／后续版本日志、总结并更新 [经验文档](DevelopmentExperience.md)。Codex 与 DeepSeek 共用任务和经验，不按模型分叉。
+
 调用主引擎 agent、协调复杂任务或继续跨模块开发时，使用 [`.agents/skills/restarengine-core/SKILL.md`](../../.agents/skills/restarengine-core/SKILL.md)。项目角色为 [`.codex/agents/restarengine_core.toml`](../../.codex/agents/restarengine_core.toml)；当前主聊天可直接承担该角色，无需再创建一层经理。
 
 需求与进度入口为 [`local/docs/DevelopmentStatus.md`](DevelopmentStatus.md)，分派、文件归属和验收标准为 [`local/docs/AgentDevelopment.md`](AgentDevelopment.md)。复杂任务按实际依赖自动分派子 agent，简单修改直接处理；渲染使用已有专项角色，其他领域按需增加。具体能力受当前客户端工具限制，不能把普通子 agent 读取角色文件说成原生角色已加载。

@@ -30,8 +30,10 @@
 
 ## 每次改动同步到哪里
 
+开发流程统一见 [TaskWorkflow.md](TaskWorkflow.md)：任务索引和 v1／v2／后续日志放 `local/docs/tasks/<日期-任务>/`，经验索引为 [DevelopmentExperience.md](DevelopmentExperience.md)，主题经验放 `local/docs/experience/`。这些文本由协作 Git 管理，原始证据继续放引擎忽略的 `artifacts/`，不进入引擎库。
+
 1. 引擎功能、配置格式和操作变化：同步 README／对应公开领域文档，保证使用者不依赖本地资料也能理解和构建。
-2. 开发过程、验证结果、待办与后续任务：同步 DevelopmentStatus；复杂任务的详细交接放 `artifacts/agent-tasks/`，不把时间流水账写回公开说明。
+2. 开发过程、验证结果、待办与后续任务：每个任务更新 `local/docs/tasks/` 的版本日志及索引，DevelopmentStatus 只摘要并链接；临时调度细节可放 `artifacts/agent-tasks/`。收尾新增、修订或注明复用经验，不把时间流水账写回公开说明。
 3. 角色或协作流程变化：同步本地 AgentDevelopment、相关角色与技能；统一的位置规则维护本页，由 AGENTS 引用，不在多份文件复制机器路径。
 4. 写作与媒体变化：同步本地 ZhihuSeries／Ledger，正式稿与 `_assets/` 留在外部输出根；文章已完成、已审核、已发布分别记录。
 5. 新目录、外置配置或提交边界变化：先更新本页；涉及公开提交规则时再更新 RepositoryPolicy 和 `.gitignore`，验证新路径确实被忽略或允许。
