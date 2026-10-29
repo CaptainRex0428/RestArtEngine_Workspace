@@ -1,3 +1,119 @@
+## 进度同步快照（2026-10-30，补充模型）
+
+读取协作入口、任务闭环、状态页、任务日志与经验索引后的对齐结果；本段只同步仓库事实与 Codex 记录的验收摘要，本轮未重新构建或复验 GPU 数字。
+
+**引擎仓库**
+
+- `master` HEAD `c86a6de`，`origin/master` 仍为 `f6e3295`；`eee716d`（资产重导入/删除）、`8119e01`（间接漫反射强度）、`c86a6de`（浮窗越界）三个提交未推送。
+- 工作区 49 个已跟踪文件修改、39 个未跟踪路径（`Projects/PathTracing_CornellBox/`、`Shaders/Private/DepthOfField.hlsli`、`Lighting.hlsli`、Sandbox 资产等），对应 Camera／四分屏 DOF／GI／DXR／导入与 Content 的进行中改动，未提交。
+- `codex/cornell-box` 分支有 `638ae2e`（Cornell 示例与矩形灯），未合入 master。
+
+**Codex 任务日志已记录、本轮未复验的验收**
+
+- 统一 Camera v6：20/20 CPU、8 次真实 DXR dispatch、GI 1568、完整 Editor 通过，errors 0（[任务](tasks/2026-10-30-camera/v6.md)）。
+- 四分屏与景深 v2：20/20 CPU、Camera 37 次 dispatch、GI 1568、三格正交拾取，errors 0（[任务](tasks/2026-10-30-camera-quad-dof/v2.md)）。
+- 间接漫反射强度：已提交 `8119e01`；GI 1458 与 UI 230 次真实 DXR dispatch，errors 0。
+- 网格 Slot／UV v3：18/18 CPU、属性 27 + 硬件 206 + GI 1291 dispatch，千万面 10,000,024 三角形通过（[任务](tasks/2026-10-29-mesh-slots-uv/v3.md)）。
+- 灯光 v3：16/16 CPU、灯光 84 + GI 1291 dispatch、完整自测通过（[任务](tasks/2026-10-29-lighting/v3.md)）。
+- 资产重导入/删除：提交 `eee716d`，14/14 CTest、完整隔离自测；浮窗越界：提交 `c86a6de`，完整 Editor 自测。
+- 各任务证据目录与原始 artifacts 只在本机；跨机读取时按历史验证处理。
+
+**资产管线侧（补充模型实现，已冻结审计）**
+
+- `daa8859` 及之前的 49 个提交由 [DevLog02 后审计](DevelopmentChanges-AfterDevLog02.md) 与 [Content 交付记录](ContentBrowser-2026-10-28.md) 记录：`.rasset` 容器、GUID、64px 缩略图、Asset Details、可旋转材质球、GPU 场景 sidecar、自测临时工程隔离均在其中。
+- Codex 在 10-29 的导入、Engine 网格与 Content 重构接续这些接口，公开文档已同步。
+
+**同步后的待办**
+
+1. 为 49 文件工作区改动分类、补验证并提交；三个未推送提交按授权推送。
+2. `codex/cornell-box` 合入并处理共享 Shader／SceneEditor 冲突。
+3. DevLog03 尚未开始，素材未整理。
+
+边界：本节只记录仓库状态与任务日志摘要，未运行引擎，不把 Codex 的 GPU 数字转写成本轮验证；技能运行副本 Status 为 Synced。
+## Cornell 示例独立提交（2026-10-30）
+
+Cornell Box 示例及必要场景／矩形灯支持已提交 638ae2e（codex/cornell-box，基线f6e3295）。独立Debug无警告、10/10 CPU、GI1261真实dispatch/errors0、完整Editor和1024/1024样例通过。共享master同期被其他任务推进，本次使用独立索引／分支，未合入master、未推送；其他功能和用户工程保持原工作文件。后续集成需处理共享Shader/SceneEditor改动并重验。详见[任务v2](tasks/2026-10-29-cornell-box/v2.md)。
+
+## 四分屏与景深（2026-10-30）
+
+在Camera首版上接通四格独立相机、激活/导航/拾取路由、最大化/恢复及窄窗口切换；激活格沿用主DXR/GI历史，其余三格使用独立Raster输出。Camera Actor及自由视图支持DOF开关、对焦距离、f-stop、传感器高度；光栅/Realtime采用屏幕景深，Progressive为圆孔径薄透镜采样，正确区分history失效。DOF撤销、关闭保值、开场书签及v7场景保存兼容接通。
+
+Debug构建无警告，20/20CPU、Camera GPU37次实际DXR dispatch、GI全套1568dispatch及最终完整Editor通过，图形错误0；三格正交拾取、真实焦点控件Undo/重开和两主题截图已验证。屏幕DOF焦平面像素差0，近远条纹边缘能量下降；PT焦平面和孔径效果有实际图像证据。最后工具栏两行/半透明微调按低风险视觉变更额外构建及演示截图验收。原Projects34文件哈希不变；独立演示入口 `artifacts/camera-quad-dof/Open-CameraStudio.cmd`、默认景深输出 `View-DepthOfField.cmd`。范围与证据见[任务v2](tasks/2026-10-30-camera-quad-dof/v2.md)，经验与公开Camera文档同步。当前仅一个常驻主DXR历史；屏幕景深有24px半径及遮挡/深度近似限制。未提交／推送。
+
+## 统一Camera系统首版（2026-10-30）
+
+视口、场景Camera Actor与工具预览统一平台无关Pose/Lens/View求值，透视/正交、六向视图、Orbit/Fly、实际画幅内拾取/Gizmo/拖放接通。Camera创建与镜头Details、只读查看/显式操纵、连续手势Undo、默认输出引用、独立Raster预览及v6场景保存重开完成；旧v1–v5与开场书签兼容。正交观察方向、深度、CSM、光追射线和GI像素尺度同步，ViewId防历史误复用。当前单主时间历史，无四分屏或多套常驻DXR历史。
+
+Debug无警告构建、20/20 CPU及导航回归、Camera GPU 8次真实DXR dispatch、GI1568次dispatch/errors0通过。最终v6完整Editor退出0，Camera创建/真实镜头控件Undo/默认引用/固定画幅/View/Pilot/恢复自由视角/正交拾取/两主题预览/保存重开/删除Undo全部PASS，D3D11 validation errors0；原生浮窗、资产/材质保存、灯光、Shader与布局旧回归同样通过。证据 `artifacts/camera/v6/editor.log`，程序 `build/camera/Debug/RestArtEngine.exe`，独立演示 `artifacts/camera/Open-CameraStudio.cmd`。最终默认相机无UI演示16帧/exit0/errors0、真实截图已检查，原Projects 34文件SHA256全不变，完整性与源码快照位于v6证据目录。失败原因及修复保留v1–v5；公开说明 `docs/Camera.md` 已加入文档allowlist，[任务v6](tasks/2026-10-30-camera/v6.md)与[经验](experience/Camera.md)同步。未提交／推送。
+
+## 间接漫反射强度独立提交（2026-10-30）
+
+已提交8119e01 `feat(renderer): add configurable indirect diffuse intensity`，仅10文件239新增／13删除的参数／持久化／实时UI／首段BRDF+PDF增益／history及测试文档；保留其他任务和用户工程在工作树。相对已提交基线独立构建无警告、9/9 CPU、GI1458与硬件UI230真实DXR dispatch全部通过，errors0；候选按暂存blob校验，真实紧凑UI截图通过。隔离首次误读注册表中的工作引擎导致Shader布局拒绝，已通过夹具绝对engineRoot修正并保留失败证据。未推送，常用bin保留完整工作树交付版本。详见[提交v3](tasks/2026-10-30-cornell-bleeding/v3.md)。下段未提交为当时状态。
+
+## 可配置间接漫反射强度（2026-10-30）
+
+用户选择艺术互染控制后，Project Settings→Rendering新增Indirect diffuse intensity（0–8，默认1）。实时／渐进统一在第一接收表面的间接漫反射BRDF应用一次，匹配采样PDF；直接灯光及间接镜面分量不被倍乘，后续反弹不重复放大。倍率变化实时重置history，贡献关闭保值，项目JSON缺失默认1／严格有限范围验证／保存重开接通。沿用现有GI分类，漫反射采样环境照明也随倍率变化。
+
+Debug无警告构建、20/20 CPU、GI1568与硬件/UI230真实DXR dispatch通过，graphics errors0；实际鼠标拖动、持久化、常规／紧凑UI截图检查通过。3倍间接贡献的近似显示反演比2.9918、纯金属接收面像素误差0；真实Cornell1x/3x各1024样本／64dispatch图像已查看。29用户工程文件哈希未变；本轮GI源码和产物稳定，后续并发Camera7文件变化保留且不计入本轮验收。常用bin Debug已更新并校验。详见[任务v2](tasks/2026-10-30-cornell-bleeding/v2.md)，经验补充至PathTracingExamples；未提交／推送。
+
+## Cornell 地面互染偏弱诊断（2026-10-30）
+
+实际场景GI两贡献开启／12反弹，地面非金属；只读积分审查未发现明确系统性衰减错误。四组隔离GPU对照（原场景、关间接、侧墙中性、提高侧墙反射率）均1024样本／64真实dispatch／errors0，确认红绿墙颜色实际传到地面，提高墙面反射率会增强色偏。仅显示域ROI证据，不当作物理参考精度证明。保留用户场景全部参数与资产，未改生产代码；已询问物理场景调整或艺术增益偏好，后续依回复实施。详见[诊断v1](tasks/2026-10-30-cornell-bleeding/v1.md)，经验补充至PathTracingExamples，未提交／推送。
+
+## 导入网格多材质 Slot 与四套 UV（2026-10-30）
+
+FBX 按实例面材质 ID 保留命名 Slot／连续 section、最多 UV0–UV3；OBJ 支持 usemtl 与一套 vt，接缝与镜像角点对应保留。所有属性在同一 .rasset；无 UV 仍为 24B 顶点，旧资产兼容。Actor 每槽独立材质覆盖、实时草稿、Undo／Redo、命中面拖放、v5 场景保存与来源身份重映射接通；光栅、阴影、软件射线、DXR／GI统一解析。Asset Details 展示 Slot 与 UV，长列表可滚动。不能自动转换 DCC 材质图／贴图；旧模型需 Reimport 获取此前丢弃的属性，同名源材质无法唯一匹配时拒绝重导入并保留原资产。
+
+Debug 无警告构建、18/18 CPU、属性GPU专项27 DXR dispatch、完整Editor、硬件回归206 dispatch、GI回归1291 dispatch全部通过，图形错误0；四UV／25Slot截图已检查。千万面兼容测试在RTX5060、1080p、DXR+实时GI通过（10,000,024 triangles，66 dispatches，无FPS门槛）。Audi原FBX只读解析25Slot／25section／1UV，未修改原模型。122源码／产物哈希稳定，Sandbox资产未改；Cornell配置外部采样设置变化保留。常用bin Debug已更新并哈希匹配。公开说明与[任务v3](tasks/2026-10-29-mesh-slots-uv/v3.md)、[经验](experience/MeshAttributes.md)同步；未提交／推送。
+
+## 五类场景灯光模块（2026-10-29）
+
+已增加 Directional／Sky／Rect／Spot／Point Light Actor，创建菜单、Details实时参数、撤销、视口标记拾取/Gizmo与保存重开接通；含灯光场景v4，旧v1-v3兼容。共享b7支持32直接灯与独立Sky聚合，Forward／Deferred／软件光追／DXR／GI统一，保留Cornell矩形MIS并扩展到多Actor Rect，参数变化重置GI历史。普通Raster/Realtime局部直接阴影须AnalyticRay，硬件preview/Progressive支持DXR阴影；程序化Sky不含HDRI，矩形发光面本体仅Progressive主成图可见。
+
+Debug无警告构建、16/16 CPU、灯光专项84真实DXR dispatch、GI全套1291 dispatch、完整editor-self-test通过，graphics errors 0；实际两主题截图已检查。首次GUI因新增按钮挤掉Outliner列表失败，v3改为同行创建/窄矮菜单后完整通过，失败记录保留。交付程序 build/cmake-lighting/Debug/RestArtEngine.exe；用户常用bin进程未关闭或覆盖。自测使用隔离夹具；收尾真实Sandbox场景/缩略图在自测退出后再次保存，保留外部更新，其余22文件哈希一致。公开技术说明、[任务v3](tasks/2026-10-29-lighting/v3.md)及[经验](experience/Lighting.md)已同步；未提交／推送。
+
+## Cornell Box Path Tracing 示例（2026-10-29）
+
+新增 Projects/PathTracing_CornellBox：红绿房间、三种粗糙度金属球、真实矩形顶灯，Engine网格引用、6个现代材质及缩略图、渐进4 SPF／1024目标／8次表面着色、初始曝光0.38。补齐可选场景camera／lighting及Scene编辑入口；矩形单面发光、主射线／反射可见、面积与BRDF采样MIS、有限遮挡和历史失效。通用emission材质和玻璃折射未实现，矩形仅progressive PT。
+
+固定源码独立Debug无警告构建、16/16 CPU、GI专项1261真实dispatch／errors0、样例1024/1024样本／256dispatch通过；真实样例及32帧编辑器启动截图已查看。生成器拒绝覆盖且重建字节一致，原工程23文件哈希未改；公开说明、任务及经验同步。常用bin已有用户进程运行，未关闭／覆盖，验证程序位于build/cornell-box/Debug/RestArtEngine.exe。保留同期LightActor开发；其完整GPU功能不属于本轮验收。未提交／推送。见 [任务v1](tasks/2026-10-29-cornell-box/v1.md)、[经验](experience/PathTracingExamples.md)。
+
+## 资产重新导入与删除（2026-10-29）
+
+2026-10-30 已按本功能片段提交 `eee716d`（feat(assets): add reimport and safe asset deletion），16 文件，未推送。精确候选独立 Debug 构建、10/10 CTest、完整 editor-self-test 通过，D3D11 errors 0；其他工作区及并行任务的 10 项暂存保留。[提交验收](tasks/2026-10-29-asset-lifecycle/commit.md) 记录版本适配与隔离测试工程绑定修正。
+
+Content 右键新增 Reimport（原来源）和 Reimport from...（新来源），项目 Imported Mesh 保留 GUID／名称／位置，几何及预览更新；解析／写入失败保留旧数据。Delete... 可删除未被引用的已加载项目网格／材质，保护当前与保存场景引用、Engine、活动／启动场景和材质草稿；同步磁盘／内存，保留外部源文件，确认窗说明成功后清空场景 Undo／Redo。重复 GUID／legacy 或无法验证依赖时拒绝。
+
+CMake Debug、Premake Debug（0 warning/error）、14/14 CTest、完整隔离 editor-self-test 通过，D3D11 errors 0；真实菜单／确认、两主题列表／网格、同 GUID GPU 几何更新和删除后无复活已验证，Sandbox 15 文件哈希未改。常用 bin Debug 已更新。新源执行服务已测试，原生选择窗口未自动化操作；符号链接夹具因权限跳过。详细 [任务 v1](tasks/2026-10-29-asset-lifecycle/v1.md)、[经验](experience/AssetLifecycle.md)，证据 `artifacts/importing/asset-lifecycle/`。未提交／推送。
+
+## Audi FBX 移除圆柱体（2026-10-29）
+
+从已清理 FBX 移除独立 Cylinder.001，另存 Cleaned_NoCylinder.fbx；其余属性逐项不变，原件保留。Blender 实际打开及引擎严格导入通过，剩余 73 网格、3,873,168 三角形。仅处理外部资产，未修改引擎源码或项目；[任务记录](tasks/2026-10-29-fbx-remove-cylinder/v1.md)，证据 `artifacts/importing/fbx-no-cylinder/`。未提交／推送。
+
+## 编辑器底栏与命令控制台（2026-10-29）
+
+新增固定底栏：Content／Output Log／Cmd／Diagnostics／Tools 与分类保存状态。命令共用现有编辑器操作和撤销，支持 help、Tab 补全、历史／草稿、选择 Actor、保存和诊断；日志保留会话命令及编辑器提示。高缩放底栏高度计入 ImGui 最小窗口尺寸，DockSpace 与视口真实排版，文本焦点不透传场景。
+
+Debug 无警告构建、13/13 CPU、完整 editor-self-test 通过，D3D11 errors=0；两主题 1440px／680px＋150% 截图已检查，用户 Sandbox 14 文件哈希不变。Premake 已刷新，常用 bin Debug 已与验证产物哈希匹配。公开操作／架构文档、任务版本及经验已同步；未提交／推送。详情见 [任务 v4](tasks/2026-10-29-status-bar/v4.md)，经验见 [EditorConsole](experience/EditorConsole.md)。首轮增量混编崩溃、测试页签延迟、最小高度越界分别保留失败记录；不宣称全量日志、Content 临时抽屉或非 Windows 验收。
+
+## 普通浮窗跨主窗口边界（2026-10-29）
+
+2026-10-30 提交完成：c86a6de，仅浮窗修复、自测与文档 15 文件，未推送。候选合并到 8119e01 后独立 Debug 无警告构建，完整 Editor 自测退出 0、D3D11 错误 0；本轮原生外窗图像已查看，真实外移／回嵌与跨窗口投递通过。补充处理测试中重叠浮窗的实际 z-order 与拖源激活，保留旧输入注入和真实拖放断言。共享工作区其他修改保留，提交前后可见文件哈希无变化；见[任务 v2](tasks/2026-10-29-floating-windows/v2.md)。
+
+已解除普通dock面板、Diagnostics/Project Settings/GC/Outline的main viewport pin；SceneViewport独立scene目标尺寸与desktop映射，完整显示／拾取／跨窗Mesh与Material拖放／Gizmo／回嵌和布局读取。主最小化保留owned浮窗并跳隐藏Scene GPU；F1隐藏UI不因minimized复活。固定快照独立Debug无警告构建、完整Editor自测退出0，native GPU画面已检查，D3D11错误0；35原始工程／资产／Shader哈希不变。新产物build/floating-windows/Debug/RestArtEngine.exe，未覆盖bin、未提交。完整过程见[任务v1](tasks/2026-10-29-floating-windows/v1.md)，经验见[原生浮窗](experience/NativeFloatingWindows.md)。其他Persistence/Sandbox改动保留。
+
+## 场景与资产保存职责分离（2026-10-29）
+
+根据用户进一步要求，Save Scene／Save As 现在只写 Actor、变换和 GUID 引用，不写资产、不清除资产 dirty，也不扫描几何。编辑器按实际挂载范围只读文件索引检查依赖，未落盘／缺失引用提示先 Save Asset／Save All；已发布资产的内存修改保持独立。Apply 只标记对应材质，Save material asset 仅当前材质；New material 正常创建即发布，失败保留 dirty 可重试。Save All 负责应用草稿、增量保存资产与场景／配置；几何完整性验证移到实际资产写入之前。
+
+最终 Debug 无警告构建、12/12 CTest、完整编辑器自测通过，D3D11 errors=0，覆盖两个材质独立 dirty、新建失败恢复、场景与资产互不写入、缺失依赖和 Save All 重载。构建／测试期间 93 源文件哈希稳定，Sandbox 14 文件未改，常用 bin 已更新。同期另一聊天的浮动窗口改动保留；其首轮最小化测试失败和后续更新后的完整通过分别留证。公开文档、经验已同步；未提交／推送。详见 [v5 记录](tasks/2026-10-29-save-scene/v5.md)。下段 v4 的几何验证缓存和保存调用行为为历史阶段，已由本段替代。
+
+## Save Scene 无响应修复（2026-10-29）
+
+已确认 Save Scene 会重写 Content 中未引用的约 326 MB R8：全量几何打包、逐坐标 JSON 包围盒操作、缩略图与同步写盘，World 还验证所有网格。现对已加载／发布且未变的网格复用持久化文件，修改／移动／缺失／迁移仍保存；场景只记录实际引用并按几何版本缓存验证。Save As 同步资产后写场景，Save All 去除重复材质保存。
+
+Debug 无警告构建、11/11 CTest、六个内置网格逐字节重建、完整编辑器自测与新增 Save Scene／Save As／Save All／失败恢复／重载通过，D3D11 errors=0。R8 未引用的隔离保存从约 78～89 秒降到约 6 ms；引用首次约 235 ms、重复约 7 ms（函数计时，不含 UI／启动／GPU）。常用 bin Debug 程序已更新并哈希确认，用户 Sandbox 14 文件未变。文档、经验已同步；未提交／推送。完整过程和前期测试定位失败见 [任务记录](tasks/2026-10-29-save-scene/README.md)。首次或实际修改大网格仍同步，文件状态不是内容哈希，资产与场景尚无整体事务。
+
 ## 剩余开发改动分类提交（2026-10-29）
 
 用户授权整理提交剩余改动，并明确保留 R8 测试模型及引用它的 Sandbox 改动在本地。本轮引擎提交：b7f77fe（公开轻量协作入口与同步 wrapper）、769f192（PBR／NPR 目标和 GPU 裁剪统计说明）、f6e3295（统一导入、六个 Engine 网格、材质拖放及配套测试／文档）。此前 2c84e99、d7d2fe6、933e2d7 的性能、统计、材质状态提交保留。引擎库剩余工作区仅为 Sandbox 用户资产和配置；未提交 R8 或任何协作正文／原始证据，未推送。
