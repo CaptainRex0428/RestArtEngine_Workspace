@@ -40,6 +40,7 @@ $restarengine-gui 为 Details 面板设计布局和交互状态，先给方案�
 | Shader、GPU 参数、Pass、管线、后端 | rendering 专项 agent + [rendering skill](../../.agents/skills/restarengine-rendering/SKILL.md) | CPU/GPU 契约、热编译原子替换、画面反馈、生命周期、能力协商与移植边界。 |
 | Project Manager、编辑器 GUI/UX、主题、面板、输入与编辑事务 | gui 专项 agent + [gui skill](../../.agents/skills/restarengine-gui/SKILL.md) | [GUI 规范](../../docs/GuiDevelopment.md)、[编辑器指南](../../docs/EditorGuide.md)、[事务](../../docs/UndoTransactions.md)；任务与状态设计、视觉规则、实际可见区域、输入归属、事务原子性、布局持久化及截图/交互验收。 |
 | 工程、资产、构建与分发 | 主 agent 或有边界的通用子 agent；尚无独立角色 | [工程管理](../../docs/ProjectManagement.md)、[资产格式](../../docs/AssetFormat.md)、[分发](../../docs/EngineDistribution.md)；工程纯数据、路径归属、版本兼容、失败不破坏原数据。 |
+| UE 参考材质／材质资产制作（仅参考，不作用于引擎运行时） | Codex 或主 agent 按需使用 [ue-material-agent skill](../../.agents/skills/ue-material-agent/SKILL.md) | UE Editor Python 工作流、包路径、编译保存与脏包保护；RestArtEngine 自身材质仍是 `.rasset` + 共享 HLSL，不通过该 skill 修改。 |
 | 独立验证或审查 | 有需要时分派通用子 agent + delivery skill；尚无独立角色 | 只读审查不写代码，检查实际证据，明确覆盖与缺口。 |
 
 复杂任务按真正依赖拆分，不按表格机械创建全部角色。例如材质连续预览涉及渲染覆盖与编辑器状态：先确定预览／提交／取消契约，再分派独立模块；若都要改 `SceneEditor.cpp`，只指定一名写入者，其他任务提供调查或审查结果。只有可独立执行的部分并行。

@@ -1,0 +1,4 @@
+interface:
+  display_name: "UE Material Agent"
+  short_description: "Create, edit, compile, save, and verify Unreal materials"
+  default_prompt: "Use $ue-material-agent to create and verify an Unreal Engine material asset."

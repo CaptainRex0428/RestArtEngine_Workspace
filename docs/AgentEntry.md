@@ -38,6 +38,9 @@ Windows、Linux、macOS 均纳入首轮架构；图形后端范围为 DX11、DX1
 
 设计流程、默认风格、外部标准、工程基线和验收见 [`docs/GuiDevelopment.md`](../../docs/GuiDevelopment.md)。按任务规模完成用户任务与状态设计、布局原型、视觉规则、实现及截图／交互验收，保留现有命令、事务、预览和保存契约；设计请求按其范围交付方案。Shader、Pass 和图形后端按渲染专项路由，跨模块任务由主 agent 统一文件归属。
 
+## UE 材质参考
+
+需要在 Unreal Editor 中制作参考材质、对照截图或参考资产时，使用 [`.agents/skills/ue-material-agent/SKILL.md`](../../.agents/skills/ue-material-agent/SKILL.md)。该 skill 由 Codex 本机 skill 补充进协作库，只操作 UE 资产，不修改 RestArtEngine 的 `.rasset` 材质与 HLSL；引擎材质仍走渲染／主 agent 流程。OpenAI `.system` 内置 skill 不进协作库。
 ## 知乎连载
 
 触发词：写知乎、下一期、阶段总结、把这阶段写成分享。

@@ -14,6 +14,10 @@
     ".agents/skills/restarengine-gui/SKILL.md",
     ".agents/skills/restarengine-rendering/agents/openai.yaml",
     ".agents/skills/restarengine-rendering/SKILL.md",
+    ".agents/skills/ue-material-agent/agents/openai.yaml",
+    ".agents/skills/ue-material-agent/references/project-profile-template.md",
+    ".agents/skills/ue-material-agent/references/ue-5.8-material-python.md",
+    ".agents/skills/ue-material-agent/SKILL.md",
     ".codex/agents/restarengine_core.toml",
     ".codex/agents/restarengine_gui.toml",
     ".codex/agents/restarengine_rendering.toml"
