@@ -1,3 +1,19 @@
+## R8 大网格运行与拾取性能优化（2026-10-29）
+
+实际 Sandbox Audi R8 容器包含 3,877,264 三角形、11,631,792 顶点／索引，约 325.7 MB。本轮针对导入后持续卡顿：GPU 网格每个 Pass 重哈希约 311 MiB 数据；DXR 静态帧反复展开、变换和哈希约 562 MiB 临时数据；鼠标查询逐面变换／求交；包围盒与静态 Details 预览重复计算。保留用户模型、场景、材质和采样设置。
+
+已实现 `MeshGeometryKey`／`markGeometryModified()`、版本化局部包围盒、GPU 几何缓存、软件光追／DXR 小输入签名（含 Transform、材质和 Cull／Depth 状态），仅实际变化时重建。静态 Mesh Details 按几何／Shader／默认材质／预览资源失效刷新。Assets 层新增平台无关 `MeshQueryCache`，局部空间射线查询真实三角形，保留单双面、镜像／非均匀缩放、最近命中语义；Morton 编码＋线性基数排序构建 BVH，256 MiB LRU，清理删除／替换资产。单个超预算网格可保留，预算不表示构建临时内存的峰值上限。原位或同长度内容赋值后须显式标记几何修改，公开 AssetFormat／RenderingDevelopment 已说明。
+
+受控 Debug 实测（独立 R8 工程、`--no-ui`、排除前两帧）：光栅 Application Frame 平均 684.72 → 45.92 ms，Scene Submit 684.07 → 0.28 ms；原硬件光追＋GI 设置（16 spp／9 bounces）平均 5106.98 → 252.92 ms。数据为应用帧墙钟／CPU scope，含 GPU 等待，不是 GPU 独立时间或用户完整编辑器 FPS。优化前后 R8 光栅 BMP SHA256 一致且已查看。新增 `--trace-output` 自动导出主循环 Chrome Trace，公开 Diagnostics 说明测量边界。
+
+最终 Morton BVH 实测：1808 checks 通过；包围盒首次计算 326.47 ms，首次求交含 BVH 构建 628.87 ms（前一版中位分割构建 9748.97 ms）；128 条预热射线平均 0.055 ms、平均 133.53 候选三角形，缓存 57,452,056 字节、仅构建一次。首次包围盒与 BVH 仍为同步成本；改变 Actor Transform／材质仍会重新展开全场 DXR 数据，按网格 BLAS／实例 TLAS 更新尚未实现。高采样／多反弹 GPU 成本仍存在，未暗中降低画质。
+
+集成结束后再次测量：final-comparison.json 记录光栅 5.54 ms／硬件 48.09 ms；随后重新串行跑冻结旧程序和当前程序，recheck-comparison.json 记录光栅 855.98 → 4.69 ms、硬件 5812.68 → 11.09 ms。几次应用帧墙钟有明显波动，真实用户程序仍在运行，未隔离整机 GPU 负载，因此不据此换算承诺帧率或只宣传最好样本；首轮保守结果与全部原始 Trace 均保留。当前 Scene Submit 光栅约 0.18 ms，再次确认重扫几何开销消失。final-image 与 before-image／after-image 的 BMP SHA256 均为 `4F0BF00F20B0EFA23BFCB744FF117DFE6C95995C027A50D50C848743D60B7C96`，真实模型与隔离模型 SHA256 一致。
+
+验证：当前 Debug 构建及 9/9 CTest 通过；硬件回归 206 次真实 dispatch、GI 回归 1181 次 dispatch，均 graphics errors=0，包含本轮新增的同缓冲同长度几何原位编辑／恢复像素测试。完整隔离编辑器回归通过，涵盖拾取、网格／材质拖放、变换、预览／提交／保存、Shader 热编译／失败恢复、布局和诊断，D3D11 errors=0。首次集成构建遇到并行新增测试的 Windows `near` 宏冲突，相关任务已改名后重建成功；集成验收补齐新增 Cull／Depth 测试的原始像素采集前缀，并将屏幕外几何统计检查区分 CPU 视锥剔除开启（GPU 输入 0）与关闭（GPU 输入 2，裁剪后 0），保留原始失败日志。证据根 `artifacts/r8-performance/`，包括 comparison.json、picking-final.log、cpu-final.log、hardware-final.log、gi-final.log、editor-complete.log／editor-complete、before/after-image。用户运行的旧 Premake 进程保持运行，新产物在 `build/cmake-sandbox-meshes/Debug/RestArtEngine.exe`；性能优化已提交为 `2c84e99`，未推送。
+
+提交验收：`2c84e99`（`perf(engine): cache static mesh geometry and accelerate viewport picking`）仅含本轮性能优化、测试和公开技术文档，共 16 文件。以 HEAD 为基准按片段暂存，排除未提交的导入器、Engine 网格、材质 Cull／Depth、视锥剔除和三角面数统计；相关缓存键对新增材质状态的适配与集成测试修补仍保留在工作区，随对应功能后续提交。R8／Sandbox 用户资产未纳入。单独导出暂存候选与固定子模块源码，Debug 构建无警告、7/7 CTest、硬件光追 206 dispatch／errors=0；证据 `artifacts/r8-commit/{build.log,cpu.log,hardware.log,manifest.json}`。修正新拾取测试的 C++20 u8path 弃用警告，不改变测试行为。提交操作未覆盖当前完整工作区或用户运行程序。
+
 # 开发状态与事实入口
 
 ## 协作库公开规则（2026-10-29）
