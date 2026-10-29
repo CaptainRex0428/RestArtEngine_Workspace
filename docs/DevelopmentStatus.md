@@ -1,3 +1,12 @@
+## 工作区分类提交与 Cornell 合入（2026-10-30，补充模型）
+
+完成待办 1、2：把 10-30 工作区 49 个已跟踪改动、39 个未跟踪路径分类提交，并合入 `codex/cornell-box`。
+
+- 提交：`8f027db` 引擎集成（Camera／四分屏 DOF／五类灯光／网格 Slot+UV／控制台／GI-DXR／Content，67 文件）、`c5db70c` 公开文档（12 文件）；Sandbox 材质／场景／工程与 R8 资产按要求保持未提交。
+- 合并：`a46432b`。分支基于 `f6e3295`，其代码改动已被 master 工作区的更新实现覆盖，冲突取 master；保留分支独有的 Cornell 示例、`GenerateCornellBox`、`ScenePresentationTests` 与文档段落，CMake 与文档取并集。
+- 验证：Debug 全量构建 0 warning；CTest 21/21；编辑器自测退出 0（原生窗口聚焦断言需要前台控制台，否则会先失败在 focus 检查，属环境竞争）；`--project Projects/PathTracing_CornellBox --frames 3 --capture-temp` 退出 0、validation errors 0；`GenerateCornellBox` 构建通过。
+- 推送：`origin/master` 已同步至 `a46432b`。实现过程未修改功能语义。
+- 记录：[任务 v1](tasks/2026-10-30-integration-merge/v1.md)，经验补充至 [Integration](experience/Integration.md)。
 ## 进度同步快照（2026-10-30，补充模型）
 
 读取协作入口、任务闭环、状态页、任务日志与经验索引后的对齐结果；本段只同步仓库事实与 Codex 记录的验收摘要，本轮未重新构建或复验 GPU 数字。

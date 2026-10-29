@@ -11,3 +11,5 @@
 整理资产相关提交时，先核对示例场景的引用闭包。用户要求测试模型留在本地，则引用该模型的场景也必须留在本地；不能为清空 Git 状态擅自删除模型、改写场景或漏交依赖。公开技术文档要与已提交的示例一致，不能把仅在本机完成的场景迁移写成干净 clone 已包含。此次应用见 [剩余提交任务](../tasks/2026-10-29-remaining-commits/README.md)。
 
 来源：R8 提交 `2c84e99` 的独立 Debug 构建、7/7 CTest、硬件光追 206 dispatch／0 graphics errors，证据 `artifacts/r8-commit/`；[任务记录](../DevelopmentStatus.md#r8-大网格运行与拾取性能优化2026-10-29)。该提交没有携带并行的导入、材质状态、几何统计和用户资产。完整工作区的 9 项测试与独立提交的 7 项测试代表不同源码范围，不能互换。
+
+合并基于旧基线的分支前，先确认工作区是否已经包含该分支功能的更新实现。本例 Cornell 分支基于 `f6e3295`，而 master 工作区已有 Camera v7、Lighting v4 与多矩形 MIS；逐项比较后，冲突代码取 master，只保留分支独有的示例工程、生成工具、`ScenePresentationTests` 与文档段落，CMake 与文档做并集。验证为合并后完整构建、21/21 CTest、编辑器自测与 `--project Projects/PathTracing_CornellBox --frames 3 --capture-temp` 加载样例（0 validation errors）。原生窗口聚焦相关的自测断言会受前台窗口抢占影响，需要先激活控制台再运行；不同轮次失败点不同时应先复跑并核对源码是否真的变化，不能直接归因于合并。来源：[集成任务](../tasks/2026-10-30-integration-merge/v1.md)。
