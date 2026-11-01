@@ -2,9 +2,9 @@
 
 新增 `createTextureFromSharedHandle`：DX12 可打开 DX11 共享纹理，DX11/Base/Null 明确拒绝；BackendTests 55。
 
-- 尝试 DX11 `SHARED_NTHANDLE | KEYEDMUTEX` → DX12 打开并回读，句柄创建/打开成功，keyed mutex 显式 Acquire/Release 后 DX12 回读颜色一致，GPU smoke 通过。
+- 尝试 DX11 `SHARED_NTHANDLE | KEYEDMUTEX` → DX12 打开并回读，句柄创建/打开成功，keyed mutex 显式 Acquire/Release 后 DX12 回读颜色一致；进一步用共享 FP16 HDR 场景纹理执行 DX12 后处理 Pass 并回读正确，GPU smoke 通过。
 - 结论：共享资源是 DX12 场景后处理的前置，但同步契约与 SceneRenderer 接入尚未完成；不能宣称 DX12 场景后处理已可执行。
-- 提交：`7f49f94`、`6d11427`（未推送）；任务 [v5](tasks/2026-11-02-rhi-post-compliance/v5.md)。剩余：SceneRenderer 的场景纹理共享接入、跨设备同步、调试视图 RHI 化。
+- 提交：`7f49f94`、`6d11427`、`1bb5110`（未推送）；任务 [v5](tasks/2026-11-02-rhi-post-compliance/v5.md)。剩余：SceneRenderer 的场景纹理共享接入、跨设备同步、调试视图 RHI 化。
 
 ## RHI DOF 与纹理拷贝（2026-11-02，补充模型）
 
