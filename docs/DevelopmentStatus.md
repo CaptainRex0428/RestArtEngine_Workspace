@@ -1,3 +1,15 @@
+## RHI 后处理设计合规审计（2026-11-02，补充模型）
+
+按用户要求把 `RestArtEngine_Workspace` 克隆到 `local/`，设置 SSH remote，执行 Status/Install（全部 Synced），读取 AgentEntry、TaskWorkflow、RenderingDevelopment、rendering skill 后审计后处理/RHI 设计。
+
+- 修正契约错误：`PostEffect::Taa` 从 `LinearHdr` 改为 `Display`；TAA 实际在 tonemap 后、读 `SceneColorPost`，阶段枚举必须反映执行位置。
+- 拆出 `Shaders/Private/Rhi/{Fxaa,MotionBlur,Taa}.hlsl`，`SceneRenderer` 不再内嵌 RHI post shader；`reloadShaders` 成功后失效并重编 RHI 管线，失败保留 D3D11 回退。
+- 更新公开文档的过时 TAA/RHI/测试计数描述；新增原生 FP16 导入 smoke 结论。
+- 验证：PostProcessTests 375、RenderPipelineTests 148、ProjectSettingsTests 783、BackendTests 53；`--taa-self-test`、`--backend-self-test`、`Validate-Render`、`--hardware-rt-self-test`（235 dispatches）全 PASS，D3D11 errors 0。
+- 提交：引擎 `25cf91d`（未推送）。任务记录 [v1](tasks/2026-11-02-rhi-post-compliance/v1.md)，经验 [RhiPostProcessing](experience/RhiPostProcessing.md)。
+- 未完成：Tonemap/Bloom/DOF 仍为 D3D11；DX12 场景纹理共享未实现；RHI post pipeline 尚无 D3DReflect 契约校验；整条后处理链迁移未达成。Tonemap 试验的 sky-only 现象已缩小到场景目标/句柄生命周期，独立 FP16 导入正常。
+- 工作区另有此前存在的 `.idea/.idea.RestArtEngine/.idea/.name` 删除，未纳入本轮提交。
+
 ## 工作区分类提交与 Cornell 合入（2026-10-30，补充模型）
 
 完成待办 1、2：把 10-30 工作区 49 个已跟踪改动、39 个未跟踪路径分类提交，并合入 `codex/cornell-box`。
