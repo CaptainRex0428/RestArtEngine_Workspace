@@ -1,3 +1,13 @@
+## RHI DOF 与纹理拷贝（2026-11-02，补充模型）
+
+DOF 迁到 RHI：新增 `copyTexture`（DX11 CopyResource、DX12 copy 屏障），先把 `SceneColor` 复制到 FP16 临时目标，再用 t0 色/t1 深度写回场景；失败回退原生 DOF。
+
+- 新增 `Shaders/Private/Rhi/DepthOfField.hlsl`、`RhiDofConstants`；场景 RHI 纹理带 RTV 以承接 DOF 目标。
+- `--taa-self-test` 增加 DOF 开关图像差异检查，确认 `RHI DOF active`；`--backend-self-test` 在 DX11/DX12 验证 copy；BackendTests 54。
+- 验证：`Validate-Render` PASS（errors 0）、TAA/backend smokes、硬件 RT 235 dispatches PASS。
+- 提交：`2e0334b`（未推送）；任务 [v4](tasks/2026-11-02-rhi-post-compliance/v4.md)。
+- 剩余：DX12 场景纹理共享未实现；调试视图 Tonemap/Bloom 仍原生；“整条链迁移”尚未完成。
+
 ## RHI Bloom 三 Pass（2026-11-02，补充模型）
 
 Bloom 阈值/Bright 与 H/V 模糊迁到 RHI：FP16 双目标 ping-pong、64 B 常量（阈值/强度/texel/方向/viewport/全分辨率尺寸）。
