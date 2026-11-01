@@ -1,3 +1,11 @@
+## DX12 共享纹理导入脚手架（2026-11-02，补充模型）
+
+新增 `createTextureFromSharedHandle`：DX12 可打开 DX11 共享纹理，DX11/Base/Null 明确拒绝；BackendTests 55。
+
+- 尝试 DX11 `SHARED_NTHANDLE | KEYEDMUTEX` → DX12 打开并回读，句柄创建/打开成功，但 keyed mutex 同步下颜色不一致，未作为通过证据，GPU smoke 已移除。
+- 结论：共享资源是 DX12 场景后处理的前置，但同步契约与 SceneRenderer 接入尚未完成；不能宣称 DX12 场景后处理已可执行。
+- 提交：`7f49f94`（未推送）；任务 [v5](tasks/2026-11-02-rhi-post-compliance/v5.md)。剩余：keyed mutex 同步、DX12 场景 HDR/深度/历史接入、调试视图 RHI 化。
+
 ## RHI DOF 与纹理拷贝（2026-11-02，补充模型）
 
 DOF 迁到 RHI：新增 `copyTexture`（DX11 CopyResource、DX12 copy 屏障），先把 `SceneColor` 复制到 FP16 临时目标，再用 t0 色/t1 深度写回场景；失败回退原生 DOF。

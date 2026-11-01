@@ -37,8 +37,9 @@
 - Bloom 在 `debugView != 0` 保留原生路径，避免 Unlit 直通被 Bloom 合成改写。
 - 读取自身目标的 Pass（DOF）需要显式 `copyTexture` 快照；DX12 必须经过 COPY_SOURCE/COPY_DEST 屏障，不能直接同资源读写。
 - DOF 的 RHI 版本以 `debugView == 0` 为边界，失败回退原生，避免模糊/显示语义在调试视图分叉。
+- DX12 共享纹理：句柄创建/`OpenSharedHandle` 本身可行，但 keyed mutex 未显式 Acquire/Release 时回读颜色不可信；共享路径必须把同步契约纳入 API，而不是只验证句柄能打开。
 
 ## 来源
 
-- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)、[v3](../tasks/2026-11-02-rhi-post-compliance/v3.md)、[v4](../tasks/2026-11-02-rhi-post-compliance/v4.md)
+- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)、[v3](../tasks/2026-11-02-rhi-post-compliance/v3.md)、[v4](../tasks/2026-11-02-rhi-post-compliance/v4.md)、[v5](../tasks/2026-11-02-rhi-post-compliance/v5.md)
 - 相关实现：`include/RestArtEngine/Renderer/RenderBackend.h`、`src/Renderer/RenderBackend.cpp`、`src/Renderer/SceneRenderer.cpp`、`Shaders/Private/Rhi/`。
