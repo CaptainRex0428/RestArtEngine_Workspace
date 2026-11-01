@@ -1,3 +1,12 @@
+## RHI Bloom 三 Pass（2026-11-02，补充模型）
+
+Bloom 阈值/Bright 与 H/V 模糊迁到 RHI：FP16 双目标 ping-pong、64 B 常量（阈值/强度/texel/方向/viewport/全分辨率尺寸）。
+
+- `debugView=0` 走 RHI Bloom；Unlit/法线等调试视图保留原生 Bloom，避免直通语义被 Bloom 合成改写；失败回退原生三 Pass。
+- 首次实现误用半分辨率尺寸做 viewport 分母，Unlit 变黑；改为全分辨率 `sceneSize` 并 gating 后 Validate 通过。
+- 验证：`Validate-Render` PASS（errors 0）、`--taa-self-test`、`--backend-self-test`、硬件 RT 235 dispatches PASS。
+- 提交：`bd99a39`（未推送）；任务 [v3](tasks/2026-11-02-rhi-post-compliance/v3.md)。剩余：DOF 仍 D3D11；DX12 场景纹理共享未实现；整条链未完成。
+
 ## RHI Tonemap 与运行时交换链（2026-11-02，补充模型）
 
 解决“RHI Tonemap 在运行时只输出天空”的阻塞：根因是原生 FXAA 消费 RHI 写入的 post，而非 HDR 导入；运行时改为 RHI FXAA 写 `SceneColorDisplay` 后回拷交换链。
