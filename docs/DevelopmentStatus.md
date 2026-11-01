@@ -1,3 +1,14 @@
+## RHI Tonemap 与运行时交换链（2026-11-02，补充模型）
+
+解决“RHI Tonemap 在运行时只输出天空”的阻塞：根因是原生 FXAA 消费 RHI 写入的 post，而非 HDR 导入；运行时改为 RHI FXAA 写 `SceneColorDisplay` 后回拷交换链。
+
+- Tonemap 普通视图（`debugView=0`）迁到 RHI：`Shaders/Private/Rhi/Tonemap.hlsl`，HDR 场景 + Bloom 双源，b0 承载曝光/Bloom/调试视图/viewport/调色/暗角；数据调试视图保留原生直通 tonemap。
+- 运行时 FXAA 也走 RHI 并回拷交换链；解决天空输出。
+- 验证：`Validate-Render` PASS（errors 0，normals 检查恢复）、`--taa-self-test` PASS、`--backend-self-test` PASS、BackendTests 53、硬件 RT 235 dispatches PASS。
+- 提交：`d324683`（运行时 FXAA 回拷）、`12cbfd6`（RHI Tonemap）；均未推送。
+- 任务 [v2](tasks/2026-11-02-rhi-post-compliance/v2.md)。未完成：Bloom/DOF 仍 D3D11；DX12 场景纹理共享未实现；整条链迁移未达成。
+- 工作区另有此前存在的 `.idea/.idea.RestArtEngine/.idea/.name` 删除，未纳入提交。
+
 ## RHI 后处理设计合规审计（2026-11-02，补充模型）
 
 按用户要求把 `RestArtEngine_Workspace` 克隆到 `local/`，设置 SSH remote，执行 Status/Install（全部 Synced），读取 AgentEntry、TaskWorkflow、RenderingDevelopment、rendering skill 后审计后处理/RHI 设计。

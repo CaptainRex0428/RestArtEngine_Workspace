@@ -13,8 +13,10 @@
 - 通过 `scripts/Sync-Workspace.ps1` 完成 Status/Install，skills 与 agents 全部 Synced。
 - 对照 [RenderingDevelopment.md](../../../docs/RenderingDevelopment.md) 四条要求审计后处理/RHI 实现，发现并修复：
   1. `PostEffect::Taa` 的阶段映射错误：代码标为 `LinearHdr`，实际执行在 tonemap 之后（显示空间）；已改为 `Display` 并更新测试与文档。
-  2. RHI 后处理 shader 内嵌在 `SceneRenderer.cpp`，不符合“源码入口可定位、职责清晰”；已拆到 `Shaders/Private/Rhi/{Fxaa,MotionBlur,Taa}.hlsl`。
+  2. RHI 后处理 shader 内嵌在 `SceneRenderer.cpp`，不符合“源码入口可定位、职责清晰”；已拆到 `Shaders/Private/Rhi/{Fxaa,MotionBlur,Taa,Tonemap}.hlsl`。
   3. RHI post shader 未参与 `reloadShaders` 生命周期；现在重载成功后失效 RHI 管线，下一帧重新读取/编译，失败保留 D3D11 回退。
+- 运行时 FXAA 改为 RHI 写显示纹理后回拷交换链，解决 RHI Tonemap 在运行时只输出天空的阻塞。
+- 普通视图 Tonemap 已走 RHI；数据调试视图保留原生 tonemap。
 - 更新公开文档中过时的 TAA/RHI/测试计数描述。
 
 ## 未完成
@@ -25,5 +27,5 @@
 
 ## 证据
 
-- `artifacts/compliance-taa/`、`artifacts/compliance-backend/`、`artifacts/compliance-validate.log`
-- 详见 [v1.md](v1.md)。
+- `artifacts/compliance-taa/`、`artifacts/compliance-backend/`、`artifacts/compliance-validate.log`、`artifacts/tonemap-gated2-validate.log`
+- 详见 [v1.md](v1.md)、[v2.md](v2.md)。

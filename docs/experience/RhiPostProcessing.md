@@ -30,9 +30,11 @@
 
 - DX12 当前只支持 RHI 自有纹理；场景 HDR/深度/历史的共享纹理路径未实现。
 - RHI post pipeline 尚无 D3DReflect 契约校验；文件监听/异步热编译未实现，只有显式 `reloadShaders`。
-- 本轮 Tonemap 迁移试验在 Validate 捕获中只采到天空，独立导入 smoke 正常，问题缩到场景目标/句柄生命周期；未合入。
+- Tonemap 的运行时天空问题已定位：**原生 FXAA 消费 RHI post**，不是 HDR 导入/句柄问题。运行时改为 RHI FXAA 写显示纹理后回拷交换链。
+- 调试视图与显示变换语义不同；Tonemap RHI 首版以 `debugView == 0` 为边界，调试视图保留原生直通，避免 normals/unlit 被 ACES/gamma 改写。
+- 交换链不能被 RHI 直接绑定；RHI 后处理的运行时出口必须显式回拷。
 
 ## 来源
 
-- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)
+- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)
 - 相关实现：`include/RestArtEngine/Renderer/RenderBackend.h`、`src/Renderer/RenderBackend.cpp`、`src/Renderer/SceneRenderer.cpp`、`Shaders/Private/Rhi/`。
