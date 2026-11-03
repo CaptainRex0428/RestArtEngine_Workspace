@@ -1,3 +1,9 @@
+## 引擎远端同步（2026-11-03，补充模型）
+
+- 快进 `a46432b..14a6b0d`（4 个提交，54 文件，+2347/−356）：`7f8a585` 声明 RenderPipeline/RenderFeatures、抽取 ShadowPass、Diagnostics 特性矩阵；`f9796d3` 修复 RayTracing_Simple 材质 JSON；`fca018a` 重写 README 并补充 16 张文档图与 `docs/RenderPipeline.md`；`14a6b0d` 提升 Cornell GI 采样并修正材质引用。
+- 验证：CMake Debug 全量构建通过、未出现 warning；CTest **22/22**（新增 RenderPipelineTests）；Sandbox 4 个已跟踪修改与 3 个未跟踪资产原样保留。
+- `--editor-self-test` 在 `Native Content did not gain focus before the drag` 失败；本轮提交未改动窗口/焦点路径（MinimalApp、ImGui、EditorDockManager、SceneEditor 的 diff 为空），属桌面前台焦点竞争，未写成通过。
+- 记录：[任务 v1](tasks/2026-11-03-engine-sync/v1.md)。
 ## 工作区分类提交与 Cornell 合入（2026-10-30，补充模型）
 
 完成待办 1、2：把 10-30 工作区 49 个已跟踪改动、39 个未跟踪路径分类提交，并合入 `codex/cornell-box`。
