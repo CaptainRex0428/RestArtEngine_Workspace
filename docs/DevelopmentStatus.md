@@ -1,3 +1,11 @@
+## 进度快照（2026-11-10，补充模型）
+
+距 2026-11-03 同步后，远端无新提交；本轮做了状态核对与复验，未改引擎源码。
+
+- 引擎：`master` 与 `origin/master` 同为 `14a6b0d`（最后提交 10-31，包含 render pass/feature 声明、README 重写、示例材质与 Cornell GI 修正）。工作区仍只有既有 Sandbox 用户资产：4 个已跟踪修改、3 个未跟踪（Ground／Yellow／R8），未提交也未删除。
+- 复验：CMake Debug 构建通过；CTest **22/22**。`--editor-self-test` 的原生 Content focus 断言仍受桌面前台限制，未取得通过；窗口/焦点相关源码自 10-31 未变。
+- 协作库：`main`／`origin/main` 同为 `c27a84f`；技能为 6 个项目 skill 加 `ue-material-agent` 参考 skill、3 个 agent，`Sync-Workspace` 显示 **20/20 Synced**，清单 20 个文件。
+- 未决：完整编辑器自测需要可交互前台桌面；Sandbox 资产是否迁移或提交由用户决定；DevLog03 尚未开始，本阶段素材未整理。
 ## 引擎远端同步（2026-11-03，补充模型）
 
 - 快进 `a46432b..14a6b0d`（4 个提交，54 文件，+2347/−356）：`7f8a585` 声明 RenderPipeline/RenderFeatures、抽取 ShadowPass、Diagnostics 特性矩阵；`f9796d3` 修复 RayTracing_Simple 材质 JSON；`fca018a` 重写 README 并补充 16 张文档图与 `docs/RenderPipeline.md`；`14a6b0d` 提升 Cornell GI 采样并修正材质引用。
