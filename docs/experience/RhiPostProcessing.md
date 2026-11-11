@@ -18,6 +18,8 @@
 4. **重载成对实现**：`reloadShaders` 成功后释放 RHI post 管线并重置 attempt，下一帧重编译；失败保留原生回退。
 5. **阶段从执行位置推导**：TAA 在 tonemap 后、显示空间，必须归入 `Display`，不能因为固定顺序靠前就归入 `LinearHdr`。
 6. **回退是契约的一部分**：每次 RHI 尝试都必须保留 D3D11 路径；验证时确认 RHI 路径确实开启，而不是“回退后测试仍通过”。
+7. **绑定契约用反射钉死**：`RhiPipelineDesc` 声明 `sourceCount` 与 `constantBufferSize`，`createPipeline` 内 DX11 走 `D3DReflect`、DX12 走 `IDxcUtils::CreateReflection`，共享同一校验函数；错误在创建阶段返回并触发既有回退，而不是等 draw 才黑屏。
+8. **真实 shader 参与 smoke**：除了构造负例，还要用 `Shaders/Private/Rhi/*.hlsl` 和调用方相同的声明在两条 API 上创建管线；声明与 shader 一起漂移时能被立刻发现。
 
 ## 验证
 
@@ -38,8 +40,11 @@
 - 读取自身目标的 Pass（DOF）需要显式 `copyTexture` 快照；DX12 必须经过 COPY_SOURCE/COPY_DEST 屏障，不能直接同资源读写。
 - DOF 的 RHI 版本以 `debugView == 0` 为边界，失败回退原生，避免模糊/显示语义在调试视图分叉。
 - DX12 共享纹理：句柄创建/`OpenSharedHandle` 可行；DX11 侧必须显式 `AcquireSync(0)` → 写入 → `ReleaseSync(0)`，否则回读颜色不可信。已验证 DX12 采样共享纹理，但 SceneRenderer 集成与跨设备帧同步仍未完成。
+- 采样器不是必填：FXAA 用整数 `Load`，不声明 `s0`；契约只能限制“最多一个 `s0` 且必须在 s0”，不能要求“有源就有采样器”，否则真实 shader 会在创建阶段被误拒。
+- 反射校验只覆盖源码级绑定；运行时 descriptor/root signature 是否绑定正确仍需画面或回读验证。DX12 的反射来自 DXIL 容器，strip reflection 后需要另存反射数据。
+- 新增或修改后处理时，`sourceCount` 与 `constantBufferSize` 必须和 HLSL、C++ 常量结构同时更新；只改一侧会在创建阶段失败并静默回退到 D3D11。
 
 ## 来源
 
-- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)、[v3](../tasks/2026-11-02-rhi-post-compliance/v3.md)、[v4](../tasks/2026-11-02-rhi-post-compliance/v4.md)、[v5](../tasks/2026-11-02-rhi-post-compliance/v5.md)
+- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)、[v3](../tasks/2026-11-02-rhi-post-compliance/v3.md)、[v4](../tasks/2026-11-02-rhi-post-compliance/v4.md)、[v5](../tasks/2026-11-02-rhi-post-compliance/v5.md)、[2026-11-11 管线绑定契约反射校验](../tasks/2026-11-11-rhi-pipeline-reflection/v1.md)
 - 相关实现：`include/RestArtEngine/Renderer/RenderBackend.h`、`src/Renderer/RenderBackend.cpp`、`src/Renderer/SceneRenderer.cpp`、`Shaders/Private/Rhi/`。

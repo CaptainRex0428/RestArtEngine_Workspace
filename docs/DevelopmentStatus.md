@@ -1,3 +1,12 @@
+## RHI 管线绑定契约反射校验（2026-11-11，补充模型）
+
+`RhiPipelineDesc` 增加 `sourceCount` 与 `constantBufferSize`；`createPipeline` 用 `D3DReflect`（DX11）和 DXC `CreateReflection`（DX12）校验 `t0..tN / s0 / b0`、VS 输入与 PS 输出。`SceneRenderer` 七条后处理管线补齐真实声明，错误在创建阶段返回并走既有回退。
+
+- 负例（声明 0 源读 t0、b0 尺寸不符）与真实 `Shaders/Private/Rhi/*.hlsl` 在两条 API 上创建全部七条管线均通过。
+- 验证：Debug 无 warning；`--backend-self-test`、`--taa-self-test`、`Validate-Render.ps1` PASS（RHI 路径未静默回退）。
+- 限制：源码级校验，不验证运行时 descriptor；DX12 依赖 DXIL reflection；`BackendTests` 本轮未运行。
+- 任务 [v1](tasks/2026-11-11-rhi-pipeline-reflection/v1.md)；经验并入 [RhiPostProcessing](experience/RhiPostProcessing.md)。
+
 ## DX12 共享纹理导入脚手架（2026-11-02，补充模型）
 
 新增 `createTextureFromSharedHandle`：DX12 可打开 DX11 共享纹理，DX11/Base/Null 明确拒绝；BackendTests 55。
