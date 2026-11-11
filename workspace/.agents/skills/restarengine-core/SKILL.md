@@ -27,6 +27,8 @@ description: "Coordinate RestArtEngine development as the main engine agent: res
 
 使用 [restarengine-delivery](../restarengine-delivery/SKILL.md) 收回并核验子任务，检查实际 diff，完成跨模块验证。主 agent 保留最终集成责任；新增改动使旧证据失效时，重跑受影响检查。完成一个阶段后同步领域文档、进度索引和可复用技能经验；不要把实现细节或进度复制进多个 SKILL.md。
 
+不产生代码的讨论、方案和可复用经验也按 [讨论与学习记录](../../../local/docs/AgentEntry.md#讨论与学习记录必须) 落盘并推送协作库，不以聊天记录作为唯一归档。
+
 需要跨轮次的复杂任务可在 `artifacts/agent-tasks/<任务标识>.md` 留下临时调度细节；跨机需要的原因、进度、证据摘要和下一步写入协作库任务日志。[DevelopmentStatus.md](../../../local/docs/DevelopmentStatus.md) 保存里程碑摘要与任务链接，具体引擎行为更新领域文档。小改动无需额外分派台账，但仍保留简短四步记录。
 
 交付说明完成了什么、验证了什么、还缺什么；“已写代码”“构建通过”“运行验证”“已提交”分别陈述。创建角色和技能不能宣称客户端已经加载，更不能代表引擎功能已实现。
