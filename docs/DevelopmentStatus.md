@@ -1,3 +1,11 @@
+## 学习与方案文档（2026-11-11，补充模型）
+
+把 RHI → PSO／G-Buffer／CBuffer → Shader 语言与材质模板的讨论整理为三份文档，未改引擎代码。
+
+- 会话记录：[conversations/2026-11-11-rhi-material-system.md](conversations/2026-11-11-rhi-material-system.md)（问题、结论、误解澄清、未决项）。
+- 学习笔记：[learning/RenderingArchitecture.md](learning/RenderingArchitecture.md)（Pass 流、延迟渲染、常量打包、PSO/RHI、多光源、阅读路线与练习）。
+- 方案提案：[design/MaterialTemplateSystem.md](design/MaterialTemplateSystem.md)（模板 API、分阶段路线、RHI 接口、风险与里程碑）。
+- 边界：RHI 仍是骨架、材质模板未实现；引擎 HEAD 仍为 `14a6b0d`。
 ## 进度快照（2026-11-10，补充模型）
 
 距 2026-11-03 同步后，远端无新提交；本轮做了状态核对与复验，未改引擎源码。
