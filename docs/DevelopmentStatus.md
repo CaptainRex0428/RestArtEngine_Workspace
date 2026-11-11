@@ -1,3 +1,11 @@
+## 讨论记录规范（2026-11-11，补充模型）
+
+用户要求此后每次讨论都记录为学习／经验，并能跨机同步。已固化到协作库：
+
+- [AgentEntry「讨论与学习记录（必须）」](AgentEntry.md#讨论与学习记录必须) + [TaskWorkflow 第 5 步](TaskWorkflow.md#5-讨论与学习记录) + [讨论模板](conversations/_TEMPLATE.md)；
+- 记录路由：`learning/`、`conversations/`、`experience/`、`design/`，索引更新到 [DevelopmentExperience.md](DevelopmentExperience.md)；
+- 技能 `restarengine-context/core/delivery` 增加讨论收尾要求，运行副本 `Sync-Workspace` 20/20 Synced；
+- 规范提交 `5c80e57`；讨论记录：[conversations/2026-11-11-discussion-recording-policy.md](conversations/2026-11-11-discussion-recording-policy.md)。引擎未改代码，HEAD 仍为 `14a6b0d`。
 ## 学习与方案文档（2026-11-11，补充模型）
 
 把 RHI → PSO／G-Buffer／CBuffer → Shader 语言与材质模板的讨论整理为三份文档，未改引擎代码。
