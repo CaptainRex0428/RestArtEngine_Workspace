@@ -1,3 +1,13 @@
+## DX12 场景共享：显示色 FXAA（2026-11-11，补充模型）
+
+`--dx12-post` 让 FXAA 在独立 DX12 设备上消费 DX11 共享的显示色 RGBA8 纹理，并回拷显示目标。共享纹理为 NTHANDLE|KEYEDMUTEX；DX11 每帧 copy→等待→DX12 draw→copy 回，失败回退 DX11 RHI。
+
+- 同帧与默认路径截图像素比较：MAE 2e-7/255、最大差 1；validation 0，退出 0。
+- 修复：共享目标缺 RTV 描述符、共享纹理缺 KEYEDMUTEX、CopyResource 前未解绑 RTV/SRV。
+- 回归：`--backend-self-test`、`--taa-self-test`、`Validate-Render.ps1` PASS。
+- 限制：仅显示色；HDR/深度/历史未共享；CPU 串行同步；实验开关默认关闭。
+- 任务 [v1](tasks/2026-11-11-dx12-scene-share/v1.md)；经验并入 [RhiPostProcessing](experience/RhiPostProcessing.md)。
+
 ## RHI 管线绑定契约反射校验（2026-11-11，补充模型）
 
 `RhiPipelineDesc` 增加 `sourceCount` 与 `constantBufferSize`；`createPipeline` 用 `D3DReflect`（DX11）和 DXC `CreateReflection`（DX12）校验 `t0..tN / s0 / b0`、VS 输入与 PS 输出。`SceneRenderer` 七条后处理管线补齐真实声明，错误在创建阶段返回并走既有回退。

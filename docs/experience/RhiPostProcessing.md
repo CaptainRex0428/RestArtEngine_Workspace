@@ -20,6 +20,7 @@
 6. **回退是契约的一部分**：每次 RHI 尝试都必须保留 D3D11 路径；验证时确认 RHI 路径确实开启，而不是“回退后测试仍通过”。
 7. **绑定契约用反射钉死**：`RhiPipelineDesc` 声明 `sourceCount` 与 `constantBufferSize`，`createPipeline` 内 DX11 走 `D3DReflect`、DX12 走 `IDxcUtils::CreateReflection`，共享同一校验函数；错误在创建阶段返回并触发既有回退，而不是等 draw 才黑屏。
 8. **真实 shader 参与 smoke**：除了构造负例，还要用 `Shaders/Private/Rhi/*.hlsl` 和调用方相同的声明在两条 API 上创建管线；声明与 shader 一起漂移时能被立刻发现。
+9. **运行时共享先串行**：共享纹理的创建/打开、keyed mutex 与回读先在一帧内 CPU 串行验证正确性，再换共享 fence；不要一开始就做跨设备并发。
 
 ## 验证
 
@@ -43,8 +44,12 @@
 - 采样器不是必填：FXAA 用整数 `Load`，不声明 `s0`；契约只能限制“最多一个 `s0` 且必须在 s0”，不能要求“有源就有采样器”，否则真实 shader 会在创建阶段被误拒。
 - 反射校验只覆盖源码级绑定；运行时 descriptor/root signature 是否绑定正确仍需画面或回读验证。DX12 的反射来自 DXIL 容器，strip reflection 后需要另存反射数据。
 - 新增或修改后处理时，`sourceCount` 与 `constantBufferSize` 必须和 HLSL、C++ 常量结构同时更新；只改一侧会在创建阶段失败并静默回退到 D3D11。
+- D3D11 共享纹理必须同时设置 `SHARED_NTHANDLE | SHARED_KEYEDMUTEX`；只设 NTHANDLE 时 `CreateTexture2D` 返回 `E_INVALIDARG`。DX11 写入前后要 `AcquireSync(0)` / `ReleaseSync(0)`。
+- DX12 打开共享纹理后若作为渲染目标，RHI 必须为它创建 RTV 描述符；否则 `OMSetRenderTargets` 报未初始化描述符，随后 `DrawInstanced` 报 PSO 与目标格式不匹配。
+- `CopyResource` 前先解绑上一 Pass 的 RTV/SRV，否则 D3D11 校验会报资源仍绑定。
+- 跨 API 共享的运行时验证用同一帧截图逐像素比较（MAE、最大差、changed>3），不能只看“没有报错”。
 
 ## 来源
 
-- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)、[v3](../tasks/2026-11-02-rhi-post-compliance/v3.md)、[v4](../tasks/2026-11-02-rhi-post-compliance/v4.md)、[v5](../tasks/2026-11-02-rhi-post-compliance/v5.md)、[2026-11-11 管线绑定契约反射校验](../tasks/2026-11-11-rhi-pipeline-reflection/v1.md)
+- 任务：[2026-11-02 RHI 后处理设计合规审计](../tasks/2026-11-02-rhi-post-compliance/v1.md)、[v2](../tasks/2026-11-02-rhi-post-compliance/v2.md)、[v3](../tasks/2026-11-02-rhi-post-compliance/v3.md)、[v4](../tasks/2026-11-02-rhi-post-compliance/v4.md)、[v5](../tasks/2026-11-02-rhi-post-compliance/v5.md)、[2026-11-11 管线绑定契约反射校验](../tasks/2026-11-11-rhi-pipeline-reflection/v1.md)、[2026-11-11 DX12 场景共享](../tasks/2026-11-11-dx12-scene-share/v1.md)
 - 相关实现：`include/RestArtEngine/Renderer/RenderBackend.h`、`src/Renderer/RenderBackend.cpp`、`src/Renderer/SceneRenderer.cpp`、`Shaders/Private/Rhi/`。
