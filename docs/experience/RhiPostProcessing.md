@@ -48,6 +48,9 @@
 - DX12 打开共享纹理后若作为渲染目标，RHI 必须为它创建 RTV 描述符；否则 `OMSetRenderTargets` 报未初始化描述符，随后 `DrawInstanced` 报 PSO 与目标格式不匹配。
 - `CopyResource` 前先解绑上一 Pass 的 RTV/SRV，否则 D3D11 校验会报资源仍绑定。
 - 跨 API 共享的运行时验证用同一帧截图逐像素比较（MAE、最大差、changed>3），不能只看“没有报错”。
+- 共享 HDR/Bloom 用 RGBA16F、SRV-only 的 NTHANDLE|KEYEDMUTEX 纹理；每张纹理各自持有 keyed mutex。一次帧内可以连续拷入多张输入，再统一等待一次 DX11 完成，然后执行 DX12 Pass。
+- Tonemap 迁到 DX12 时，`sourceCount=2` 的 t1 在 Bloom 关闭时绑定 HDR 本身，和 DX11 RHI 路径保持一致；`RhiTonemapConstants` 的 112 B 布局与 Bloom 尺寸一起参与契约。
+- 一帧里 Tonemap 与 FXAA 各是独立的“拷入→等待→DX12 绘制→拷回”，中间不能共用同一张共享输出而不回拷，否则后一个 Pass 会覆盖前一个结果。
 
 ## 来源
 

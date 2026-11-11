@@ -10,8 +10,8 @@
 
 ## 结果摘要
 
-- `--dx12-post`：DX11 创建共享 RGBA8 纹理，DX12 打开并执行 FXAA，DX11 回拷显示目标。
-- 同一帧与默认路径逐像素 MAE 2e-7/255，最大差 1；validation 0。
+- v1：`--dx12-post` 显示色共享 + DX12 FXAA，与默认路径 MAE 2e-7/255。
+- v2：新增 HDR 与 Bloom 共享，Tonemap 也在 DX12 执行；画面与默认路径保持一致，validation 0。
 - 修复了 DX12 共享目标缺 RTV 描述符、共享纹理必须带 KEYEDMUTEX、CopyResource 前需解绑 RTV/SRV 三个问题。
 - 回归：backend smoke、TAA、Validate-Render 全部 PASS。
 

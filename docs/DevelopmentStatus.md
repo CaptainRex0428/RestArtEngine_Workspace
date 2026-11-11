@@ -1,3 +1,12 @@
+## DX12 共享 HDR/Bloom，Tonemap 迁到 DX12（2026-11-11，补充模型）
+
+`--dx12-post` 扩展：新增共享 RGBA16F HDR 与 Bloom，DX12 执行 Tonemap（2 源、b0 112 B）后回拷 `SceneColorPost` 或显示目标；FXAA 继续在 DX12。
+
+- 同帧与默认路径比较：MAE 2e-7/255、最大差 1、changed>3 0%；validation 0，退出 0。
+- 回归：`--backend-self-test`、`--taa-self-test`、`Validate-Render.ps1` PASS。
+- 限制：深度/TAA 历史未共享；CPU 串行；实验开关默认关闭。
+- 任务 [v2](tasks/2026-11-11-dx12-scene-share/v2.md)。
+
 ## DX12 场景共享：显示色 FXAA（2026-11-11，补充模型）
 
 `--dx12-post` 让 FXAA 在独立 DX12 设备上消费 DX11 共享的显示色 RGBA8 纹理，并回拷显示目标。共享纹理为 NTHANDLE|KEYEDMUTEX；DX11 每帧 copy→等待→DX12 draw→copy 回，失败回退 DX11 RHI。
