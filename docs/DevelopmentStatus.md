@@ -1,3 +1,11 @@
+## DX12 共享后处理接入工程设置（2026-11-12，补充模型）
+
+`rendering.dx12Post` 写入工程 manifest，Project Settings 增加复选框；`--dx12-post` / `--no-dx12-post` 作为单次覆盖。默认关闭，不可用时仍回退 DX11。
+
+- 工程字段 true 时无需 CLI 即启用；`--no-dx12-post` 可关闭；默认工程保持 DX11；validation 0。
+- `--hardware-rt-self-test`、`--backend-self-test`、`Validate-Render.ps1` PASS；全量重建 0 warning。`--editor-self-test` 在本机卡在 native Content 前台焦点断言（环境问题，非本改动）。
+- 任务 [v7](tasks/2026-11-11-dx12-scene-share/v7.md)。
+
 ## 异步 RHI 提交落地（2026-11-12，补充模型）
 
 DX12 后处理提交改为有界异步：每次 draw 独立 SRV 描述符堆、常量缓冲 4 槽 ring、提交对象最多 8 个在飞；读回/销毁前排空。共享 fence 继续负责跨设备顺序。

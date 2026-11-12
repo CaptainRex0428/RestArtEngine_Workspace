@@ -16,6 +16,7 @@
 - v4：运动模糊与景深迁到 DX12（新增共享 HDR 输出），全链路只有 1 级量化差；新增 `--dof` 调试开关。
 - v5：异步提交先试后回退，定位到描述符/常量未版本化（静默错误）。
 - v6：按 v5 的分析落地有界异步（独立 SRV 堆、常量 4 槽 ring、8 个在飞），MAE 回到 2e-7 / 8.4e-5。
+- v7：接入工程设置 `rendering.dx12Post` 与 Project Settings 复选框，CLI 可单次覆盖。
 - 修复了 DX12 共享目标缺 RTV 描述符、共享纹理必须带 KEYEDMUTEX、CopyResource 前需解绑 RTV/SRV 三个问题。
 - 回归：backend smoke、TAA、Validate-Render 全部 PASS。
 
