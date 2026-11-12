@@ -3,7 +3,7 @@
 新增共享 HDR 输出（RGBA16F RT），运动模糊（176 B）与景深（48 B）迁到 DX12；新增 `--dof` 调试开关。后处理链 Tonemap/TAA/运动模糊/景深/FXAA 均可由 DX12 消费共享场景纹理。
 
 - 运动模糊：MAE 1.0e-7、最大差 1；景深：MAE 3.0e-7、最大差 1；validation 0。
-- 学习笔记：[DX12 共享场景纹理后处理](learn/DX12共享后处理.md)。
+- 学习笔记：[DX12 共享场景纹理后处理](tasks/2026-11-11-dx12-scene-share/DX12共享后处理.md)。
 - 任务 [v4](tasks/2026-11-11-dx12-scene-share/v4.md)。
 
 ## DX12 共享深度/TAA 历史与共享 fence（2026-11-12，补充模型）
