@@ -12,16 +12,17 @@
 
 - v1：`--dx12-post` 显示色共享 + DX12 FXAA，与默认路径 MAE 2e-7/255。
 - v2：新增 HDR 与 Bloom 共享，Tonemap 也在 DX12 执行；画面与默认路径保持一致，validation 0。
+- v3：共享深度与 TAA 历史，TAA 也在 DX12 执行；同步换成共享 fence，TAA 与 DX11 RHI 路径 MAE 8e-5。
 - 修复了 DX12 共享目标缺 RTV 描述符、共享纹理必须带 KEYEDMUTEX、CopyResource 前需解绑 RTV/SRV 三个问题。
 - 回归：backend smoke、TAA、Validate-Render 全部 PASS。
 
 ## 未完成
 
-- 只共享显示色；HDR、深度、TAA 历史与 Bloom 仍未共享。
-- 同步为 CPU 串行，需替换为共享 fence。
+- 运动模糊与景深仍在 DX11 RHI。
+- 共享输入与历史采用每帧拷贝，多一次全屏开销；DX12 RHI 绘制仍同步，提交是串行的。
 - 实验开关默认关闭；未接项目设置或默认路径。
 
 ## 证据
 
-- `artifacts/dx12-post-final/`、`artifacts/dx12-share-regression/`
-- 详见 [v1.md](v1.md)。
+- `artifacts/dx12-post-final/`、`artifacts/dx12-share-regression/`、`artifacts/dx12-hdr/`、`artifacts/dx12-fence/`、`artifacts/dx12-taa/`
+- 详见 [v1.md](v1.md)、[v2.md](v2.md)、[v3.md](v3.md)。

@@ -1,3 +1,12 @@
+## DX12 共享深度/TAA 历史与共享 fence（2026-11-12，补充模型）
+
+`--dx12-post` 现在共享场景深度（R32_TYPELESS，每帧拷贝）与 TAA 历史（RGBA8），DX12 执行 TAA（3 源、b0 208 B）并回拷写目标/显示目标；同步改为共享 fence（DX11 `ID3D11Fence` → DX12 `OpenSharedHandle` + 队列 Signal/Wait），query 仅作回退。
+
+- TAA 工程内 DX12 TAA 与 DX11 RHI TAA：MAE 8.4e-5、最大差 15、changed>3 0%；validation 0。
+- 新增 `IRenderBackend` fence 接口与 backend smoke 用例；`--taa-self-test`、`Validate-Render.ps1` PASS；全量重建 0 warning。
+- 限制：运动模糊/DOF 仍在 DX11；共享输入每帧多一次拷贝；DX12 RHI 绘制仍同步，提交仍串行。
+- 任务 [v3](tasks/2026-11-11-dx12-scene-share/v3.md)。
+
 ## DX12 共享 HDR/Bloom，Tonemap 迁到 DX12（2026-11-11，补充模型）
 
 `--dx12-post` 扩展：新增共享 RGBA16F HDR 与 Bloom，DX12 执行 Tonemap（2 源、b0 112 B）后回拷 `SceneColorPost` 或显示目标；FXAA 继续在 DX12。
