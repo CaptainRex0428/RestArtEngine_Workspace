@@ -1,3 +1,10 @@
+## editor smoke 环境问题排查（2026-11-12，补充模型）
+
+`--editor-self-test` 的 “Native Content did not gain focus” 根因是非前台进程的 `SetForegroundWindow` 被拒；测试侧用 `AttachThreadInput` 激活助手修复。随后暴露并修复：夹具目录复用（旧 `.rasset`）、ScrollMax 布局后增长、以及 Project Settings 按 UI 组管理 disabled 作用域导致 FXAA+TAA 同时关闭时出现 `Missing EndDisabled()` 的真实 UI bug。
+
+- 结果：`--editor-self-test` 退出 0、59 个 PASS 段、validation 0；全量重建 0 warning。
+- 任务 [v1](tasks/2026-11-12-editor-smoke-focus/v1.md)；经验 [EditorSmoke](experience/EditorSmoke.md)。
+
 ## DX12 共享后处理接入工程设置（2026-11-12，补充模型）
 
 `rendering.dx12Post` 写入工程 manifest，Project Settings 增加复选框；`--dx12-post` / `--no-dx12-post` 作为单次覆盖。默认关闭，不可用时仍回退 DX11。
