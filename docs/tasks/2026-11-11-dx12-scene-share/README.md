@@ -19,11 +19,11 @@
 
 ## 未完成
 
-- 运动模糊与景深仍在 DX11 RHI。
+- 异步提交需要 descriptor/constants 多版本；直接去掉 `waitForGpu` 会导致静默画面错误（见 v5）。
 - 共享输入与历史采用每帧拷贝，多一次全屏开销；DX12 RHI 绘制仍同步，提交是串行的。
 - 实验开关默认关闭；未接项目设置或默认路径。
 
 ## 证据
 
-- `artifacts/dx12-post-final/`、`artifacts/dx12-share-regression/`、`artifacts/dx12-hdr/`、`artifacts/dx12-fence/`、`artifacts/dx12-taa/`
-- 详见 [v1.md](v1.md)、[v2.md](v2.md)、[v3.md](v3.md)。
+- `artifacts/dx12-post-final/`、`artifacts/dx12-share-regression/`、`artifacts/dx12-hdr/`、`artifacts/dx12-fence/`、`artifacts/dx12-taa/`、`artifacts/dx12-motion/`、`artifacts/dx12-dof/`、`artifacts/async-rhi/`、`artifacts/async-revert/`
+- 详见 [v1.md](v1.md)、[v2.md](v2.md)、[v3.md](v3.md)、[v4.md](v4.md)、[v5-async-analysis.md](v5-async-analysis.md)。

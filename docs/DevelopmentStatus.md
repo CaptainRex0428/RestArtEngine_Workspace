@@ -1,3 +1,10 @@
+## 异步 RHI 提交尝试（2026-11-12，未落地）
+
+去掉 DX12 `executeCommands` 的 `waitForGpu` 后画面错误（Sandbox MAE 90.8），validation 仍为 0。根因是共享 SRV 描述符堆与常量缓冲未做多版本；已回退，分析见 [v5](tasks/2026-11-11-dx12-scene-share/v5-async-analysis.md)。
+
+- 600 帧实测：默认 32.96s，`--dx12-post` 33.35s（≈0.65ms/帧，噪声内）。
+- 结论：异步需先做 descriptor/constants ring，再谈默认开启；`--dx12-post` 保持实验开关。
+
 ## DX12 完整后处理链：运动模糊与景深（2026-11-12，补充模型）
 
 新增共享 HDR 输出（RGBA16F RT），运动模糊（176 B）与景深（48 B）迁到 DX12；新增 `--dof` 调试开关。后处理链 Tonemap/TAA/运动模糊/景深/FXAA 均可由 DX12 消费共享场景纹理。
