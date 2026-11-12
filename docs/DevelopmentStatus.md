@@ -1,3 +1,12 @@
+## 异步 RHI 提交落地（2026-11-12，补充模型）
+
+DX12 后处理提交改为有界异步：每次 draw 独立 SRV 描述符堆、常量缓冲 4 槽 ring、提交对象最多 8 个在飞；读回/销毁前排空。共享 fence 继续负责跨设备顺序。
+
+- 验证：Sandbox MAE 2.02e-7、TAA MAE 8.4e-5、运动模糊/景深均正常；validation 0；backend/TAA/Validate PASS。
+- 600 帧实测：默认 38.10s，`--dx12-post` 38.10s（与同步版差异在噪声内，场景不是 CPU 瓶颈）。
+- 过程：先按 v5 分析试过“只删等待”，画面静默错误（MAE 90.8）；补齐多版本后通过。
+- 任务 [v6](tasks/2026-11-11-dx12-scene-share/v6.md)；分析 [v5](tasks/2026-11-11-dx12-scene-share/v5-async-analysis.md)。
+
 ## 异步 RHI 提交尝试（2026-11-12，未落地）
 
 去掉 DX12 `executeCommands` 的 `waitForGpu` 后画面错误（Sandbox MAE 90.8），validation 仍为 0。根因是共享 SRV 描述符堆与常量缓冲未做多版本；已回退，分析见 [v5](tasks/2026-11-11-dx12-scene-share/v5-async-analysis.md)。
