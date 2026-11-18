@@ -1,3 +1,7 @@
+## Pass／Render Graph／RHI 与帧检查器答疑（2026-11-18）
+
+澄清逻辑Pass、显式资源声明与Render Graph演进边界，纠正RHI只是CPU参数打包及DX11/DXR“不通”的理解；记录当前同卡DX11主渲染+DX12 RayQuery+共享图像/fence关系。Frame Inspector形成Pass快照→离线包→指定Draw检查→受限回放→像素历史提案，未实施代码。见[讨论](conversations/2026-11-18-pass-graph-rhi-inspector.md)、[学习](learning/PassGraphRhiRelationship.md)、[方案](design/FrameInspectorEvolution.md)。
+
 ## DevLog02之后的功能与管线审计（2026-11-18）
 
 已核对DevLog02=cc68a1b至当前14a6b0d全部83提交（含merge）及当前源码，整理资产/保存/相机/四视图/两种景深/五灯/GI/Pass声明/诊断的原因、收益与限制，明确已有功能与本期新增、提案与实现。引擎最后源码提交仍为10-31；11月主要复验及学习记录。发现Cornell采样README、重复灯光说明、Tone Mapping/阴影提示等文档不一致，逐项登记；本轮没有改引擎、重建或GPU复验，Sandbox资产保留。完整结论和83提交清单见[讨论审计](conversations/2026-11-18-engine-audit-after-devlog02.md)，作为下一步开发讨论依据，不视为新实现授权。
