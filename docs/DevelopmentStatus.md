@@ -1,3 +1,7 @@
+## 渲染与诊断近期优先级（2026-11-18）
+
+用户希望先聚焦渲染和RenderDoc式调试。建议顺序为Pass前后捕获/比较→线性HDR与显示转换边界→基于实测优化单个热点，保留外部RenderDoc作为专业调试补充；完整RHI/RenderGraph/多后端/节点材质/NPR/完整回放不做近期前置。尚未启动实现。见[讨论](conversations/2026-11-18-rendering-diagnostics-focus.md)与[近期方案](design/RenderingDiagnosticsFocus.md)。
+
 ## Pass／Render Graph／RHI 与帧检查器答疑（2026-11-18）
 
 澄清逻辑Pass、显式资源声明与Render Graph演进边界，纠正RHI只是CPU参数打包及DX11/DXR“不通”的理解；记录当前同卡DX11主渲染+DX12 RayQuery+共享图像/fence关系。Frame Inspector形成Pass快照→离线包→指定Draw检查→受限回放→像素历史提案，未实施代码。见[讨论](conversations/2026-11-18-pass-graph-rhi-inspector.md)、[学习](learning/PassGraphRhiRelationship.md)、[方案](design/FrameInspectorEvolution.md)。
