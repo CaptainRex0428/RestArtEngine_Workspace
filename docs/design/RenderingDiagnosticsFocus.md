@@ -1,6 +1,6 @@
 # 渲染与渲染诊断近期收敛方案（2026-11-18）
 
-状态：**优先级建议，尚未实施**。用户明确近期偏好为优化渲染及RenderDoc式调试，不继续同时铺开多个板块。引擎基线14a6b0d。
+状态：**历史优先级建议，尚未实施；近期顺序已被后续需求取代**。用户随后明确先做独立 D3D12 主后端、可选 D3D11 回退、实际 RHI 和资源声明，见[当前方案](NativeD3D12Backend.md)。下文保留原建议与验收供后续复用，不能继续当作当前任务排序。引擎基线14a6b0d。
 关联：[Inspector长期方案](FrameInspectorEvolution.md)、[讨论](../conversations/2026-11-18-rendering-diagnostics-focus.md)。
 
 ## 主线

@@ -1,4 +1,8 @@
-## 渲染与诊断近期优先级（2026-11-18）
+## 当前优先级：独立 D3D12 主后端与 D3D11 回退（2026-11-18）
+
+用户明确要求独立 D3D12 主渲染后端，并能选择回退到 D3D11；近期排序改为真实后端选择／生命周期→D3D11 实际 RHI 与资源声明→原生 D3D12 场景及编辑器→功能覆盖／原生 DXR。后端选择与光追分开，严格 D3D11 不初始化 12；Auto 不选择尚未验收的实验后端。启动生效、回退策略和旧混合工程迁移为设计建议。尚未改引擎或运行验证，详见[讨论](conversations/2026-11-18-native-d3d12-backend.md)与[提案／验收](design/NativeD3D12Backend.md)。用户 Sandbox 改动保留。
+
+## 历史建议：渲染与诊断近期优先级（2026-11-18，已被上述需求取代）
 
 用户希望先聚焦渲染和RenderDoc式调试。建议顺序为Pass前后捕获/比较→线性HDR与显示转换边界→基于实测优化单个热点，保留外部RenderDoc作为专业调试补充；完整RHI/RenderGraph/多后端/节点材质/NPR/完整回放不做近期前置。尚未启动实现。见[讨论](conversations/2026-11-18-rendering-diagnostics-focus.md)与[近期方案](design/RenderingDiagnosticsFocus.md)。
 
