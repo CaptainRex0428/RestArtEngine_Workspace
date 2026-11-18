@@ -1,5 +1,7 @@
 # Pass、Render Graph、RHI 与混合 DX11/DXR（2026-11-18）
 
+工具边界：这里的 RenderDoc 指[官方独立工具](https://github.com/baldurk/renderdoc)，尚无本引擎实际抓帧验收；自研 Frame Inspector 只捕获引擎已知事件/冻结资源，Screenshot/F9 是普通图像保存。三者不可互代。具体解释见[记录](../conversations/2026-11-18-renderdoc-tool-boundary.md)。
+
 实现更新：随后 [M3](../tasks/2026-11-18-native-d3d12/README.md) 已接通实验性独立 D3D12 主设备、场景与 UI，不创建 D3D11；其状态转换由真实附件/采样/copy/UI/present用途驱动，仍无完整 Render Graph。当前原生12暂不支持旧混合 DXR/GI 及部分后处理/捕获。下文原始答疑与 M2 边界按对应阶段理解，当前能力以[后端说明](../../../docs/RenderBackends.md)为准。
 
 基线：引擎14a6b0d。原理答疑时未修改运行时；随后[M2任务](../tasks/2026-11-18-rhi-slice/README.md)实现D3D11实际RHI切片，下文已补充当前边界。对应[讨论](../conversations/2026-11-18-pass-graph-rhi-inspector.md)。

@@ -6,7 +6,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 | --- | --- | --- |
 | 实际RHI切片、附件与生命周期 | [RhiMigration.md](experience/RhiMigration.md) | 真实执行／像素等价、逐Draw常量、附件加载、候选发布、DX12多队列UI与最小化退役、native边界和失败恢复 |
 | 后端选择、严格模式与混合光追 | [BackendSelection.md](experience/BackendSelection.md) | 区分主模式／Feature、初始化门控、请求与实际状态、CLI覆盖、旧字段兼容与真实GPU验证 |
-| Pass/Graph/RHI与帧捕获演进 | [概念澄清](learning/PassGraphRhiRelationship.md)、[Inspector提案](design/FrameInspectorEvolution.md) | 区分逻辑阶段/资源依赖/后端命令，理解DX11-DXR互操作、快照与回放边界 |
+| Pass/Graph/RHI与帧捕获演进 | [概念澄清](learning/PassGraphRhiRelationship.md)、[Inspector提案](design/FrameInspectorEvolution.md)、[RenderDoc工具边界](conversations/2026-11-18-renderdoc-tool-boundary.md) | 区分逻辑阶段/资源依赖/后端命令，理解DX11-DXR互操作、外部抓帧、自研快照与回放边界 |
 | 相机、投影与多视图 | [Camera.md](experience/Camera.md) | 统一矩阵/射线、正交与固定画幅、Camera Actor保存与手势事务、工具预览历史隔离 |
 | 多材质Slot、UV与来源身份 | [MeshAttributes.md](experience/MeshAttributes.md) | 导入面材质、UV接缝、重导入/场景绑定、可选属性缓存和详情可见性 |
 | 灯光组件与共享GPU照明 | [Lighting.md](experience/Lighting.md) | 新旧灯光来源、常量反射、GI历史、有限阴影与多矩形MIS验证 |
