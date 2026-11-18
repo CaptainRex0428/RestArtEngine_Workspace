@@ -58,3 +58,9 @@ D3D11不提供DXR接口。本引擎混合模式的硬件光追由D3D12/DXR执行
 - HardwareRayTracing.cpp：同适配器D3D12CreateDevice约791行，共享纹理约654/682行，共享fence约842行，双向Signal/Wait约979/1125行。
 - [Epic RDG](https://dev.epicgames.com/documentation/en-us/unreal-engine/render-dependency-graph-in-unreal-engine)：依赖图及自动管理示例，不等于本引擎已实现这些能力。
 - [Microsoft DXR规范](https://microsoft.github.io/DirectX-Specs/d3d/Raytracing.html)：DXR、Inline Raytracing与RayQuery。
+
+## 术语澄清：原生12后端与剩余native调用
+
+M2交付里的两个“原生”不是同义词。原生D3D12主后端指主渲染/呈现用D3D12且不依赖D3D11设备；剩余native调用则特指尚未通过Rhi.h的直接D3D11调用。当前主场景为Renderer→RHI→D3D11→GPU；UI/部分后处理/捕获仍为Renderer或UI适配器→D3D11→GPU；混合光追另由D3D12/DXR产生共享结果交给D3D11显示。前两者都可正常运行，但尚未完整统一到RHI，不能直接切换到尚未实现的纯12。
+
+资源调试名称/Pass事件是外部调试的准备；实际RenderDoc捕获必须用外部工具完成附加、抓帧、打开和检查。内部Frame Inspector的冻结资源回读通过不是该工具的验收。详见[边界澄清记录](../conversations/2026-11-18-rhi-slice-boundary.md)。

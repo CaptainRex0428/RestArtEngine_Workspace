@@ -1,5 +1,7 @@
 ## D3D11 实际 RHI 切片 M2（2026-11-18）
 
+术语与交付范围澄清见[记录](conversations/2026-11-18-rhi-slice-boundary.md)：剩余native指直接D3D11调用，与尚未实现的原生D3D12主后端分开；RenderDoc实际抓帧尚未验收。
+
 用户授权实际RHI改写。已接通Rhi.h typed RAII资源／命令 → D3D11适配器 → 网格、常量、目标、Shader／图形管线、阴影和Forward/Deferred实际Draw。附件Load/Clear/Store与真实采样句柄驱动执行；候选热编译先创建受支持PSO再发布。旧IRenderBackend仍独立占位，native UI／Outline／DOF／capture／软件光追结构化数据／DXR桥和呈现尚未整体迁移；原生12、完整Graph、自动屏障未实现。
 
 Debug无告警、CTest24/24（含WARP实际像素回读）、五案例启动矩阵、13张旧新非UI图逐字节一致、Validate-Render通过。48 RHI Pass／80 Draw（64 indexed）证明真实场景提交；严格11无D3D12初始化／DXR0。混合完整HRT217dispatch/errors0；最终构建相机9组含DOF／四视图／预览与真实DXR通过。材质状态9组、mesh属性7组/27DXR和GC回收/GUI通过。完整Editor首轮因夹具缺项目.rasset未完成；改用HEAD Sandbox隔离副本后全套通过，exit0/errors0，含Diagnostics冻结回读／实际几何计数、跨窗口拖放／重停靠、保存、四视图与独立预览。实际RenderDoc capture尚未验证。用户Sandbox七文件hash保持。引擎代码未提交；详见[任务v1–v3](tasks/2026-11-18-rhi-slice/README.md)、[经验](experience/RhiMigration.md)、[公开执行范围](../../docs/RenderBackends.md#实际-rhi-执行范围)。下一步是余下RHI资源／绑定与呈现边界，再推进M3原生12；不把native bridge叫作原生12后端。
