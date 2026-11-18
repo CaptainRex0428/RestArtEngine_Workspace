@@ -90,3 +90,5 @@ M1已完成启动选择切片；M2已承接网格／常量／场景目标、Shad
 - [D3D11 到 D3D12 的关键变化](https://learn.microsoft.com/en-us/windows/win32/direct3d12/important-changes-from-directx-11-to-directx-12)：应用承担更多同步、资源生命周期、命令与描述符管理；据此安排 M2/M3。
 - [D3D12CreateDevice](https://learn.microsoft.com/en-us/windows/win32/api/d3d12/nf-d3d12-d3d12createdevice)：设备创建／能力探测，不证明本引擎功能完整。
 - [D3D12_OPTIONS5](https://learn.microsoft.com/en-us/windows/win32/api/d3d12/ns-d3d12-d3d12_feature_data_d3d12_options5)：RaytracingTier 独立查询；据此将 DXR 能力与主后端选择分开。
+
+可行性与首个独立闭环的具体边界见[补充讨论](../conversations/2026-11-18-native-d3d12-feasibility.md)：复用共享场景／Shader与ImGui DX12适配器，改造UI纹理身份和DXR设备归属；未增加本轮运行时实现或GPU验收结论。
