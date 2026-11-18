@@ -10,7 +10,7 @@
 
 ## 原生 Frame Inspector / Profiler / Runtime（2026-11-18）
 
-2026-11-19用户授权提交后，引擎实现为`6a243b2`，技术文档为`c2ab76e`，未push；包含相互依赖的后端M1/M2/M3与Inspector实现。并行加载窗口v3的应用/脚本/说明差异及七项用户资产保留；本任务应用入口采用与原验收SHA一致的快照单独暂存，没有覆盖工作文件。下文“未提交”是原交付时状态，最新边界见[任务v5提交补记](tasks/2026-11-18-native-inspector/v5.md#2026-11-19-授权提交补记)。
+2026-11-19用户授权提交后，引擎实现为`6a243b2`，技术文档为`c2ab76e`；随后授权沿用CaptainRex0428个人SSH统一两仓库并直接推送，引擎origin/master已同步至`c2ab76e`，远端HEAD已核对。包含相互依赖的后端M1/M2/M3与Inspector实现。并行加载窗口v3的应用/脚本/说明差异及七项用户资产保留；本任务应用入口采用与原验收SHA一致的快照单独暂存，没有覆盖工作文件。下文“未提交”是原交付时状态，最新边界见[任务v5提交补记](tasks/2026-11-18-native-inspector/v5.md#2026-11-19-授权提交补记)。
 
 用户明确授权自研原生渲染检查和程序debug/profile工具。两API已实现详细RHI Draw/PSO/Viewport/绑定/逐Draw常量版本及两份冻结Shader源码、选定Pass Before/After与CSM层/最终输出、原始像素/独立显示转换、含资源的`.raframe`离线包和事务失败保旧。12真实GPU Pass时间戳已接入；CPU多线程时间线/Scope聚合、统一帧线程日志、图形消息及进程memory/cache分类可用。native调用和预算缺口明确partial，不推断默认绑定。
 
