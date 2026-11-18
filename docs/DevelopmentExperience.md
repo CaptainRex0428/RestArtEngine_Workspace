@@ -4,6 +4,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 
 | 主题 | 经验入口 | 使用时机 |
 | --- | --- | --- |
+| 引擎与工程加载反馈 | [LoadingProgress.md](experience/LoadingProgress.md) | 可选观察者、真实资源计数、初始化回调安全、进度完成语义与实际加载页 |
 | 实际RHI切片、附件与生命周期 | [RhiMigration.md](experience/RhiMigration.md) | 真实执行／像素等价、逐Draw常量、附件加载、候选发布、DX12多队列UI与最小化退役、native边界和失败恢复 |
 | 后端选择、严格模式与混合光追 | [BackendSelection.md](experience/BackendSelection.md) | 区分主模式／Feature、初始化门控、请求与实际状态、CLI覆盖、旧字段兼容与真实GPU验证 |
 | Pass/Graph/RHI与帧捕获演进 | [概念澄清](learning/PassGraphRhiRelationship.md)、[Inspector提案](design/FrameInspectorEvolution.md)、[RenderDoc工具边界](conversations/2026-11-18-renderdoc-tool-boundary.md) | 区分逻辑阶段/资源依赖/后端命令，理解DX11-DXR互操作、外部抓帧、自研快照与回放边界 |
