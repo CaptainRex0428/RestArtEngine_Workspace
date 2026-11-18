@@ -1,10 +1,16 @@
 # Frame Inspector 演进方案
 
-状态：**讨论提案，未实现，不含实现授权**。基线14a6b0d，2026-11-18。对应[讨论](../conversations/2026-11-18-pass-graph-rhi-inspector.md)。
+状态：原始讨论提案；用户随后授权原生Inspector实现。2026-11-18代码已实现下述M1/M2的受限切片和M3的Draw状态记录，集成验收见[任务](../tasks/2026-11-18-native-inspector/README.md)。M3指定Draw前后图像、M4/M5仍未实现。原讨论基线14a6b0d，对应[讨论](../conversations/2026-11-18-pass-graph-rhi-inspector.md)。
+
+## 已实现切片
+
+两后端可选择最终输出或一个Pass的受支持Before/After附件，保存实际CSM层、raw像素及冻结相机；Before仅含本帧此前初始化的资源。逐Draw记录PSO、Viewport、VS/PS、Actor/材质/section、资源绑定与不可变常量版本，native调用/预算缺口明确partial。`.raframe`保存图像、Draw/常量、两份Shader源码及可用CPU/GPU数据；跨API浏览、损坏/预算拒绝事务均纳入任务验收。CPU多线程时间线、Runtime消息/进程memory和12实际timestamp也已接入。
+
+尚无并排差分、自动资源版本图、所有View捕获、任意Draw前后图像或完整命令/Shader字节码与队列历史。以下M1/M2表格描述的完整目标不能整体标完成；实际支持与数据口径见[公开契约](../../../docs/Diagnostics.md)。
 
 ## 当前问题与准确边界
 
-RenderDiagnostics.inl的copyFrameCapture在FrameCapture阶段复制当前资源，保存Frame ID、Pass/Draw元数据和最终捕获点图像；当前导出JSON只有元数据。点事件行没有重新执行GPU，也没有该事件专属图像。选择Draw20时看到同一最终颜色，不能称为Draw20完成后的颜色。
+原始问题是copyFrameCapture仅在FrameCapture阶段复制最终资源，JSON只有元数据；现已增加选定Pass边界和包含图像的离线包，但点事件行仍不会重新执行GPU，也没有该事件专属图像。选择Draw20时看到所标Pass边界颜色，不能称为Draw20完成后的颜色。
 
 每个Draw的历史画面必须在当时留快照，或从保存的初始状态和命令重新执行获得。下一帧重新渲染可供诊断但不是过去那一帧的原始历史。Render Graph可提供插桩位置，不能事后还原已被覆盖的纹理。
 
@@ -31,7 +37,7 @@ RenderDiagnostics.inl的copyFrameCapture在FrameCapture阶段复制当前资源�
 
 ## 当前推荐首个切片
 
-先实现“选一个Pass → 捕获前后SceneColor/Depth或该Pass附件 → 并排与差分查看”，串通事件身份与资源版本。这样可以立即定位景深/光照/描边在哪一步出错，比直接建设全API回放更贴近现有工作流；但用户尚未授权实现。
+原推荐为“选一个Pass → 捕获前后SceneColor/Depth或该Pass附件 → 并排与差分查看”。现前两步已有受限实现，资源用下拉切换，自动并排差分仍待后续；选择Draw检查状态不等于历史输出。后续应根据实际故障决定区域化Draw快照还是受限回放，不默认每Draw全尺寸copy。
 
 ## 外部参考
 

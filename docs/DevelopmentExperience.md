@@ -4,6 +4,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 
 | 主题 | 经验入口 | 使用时机 |
 | --- | --- | --- |
+| 原生帧检查、离线资源与程序诊断 | [NativeDiagnostics.md](experience/NativeDiagnostics.md) | Draw时固定常量、异步原FrameID、深度整层copy、UI安全退役、候选事务、JSON容量压力与计时/内存口径 |
 | 引擎与工程加载反馈 | [LoadingProgress.md](experience/LoadingProgress.md) | 可选观察者、真实资源计数、初始化回调安全、进度完成语义与实际加载页 |
 | 实际RHI切片、附件与生命周期 | [RhiMigration.md](experience/RhiMigration.md) | 真实执行／像素等价、逐Draw常量、附件加载、候选发布、DX12多队列UI与最小化退役、native边界和失败恢复 |
 | 后端选择、严格模式与混合光追 | [BackendSelection.md](experience/BackendSelection.md) | 区分主模式／Feature、初始化门控、请求与实际状态、CLI覆盖、旧字段兼容与真实GPU验证 |

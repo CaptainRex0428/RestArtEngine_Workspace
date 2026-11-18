@@ -6,6 +6,16 @@
 
 独立 Debug 无编译警告，相关 CTest 4/4。严格 11 / 原生 12 / 混合实际启动通过，约 140 工作事件、80 个进度值，最大跳幅约 4.4% / 4.4% / 10.4%；缺 Shader 在 5.45% 失败不报 Ready。真实加载页与 Project Manager 图片已检查，取消及最小化恢复通过，47 个源资产／Shader 哈希保持。引擎未提交，未覆盖用户 EXE；其他 Inspector 改动保留，证据仅对应冻结快照。见[任务](tasks/2026-11-18-loading-progress/README.md)、[经验](experience/LoadingProgress.md)、[讨论](conversations/2026-11-18-loading-progress.md)。
 
+## 原生 Frame Inspector / Profiler / Runtime（2026-11-18）
+
+用户明确授权自研原生渲染检查和程序debug/profile工具。两API已实现详细RHI Draw/PSO/Viewport/绑定/逐Draw常量版本及两份冻结Shader源码、选定Pass Before/After与CSM层/最终输出、原始像素/独立显示转换、含资源的`.raframe`离线包和事务失败保旧。12真实GPU Pass时间戳已接入；CPU多线程时间线/Scope聚合、统一帧线程日志、图形消息及进程memory/cache分类可用。native调用和预算缺口明确partial，不推断默认绑定。
+
+最终Debug全量构建无告警、Premake接入检查通过，CTest29/29（6.21秒）；最终两API Inspector专项通过，覆盖本地/offline全部25个实际GPU显示通道、同捕获FrameID Ready计时和冻结/预算/损坏事务。两API最终UI专项双主题/760与300宽/实际控件/输入隔离通过且截图已审查。混合硬件光追251次真实dispatch/图形错误0，严格11的13张非UI图与原基准逐字节一致、Validate-Render通过。双向跨API离线打开及原生12七组功能回归保留v2通过证据，不冒充最终版本重跑。最终163文件源码身份/exe与七项用户资产哈希均已核对；具体证据见[任务v5](tasks/2026-11-18-native-inspector/v5.md)。
+
+完整hybrid Editor本轮已通过全部Diagnostics原始/显示/冻结/Trace/GUI及Content/保存等，末段跨窗拖放在真实前台断言失败；查询确认系统前台是LockApp（锁屏），一次自有窗口激活也失败。**本轮不记完整Editor PASS**，解锁后补验，不改系统锁或削弱断言。v1–v4失败与修复均保留。完整命令回放/任意Draw图像/Pixel History/Shader单步、CPU源码断点/采样/全分配追踪仍未实现；外部RenderDoc未实测。
+
+任务与经验见[索引](tasks/2026-11-18-native-inspector/README.md)、[NativeDiagnostics](experience/NativeDiagnostics.md)，公开[Diagnostics](../../docs/Diagnostics.md)／[后端矩阵](../../docs/RenderBackends.md)已同步。任务期间其他加载进度提交将引擎HEAD推进到7e5ca88；Inspector与原M1/M2/M3未提交，Sandbox七项用户资产继续保护。下方M3“Inspector/GPU时间未迁移”仅为历史状态，以本节为准。
+
 ## 原生 D3D12 主后端 M3 首阶段（2026-11-18）
 
 用户授权直接实现。独立D3D12设备／交换链／实际RHI场景／ImGui／加载窗口已接通，禁回退时不创建D3D11。真实网格材质、Forward/Deferred、光栅阴影、GTAO/Contact、相机、独立预览、resize、截图与Shader成功热编译／失败保留通过；共享声明绑定真实资源，12后端执行状态转换。严格11和11+DXR模式保留，Auto仍选严格11。
