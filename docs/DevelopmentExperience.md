@@ -4,6 +4,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 
 | 主题 | 经验入口 | 使用时机 |
 | --- | --- | --- |
+| 后端选择、严格模式与混合光追 | [BackendSelection.md](experience/BackendSelection.md) | 区分主模式／Feature、初始化门控、请求与实际状态、CLI覆盖、旧字段兼容与真实GPU验证 |
 | Pass/Graph/RHI与帧捕获演进 | [概念澄清](learning/PassGraphRhiRelationship.md)、[Inspector提案](design/FrameInspectorEvolution.md) | 区分逻辑阶段/资源依赖/后端命令，理解DX11-DXR互操作、快照与回放边界 |
 | 相机、投影与多视图 | [Camera.md](experience/Camera.md) | 统一矩阵/射线、正交与固定画幅、Camera Actor保存与手势事务、工具预览历史隔离 |
 | 多材质Slot、UV与来源身份 | [MeshAttributes.md](experience/MeshAttributes.md) | 导入面材质、UV接缝、重导入/场景绑定、可选属性缓存和详情可见性 |

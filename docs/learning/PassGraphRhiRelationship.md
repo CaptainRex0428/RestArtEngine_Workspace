@@ -44,6 +44,14 @@ Realtime共享间接HDR图，D3D11将它与光栅直接光合成；Progressive�
 
 选择这条混合路径是对现有DX11能力的复用，先拿到硬件求交；代价包括共享格式限制、设备对象边界、生命周期和同步复杂度。不能把它描述为“不通”，现有GPU历史验收已证明这条组合实际工作；也不能说已经完整迁移DX12。
 
+## 5. D3D11 是否支持光线追踪（2026-11-18补充）
+
+光追是算法，DXR是API能力，两者不等价。D3D11普通Shader可以自己做射线求交、遍历与采样；本引擎已有的解析图元／三角形求交运行在像素Shader，不是DXR。Compute Shader也能做通用计算，但不能因此声称本项目已把此路径实现为Compute，更不能声称自动使用硬件光追加速单元。
+
+D3D11不提供DXR接口。本引擎混合模式的硬件光追由D3D12/DXR执行，D3D11合成共享结果。用户明确三个正式选项：严格11、11+12/DXR混合、原生12；后者仍未实现，启动选择器不构成完整后端。当前选择／回退实现见[任务](../tasks/2026-11-18-backend-startup/README.md)。
+
+依据：[微软D3D12 Raytracing](https://learn.microsoft.com/en-us/windows/win32/direct3d12/direct3d-12-raytracing)、[D3D11 Compute](https://learn.microsoft.com/en-us/windows/win32/direct3d11/direct3d-11-advanced-stages-compute-shader)。
+
 ## 来源
 
 - 引擎RenderPipeline.h、ScenePipeline.cpp、SceneRenderer.cpp、RenderBackend.h/.cpp。

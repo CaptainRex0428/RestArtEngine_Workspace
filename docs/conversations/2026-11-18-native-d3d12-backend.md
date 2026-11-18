@@ -2,6 +2,8 @@
 
 状态：架构讨论／方案提案；用户确认目标，尚未进入具体代码实现。本轮引擎代码未改。基线 `14a6b0d`。
 
+后续：用户授权“先做着试试”，并确认混合模式与严格11、原生12并列为正式选项；M1实施／v1–v3验证见[任务](../tasks/2026-11-18-backend-startup/README.md)。本段之前的状态描述保留初始讨论时点，不代表后续尚未实现M1。另补问D3D11能否光追，结论：普通Shader可实现算法，不提供DXR API；本项目硬件通道由D3D12执行。概念补充已写入[学习笔记第5节](../learning/PassGraphRhiRelationship.md#5-d3d11-是否支持光线追踪2026-11-18补充)。
+
 参与：用户、Codex 主协调、渲染专项只读审查。
 
 关联：[实施方案与验收](../design/NativeD3D12Backend.md)、[此前近期建议](../design/RenderingDiagnosticsFocus.md)、[RHI/Pass 学习](../learning/PassGraphRhiRelationship.md)。
