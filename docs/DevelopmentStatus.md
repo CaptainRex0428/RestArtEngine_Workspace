@@ -8,6 +8,8 @@
 
 ## 原生 Frame Inspector / Profiler / Runtime（2026-11-18）
 
+2026-11-19用户授权提交后，引擎实现为`6a243b2`，技术文档为`c2ab76e`，未push；包含相互依赖的后端M1/M2/M3与Inspector实现。并行加载窗口v3的应用/脚本/说明差异及七项用户资产保留；本任务应用入口采用与原验收SHA一致的快照单独暂存，没有覆盖工作文件。下文“未提交”是原交付时状态，最新边界见[任务v5提交补记](tasks/2026-11-18-native-inspector/v5.md#2026-11-19-授权提交补记)。
+
 用户明确授权自研原生渲染检查和程序debug/profile工具。两API已实现详细RHI Draw/PSO/Viewport/绑定/逐Draw常量版本及两份冻结Shader源码、选定Pass Before/After与CSM层/最终输出、原始像素/独立显示转换、含资源的`.raframe`离线包和事务失败保旧。12真实GPU Pass时间戳已接入；CPU多线程时间线/Scope聚合、统一帧线程日志、图形消息及进程memory/cache分类可用。native调用和预算缺口明确partial，不推断默认绑定。
 
 最终Debug全量构建无告警、Premake接入检查通过，CTest29/29（6.21秒）；最终两API Inspector专项通过，覆盖本地/offline全部25个实际GPU显示通道、同捕获FrameID Ready计时和冻结/预算/损坏事务。两API最终UI专项双主题/760与300宽/实际控件/输入隔离通过且截图已审查。混合硬件光追251次真实dispatch/图形错误0，严格11的13张非UI图与原基准逐字节一致、Validate-Render通过。双向跨API离线打开及原生12七组功能回归保留v2通过证据，不冒充最终版本重跑。最终163文件源码身份/exe与七项用户资产哈希均已核对；具体证据见[任务v5](tasks/2026-11-18-native-inspector/v5.md)。
