@@ -1,5 +1,7 @@
 ## 引擎与工程加载反馈（2026-11-18）
 
+提交完成：7e5ca88，仅本任务 17 文件，未推送。以 14a6b0d 的 D3D11 / 可选 DXR 基线独立构建，正常启动、缺 Shader 失败及 4/4 CTest 通过，图形错误 0；后端迁移与 Inspector 继续留在工作区。真实 9 Shader / 24 材质状态，脚本兼容新旧后端入口；共享暂存区和工作文件保持。见[独立提交 v2](tasks/2026-11-18-loading-progress/v2.md)。下方“未提交／三模式”是 v1 混合工作区的历史范围，以此提交记录为准。
+
 加载流程接入可选 LoadProgress：9 Shader、224 PSO、可选 DXR、Engine / Project 材质与网格、场景、Content 索引／缩略图及编辑器首帧。资源显示真实当前项／总数和 UTF-8 文件名，加载页两行排版并保留百分比列；进度不再提前 100% 或切窗后退回 65%。Project Manager 仅创建 device/UI，避免重复编译场景管线。新增 --loading-report JSONL 与 Test-LoadingProgress.ps1。
 
 独立 Debug 无编译警告，相关 CTest 4/4。严格 11 / 原生 12 / 混合实际启动通过，约 140 工作事件、80 个进度值，最大跳幅约 4.4% / 4.4% / 10.4%；缺 Shader 在 5.45% 失败不报 Ready。真实加载页与 Project Manager 图片已检查，取消及最小化恢复通过，47 个源资产／Shader 哈希保持。引擎未提交，未覆盖用户 EXE；其他 Inspector 改动保留，证据仅对应冻结快照。见[任务](tasks/2026-11-18-loading-progress/README.md)、[经验](experience/LoadingProgress.md)、[讨论](conversations/2026-11-18-loading-progress.md)。
