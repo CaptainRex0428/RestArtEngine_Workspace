@@ -1,6 +1,6 @@
 # Pass、Render Graph、RHI 与混合 DX11/DXR（2026-11-18）
 
-基线：引擎14a6b0d。原理答疑，未修改运行时。对应[讨论](../conversations/2026-11-18-pass-graph-rhi-inspector.md)。
+基线：引擎14a6b0d。原理答疑时未修改运行时；随后[M2任务](../tasks/2026-11-18-rhi-slice/README.md)实现D3D11实际RHI切片，下文已补充当前边界。对应[讨论](../conversations/2026-11-18-pass-graph-rhi-inspector.md)。
 
 ## 1. Pass 与声明
 
@@ -30,7 +30,7 @@ CPU结构体对应HLSL cbuffer的字段顺序、对齐、偏移属于Shader参�
 
 目标关系：Renderer/Pass图决定工作与依赖 → RHI描述资源/命令/同步 → 具体API/驱动 → GPU。Shader编译工具链在旁边产生GPU程序，RHI消费Shader/管线对象，不自动提供自研Shader语言。
 
-当前IRenderBackend只有initialize/beginFrame/endFrame/present等生命周期方法，没承接实际SceneRenderer的资源/命令；其实现是占位。SceneRenderer直接操作D3D11。
+旧IRenderBackend只有initialize/beginFrame/endFrame/present等生命周期方法，仍未承接实际SceneRenderer资源/命令。当前主场景使用独立Rhi.h：typed RAII资源、图形管线、附件load/store/read声明、上传与实际draw，由D3D11实现。ShadowPass不再接收native context。仍没有完整Graph、上传/copy/UI/present统一追踪或原生D3D12主后端；native边界见[后端说明](../../../docs/RenderBackends.md#实际-rhi-执行范围)。
 
 ## 4. DX11、DX12、DXR的当前关系
 

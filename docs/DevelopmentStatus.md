@@ -1,8 +1,13 @@
+## D3D11 实际 RHI 切片 M2（2026-11-18）
+
+用户授权实际RHI改写。已接通Rhi.h typed RAII资源／命令 → D3D11适配器 → 网格、常量、目标、Shader／图形管线、阴影和Forward/Deferred实际Draw。附件Load/Clear/Store与真实采样句柄驱动执行；候选热编译先创建受支持PSO再发布。旧IRenderBackend仍独立占位，native UI／Outline／DOF／capture／软件光追结构化数据／DXR桥和呈现尚未整体迁移；原生12、完整Graph、自动屏障未实现。
+
+Debug无告警、CTest24/24（含WARP实际像素回读）、五案例启动矩阵、13张旧新非UI图逐字节一致、Validate-Render通过。48 RHI Pass／80 Draw（64 indexed）证明真实场景提交；严格11无D3D12初始化／DXR0。混合完整HRT217dispatch/errors0；最终构建相机9组含DOF／四视图／预览与真实DXR通过。材质状态9组、mesh属性7组/27DXR和GC回收/GUI通过。完整Editor首轮因夹具缺项目.rasset未完成；改用HEAD Sandbox隔离副本后全套通过，exit0/errors0，含Diagnostics冻结回读／实际几何计数、跨窗口拖放／重停靠、保存、四视图与独立预览。实际RenderDoc capture尚未验证。用户Sandbox七文件hash保持。引擎代码未提交；详见[任务v1–v3](tasks/2026-11-18-rhi-slice/README.md)、[经验](experience/RhiMigration.md)、[公开执行范围](../../docs/RenderBackends.md#实际-rhi-执行范围)。下一步是余下RHI资源／绑定与呈现边界，再推进M3原生12；不把native bridge叫作原生12后端。
 ## 后端启动 M1 与三模式选择（2026-11-18）
 
 用户授权实施并明确三个正式模式：严格D3D11、D3D11+D3D12/DXR混合、原生D3D12。M1已接通真实App配置／CLI覆盖、设备初始化门控、请求／实际状态、保存后下次启动及旧字段兼容；混合规范key为d3d11Dxr。原生12未实现，依回退开关严格转11或报错，不把选择器当作实际RHI。
 
-Debug／CTest23/23、五案例真实启动矩阵与13张光栅GPU图逐字节一致；混合硬件全套217dispatch/errors0，最终规范key入口3次DXR/errors0；严格11最终真实控件／保存／截图通过、DXR按预期跳过且初始化未尝试／dispatch0。后端长标签裁切已在截图检查中修复。用户Sandbox七文件SHA256保持。引擎代码未提交，协作日志单独同步。详见[任务v1–v3](tasks/2026-11-18-backend-startup/README.md)、[经验](experience/BackendSelection.md)、[公开配置说明](../../docs/RenderBackends.md)。下一步为D3D11实际RHI与资源声明切片；原生12／设备丢失／热切未实现，完整Editor自测历史失败状态未更新。
+Debug／CTest23/23、五案例真实启动矩阵与13张光栅GPU图逐字节一致；混合硬件全套217dispatch/errors0，最终规范key入口3次DXR/errors0；严格11最终真实控件／保存／截图通过、DXR按预期跳过且初始化未尝试／dispatch0。后端长标签裁切已在截图检查中修复。用户Sandbox七文件SHA256保持。引擎代码未提交，协作日志单独同步。详见[任务v1–v3](tasks/2026-11-18-backend-startup/README.md)、[经验](experience/BackendSelection.md)、[公开配置说明](../../docs/RenderBackends.md)。后续D3D11实际RHI与资源声明切片已开始，见本页上方M2；原生12／设备丢失／热切未实现，完整Editor历史失败状态已由本页上方M2正确夹具的最新通过结果取代。
 
 ## 当前方向：独立 D3D12 主后端与 D3D11 回退（2026-11-18，M1已启动）
 

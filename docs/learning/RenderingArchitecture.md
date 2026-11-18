@@ -1,6 +1,6 @@
 # 渲染架构学习笔记：RHI、Pass 图、G-Buffer 与常量打包
 
-用途：理解 RestArtEngine 当前渲染架构与通用原理。基线：引擎 `14a6b0d`。相关讨论：[2026-11-11 会话](../conversations/2026-11-11-rhi-material-system.md)；后续方案：[材质模板系统](../design/MaterialTemplateSystem.md)。
+用途：理解 RestArtEngine 当前渲染架构与通用原理。原基线：引擎 `14a6b0d`；2026-11-18按[M2实际RHI任务](../tasks/2026-11-18-rhi-slice/README.md)更新当前执行范围。相关讨论：[2026-11-11 会话](../conversations/2026-11-11-rhi-material-system.md)；后续方案：[材质模板系统](../design/MaterialTemplateSystem.md)。
 
 标注约定：**已实现** = 源码存在并通过构建/测试；**未实现** = 方案或设计目标，不能当作现成能力。
 
@@ -20,9 +20,9 @@ GPU
 
 当前的真实情况（**已实现**）：
 
-- `SceneRenderer` 直接调用 D3D11，不经过 RHI。
+- `SceneRenderer` 的主场景网格／常量／目标、图形管线、阴影与Forward/Deferred通过 `Rhi.h` → D3D11 执行；部分后处理、UI、捕获和呈现仍直接调用native。
 - `D3D12` 目录只承载 DXR 桥：DX11 光栅 + `DispatchRays`，共享纹理与 fence。
-- RHI（`IRenderBackend`）只有生命周期空壳，五个后端均为占位。
+- 实际资源／绘制 RHI 为 `Rhi.h` + `src/Renderer/D3D11/`；旧 `IRenderBackend` 仍是独立生命周期骨架，其他完整主渲染后端未实现。
 
 ## 2. 一帧的 Pass 流
 
@@ -224,7 +224,7 @@ class IRenderBackend {
 
 | 误区 | 纠正 |
 |---|---|
-| RHI 已经接入 | 只有接口骨架；D3D11 直连 |
+| RHI 已经完整接入 | 仅D3D11主场景切片；其余native边界与原生12尚待迁移 |
 | RHI 只支持 D3D11 | 设计多后端；当前一个都没实现 |
 | 延迟渲染没有深度写入 | GBuffer Pass 写 Depth，后续 Pass 读 |
 | CBuffer 可以随便放 bool/float3 | 必须遵守 16 字节对齐，用 float4/uint |
