@@ -1,5 +1,7 @@
 ## 引擎与工程加载反馈（2026-11-18）
 
+后续尺寸修复已验证：99% 场景准备阶段继续沿用首个无边框加载窗口的实际 963×542 尺寸和居中位置，不再将加载图拉伸到编辑器。GPU 预热后隐藏调整窗口，按完整目标尺寸建立 Dock 并呈现首帧，再显示常规编辑器。独立 Debug、三后端启动及缺 Shader 失败通过，所有加载提交尺寸／边框一致，120 帧退出 0 / 图形错误 0，加载页与正常编辑器实际图像已检查。用户资产保持，bin 运行进程未关闭，代码尚未提交。见[任务 v3](tasks/2026-11-18-loading-progress/v3.md)。
+
 提交完成：7e5ca88，仅本任务 17 文件，已按后续用户授权使用 CaptainRex0428 的既有个人 SSH 身份推送 origin/master。以 14a6b0d 的 D3D11 / 可选 DXR 基线独立构建，正常启动、缺 Shader 失败及 4/4 CTest 通过，图形错误 0；后端迁移与 Inspector 继续留在工作区。真实 9 Shader / 24 材质状态，脚本兼容新旧后端入口；共享暂存区和工作文件保持。见[独立提交 v2](tasks/2026-11-18-loading-progress/v2.md)。下方“未提交／三模式”是 v1 混合工作区的历史范围，以此提交记录为准。
 
 加载流程接入可选 LoadProgress：9 Shader、224 PSO、可选 DXR、Engine / Project 材质与网格、场景、Content 索引／缩略图及编辑器首帧。资源显示真实当前项／总数和 UTF-8 文件名，加载页两行排版并保留百分比列；进度不再提前 100% 或切窗后退回 65%。Project Manager 仅创建 device/UI，避免重复编译场景管线。新增 --loading-report JSONL 与 Test-LoadingProgress.ps1。
