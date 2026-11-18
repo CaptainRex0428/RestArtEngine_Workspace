@@ -1,5 +1,7 @@
 # 实际 RHI 迁移、附件声明与 native 边界
 
+最新原生 D3D12 经验与证据见本页末尾及 [M3任务](../tasks/2026-11-18-native-d3d12/README.md)；此前 M2 范围保留为迁移过程记录。
+
 ## 纵向切片先证明真实执行
 
 触发：已有接口叫Backend/RHI，但场景仍绕过它直接上传、绑定、Draw。
@@ -28,3 +30,25 @@
 ## 完整Editor验收的资产前提
 
 独立渲染专项自行构建场景，不代表同一示例满足EditorSmoke的交互前置条件。后者拖材质明确需要已加载、Project-origin、.rasset材质。RayTracing_Simple只有legacy.ramat时会在此处停止；应使用Git已提交Sandbox的隔离归档，保持用户工作树资产不变。保留首次失败，再记录修正夹具后的结果；不将缺前置资产当作RHI绘制回归，也不把部分UI检查通过说成整套通过。来源：[v3](../tasks/2026-11-18-rhi-slice/v3.md)。
+
+## 原生 UI 的队列与退役边界
+
+触发：引入 ImGui DX12、主窗口最小化但独立工具窗口仍绘制、UI 构建后替换 preview/scene 图像。
+
+原因：vendored DX12 为每个副窗口创建独立 queue，主队列中“先录制场景”不能保证副队列读到最新纹理；CPU 绘制列表先借用描述符，中途 readback/flush 完成也不代表这些尚未提交的 UI 已消费。最小化不 present，若仅在 present 退役，借用集合会持续增长。
+
+原则：所有 native12 UI 帧先把采样纹理转换为可读并完成主场景提交，随后提交副窗口；核实副窗口 SwapBuffers 的真实 fence，再在所有 UI 完成处退役描述符和借用图像。renderMain=false 仍必须执行转换和完成边界。回读、主 submit、主 present 都不能独自代表所有 UI 完成。DX12 Shutdown 自己先清主 viewport data，不照搬 DX11 的提前 DestroyPlatformWindows 顺序。
+
+防回归：同帧先借用旧图像 ID 再替换目标与 slot；真实创建独立 HWND，主窗口最小化后连续改变材质，GPU 回读变化且 debug errors0；结束时不依赖 present 清理。独立 RHI 测试以 weak_ptr 确认中途 submit 保留、finishUiFrame 释放，描述符中途 flush 不复用。
+
+边界：当前同步等待以正确性为先，不代表异步性能方案；副窗口原生寿命与 GPU 验证不等于已检查其 GUI 像素或人工视觉。来源：[M3 v1](../tasks/2026-11-18-native-d3d12/v1.md)、[v2](../tasks/2026-11-18-native-d3d12/v2.md)。
+
+## 原生 API 切换不能继承旧能力宣告
+
+触发：同一可执行中 DX11 已有 Outline/DOF/Inspector/DXR，原生 DX12 尚未迁移这些实现。
+
+原因：模块“已编译”不是当前后端“可用”，native Shader 指针也不是公共 Shader 身份；旧查询和工具测试可能直接把纹理 ID 当 D3D11 SRV 使用。
+
+原则：共享绘制用 RHI 模块标识，所有原生互操作先识别后端；能力矩阵区分请求与当前后端实现，保留请求并写明确原因。旧原生读回测试须显式限制后端，不能将 D3D12 descriptor 强转为 D3D11 COM 指针。fallback 只包设备与目标创建，不包通用资产/Shader错误。
+
+防回归：native12 禁止回退真实启动且 D3D11 device/context 均空，旧11/Auto图像对照；当前后端不支持的请求不能被标为 Active，切回11后原请求恢复执行。来源同 M3 任务与 BackendSelection/RenderPipeline CPU 测试。

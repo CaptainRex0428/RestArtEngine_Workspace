@@ -1,6 +1,6 @@
 # 独立 D3D12 主后端与 D3D11 回退（2026-11-18）
 
-状态：**分阶段方案；M1启动选择、M2的D3D11实际资源／命令切片已实现，M2持续扩展与M3原生D3D12仍未完成**。方案起点为引擎 `14a6b0d`；用户授权实施并要求混合模式正式保留。[M1任务](../tasks/2026-11-18-backend-startup/README.md)、[M2任务](../tasks/2026-11-18-rhi-slice/README.md)记录源码、运行证据与未提交状态。M3及后续仍为提案，不代表已实现。
+状态：**M1启动选择、M2的D3D11实际RHI、M3首阶段独立D3D12场景/UI路径已实现并有GPU证据；M3功能对齐及原生DXR仍为后续方案**。方案起点为引擎 `14a6b0d`；用户授权实施并要求混合模式正式保留。[M1任务](../tasks/2026-11-18-backend-startup/README.md)、[M2任务](../tasks/2026-11-18-rhi-slice/README.md)、[M3任务](../tasks/2026-11-18-native-d3d12/README.md)记录源码、实际范围与未提交状态。下文超出已验证范围的设计仍属提案。
 关联：[本轮讨论](../conversations/2026-11-18-native-d3d12-backend.md)、[Pass/RHI 学习](../learning/PassGraphRhiRelationship.md)、[此前诊断建议](RenderingDiagnosticsFocus.md)。本方案取代此前“Inspector 先行、RHI 暂缓”的近期优先级，保留 Inspector/HDR 长期目标。
 
 ## 目标与现状缺口

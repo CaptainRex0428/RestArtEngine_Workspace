@@ -1,4 +1,12 @@
-## D3D11 实际 RHI 切片 M2（2026-11-18）
+## 原生 D3D12 主后端 M3 首阶段（2026-11-18）
+
+用户授权直接实现。独立D3D12设备／交换链／实际RHI场景／ImGui／加载窗口已接通，禁回退时不创建D3D11。真实网格材质、Forward/Deferred、光栅阴影、GTAO/Contact、相机、独立预览、resize、截图与Shader成功热编译／失败保留通过；共享声明绑定真实资源，12后端执行状态转换。严格11和11+DXR模式保留，Auto仍选严格11。
+
+Debug无告警、CTest25/25（实际11/12 GPU），原生12专项及六案例启动矩阵通过；13张严格11非UI图对M2逐字节一致，9张可比较跨API图最多2像素有单通道1级差异。混合HRT251实际dispatch、完整Editor回归通过，图形错误0。最终文案修正版本实际加载→编辑器4帧、D3D11 device=no、debug errors0，截图已检查；主体全套验收与最终文案版本身份分别保存在任务日志。用户Sandbox七项资产哈希不变，Premake/CMake均接入。
+
+原生12的软件射线、DXR/GI、DOF、Outline、Inspector冻结资源及GPU查询未移植；真实RenderDoc抓帧、GBV和副窗口GUI像素未验收。同步fence首版不承诺性能提升，设备丢失／热切／完整Graph仍未实现。引擎M1/M2/M3代码未提交，协作记录独立同步。详见[任务v1–v3](tasks/2026-11-18-native-d3d12/README.md)、[经验](experience/RhiMigration.md)、[公开能力矩阵](../../docs/RenderBackends.md)。下一步优先补原生12诊断与实际RenderDoc抓帧，再按功能需求移植；下方M1/M2的“原生12未实现”为历史状态，以本节为准。
+
+## D3D11 实际 RHI 切片 M2（2026-11-18，历史阶段）
 
 术语与交付范围澄清见[记录](conversations/2026-11-18-rhi-slice-boundary.md)：剩余native指直接D3D11调用，与尚未实现的原生D3D12主后端分开；RenderDoc实际抓帧尚未验收。
 
