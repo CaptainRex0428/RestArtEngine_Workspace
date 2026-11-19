@@ -1,3 +1,12 @@
+## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
+
+用户截图显示 native DXR + Progressive GI 时 Scene Viewport 右侧有浅色错位竖带。根因：编辑器视口是 scene target 的子矩形，native HardwareResolve 却把 DXR 图像复制到 `(0,0)`；D3D11 旧路径使用 `viewportX/Y` 目标偏移。
+
+- 修复：RHI 新增 `copyTextureRegionTo(dst, dstX, dstY, src, srcX, srcY, w, h, layer)`，旧 copy 委托 `(0,0)`；native HardwareResolve 改为在 `(viewportX, viewportY)` 解析。
+- 回归：native self-test 比较同一视口在 `(0,0)` 与 `(64,48)` 的图像，AA 关闭 mismatches=0，FXAA=2（阈值 8）；临时还原旧行为会得到 18007 mismatches。
+- 验证：native self-test exit 0；CTest 30/30；Sandbox native DXR 运行时 validation 0。
+- 提交 `64a7c97` 已推送；任务 [v2](tasks/2026-11-19-native-dxr/v2.md)，经验 [NativeDxr](experience/NativeDxr.md)。
+
 ## 原生 D3D12 DXR 完成（2026-11-19，补充模型）
 
 用户选择为纯 D3D12 补齐完整原生 DXR（阴影/反射/GI）。已让 DXR 与光栅共用同一个 D3D12 device/queue，不再依赖 D3D11 或旧共享 bridge。

@@ -15,6 +15,12 @@
 - 硬件图像 resolve 直接 `copyTextureRegion` 到场景色/AA 源；copy source 状态跟随 DXR 留下的 `COPY_SOURCE`，复制后恢复原状态。
 - 队列顺序：DXR 命令列表在光栅列表之前 `ExecuteCommandLists`，所以同一 queue 保证“DXR 写 → 光栅读”；不要假设 CPU 提交顺序等于光栅 Pass 顺序。每帧 DXR 完成 fence 仍需上一帧等待，避免 allocator/upload 复用。
 
+## 编辑器视口偏移
+
+- native DXR 硬件 resolve 必须复制到 `settings.viewportX/Y`，不能假设 `(0,0)`。编辑器 scene target 是整窗大小，Scene Viewport 只是子矩形；D3D11 旧路径一直用 `CopySubresourceRegion` 的目标偏移，native 移植时漏掉会产生右侧未覆盖竖带/错位。
+- 回归方法：同一 target 分别渲染 `(0,0,200,140)` 与 `(64,48,200,140)`，比较 origin 与 offset 区域。AA 关闭要求逐像素一致；FXAA 因边界邻域允许少量误差（实测 2 像素），但阈值远小于错位时的上万像素。
+- 给 RHI 增加带目标偏移的 `copyTextureRegionTo`，旧 `copyTextureRegion` 委托 `(0,0)` 保持兼容；不要用修改旧函数语义的方式修，避免 frame capture 等调用方受影响。
+
 ## 验证
 
 - 用 D3D12 debug layer 的 validation errors 作为硬门槛；`--native-d3d12-self-test` 增加 HardwareTransport/Realtime GI 断言与 BMP。
@@ -26,4 +32,4 @@
 
 DXR 仍整幅替换硬件预览（不是 inline 混合）；没有 DispatchRays/SBT、运动重投影、透明/蒙皮、异步多帧；DOF/Outline/解析光追 native 未迁移。DXR 不可用时保留光栅并报告原因。
 
-来源：[原生 DXR 任务 v1](../tasks/2026-11-19-native-dxr/v1.md)；提交 `c017ff8`。
+来源：[原生 DXR 任务 v1](../tasks/2026-11-19-native-dxr/v1.md)、[v2 视口偏移修复](../tasks/2026-11-19-native-dxr/v2.md)；提交 `c017ff8`、`64a7c97`。
