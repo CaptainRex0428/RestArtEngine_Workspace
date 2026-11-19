@@ -1,3 +1,12 @@
+## 抗锯齿完成与启动修复（2026-11-19，补充模型）
+
+续接 Codex 中断的 AA 工作并修复引擎无法打开：FXAA resolve 曾把交换链目标写入跨帧成员 `aaResolvedImage`，原生 D3D12 在加载窗→编辑器窗 resize 时拒绝 `ResizeBuffers`。改为仅 TAA 历史持久，并在 resize 前释放 UI descriptor 借用与延迟对象。
+
+- 功能：Off／FXAA／TAA 项目设置与实时 UI；实时 DXR GI 与独立硬件 resolve 请求 TAA 时回退 FXAA；离屏工具预览 FXAA；数据视图关闭；Progressive PT 跳过额外 AA。
+- 验证：Debug 构建；正常启动 5 帧 exit 0／validation 0；`--aa-self-test` 默认、`--backend d3d11`、`--backend d3d12 --no-backend-fallback` 全 PASS；`--aa-ui-self-test` PASS；CTest **30/30**；`--native-d3d12-self-test` 通过（含 resize）；`--editor-self-test --backend d3d11` 仍受 Native Content focus 竞争影响，非 AA 回归。
+- 提交 `b142549` 已推送 `origin/master`；任务 [v4](tasks/2026-11-19-antialiasing/v4.md)，经验 [AntiAliasing](experience/AntiAliasing.md)。
+- 说明：上一状态条目“AA 未完成、完整应用不可编译”已被本轮取代，仅限于 AA 与启动路径；Project Settings 全量任务未在本次复验。
+
 ## Project Settings 依赖与重启反馈（2026-11-19）
 
 显式硬件off清依赖反射/阴影/GI，Path Tracing启硬件并清独立反射，Realtime GI再清独立光追阴影；质量/贡献参数保留。非hybrid后端编辑清不支持请求，fallback仅native12可编辑；设备降级/旧工程加载不改请求。草稿、已保存配置和真实launch request共同驱动未保存待重启、已保存待重启、未保存撤回提示；即时光照不误报重启。新增`--project-settings-self-test`，无自动退出/重启。
