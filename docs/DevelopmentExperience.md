@@ -12,7 +12,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 | 相机、投影与多视图 | [Camera.md](experience/Camera.md) | 统一矩阵/射线、正交与固定画幅、Camera Actor保存与手势事务、工具预览历史隔离 |
 | 多材质Slot、UV与来源身份 | [MeshAttributes.md](experience/MeshAttributes.md) | 导入面材质、UV接缝、重导入/场景绑定、可选属性缓存和详情可见性 |
 | 灯光组件与共享GPU照明 | [Lighting.md](experience/Lighting.md) | 新旧灯光来源、常量反射、GI历史、有限阴影与多矩形MIS验证 |
-| 实时 GI 方案 | [讨论](conversations/2026-11-19-realtime-gi-options.md)、[设计](design/RealtimeGiOptions.md) | 现有 PathTracing Realtime；SSGI／DDGI／ReSTIR／时域降噪等方案的成本、依赖、配置模型与里程碑 |
+| 实时 GI 方案 | [讨论](conversations/2026-11-19-realtime-gi-options.md)、[设计](design/RealtimeGiOptions.md)、[任务](tasks/2026-11-19-realtime-gi/README.md) | 现有 PathTracing Realtime；SSGI／DDGI／ReSTIR／时域降噪等方案的成本、依赖、配置模型与里程碑 |
 | Path Tracing 示例、面光源与视角 | [PathTracingExamples.md](experience/PathTracingExamples.md) | Cornell Box 构图、矩形发光、MIS、防止反射测试伪阳性、场景初始视角 |
 | 资产重导入、删除与引用一致性 | [AssetLifecycle.md](experience/AssetLifecycle.md) | 稳定 GUID 的几何替换、文件与内存同步、场景／Undo 引用和 legacy fallback 保护 |
 | 编辑器底栏、命令与文本焦点 | [EditorConsole.md](experience/EditorConsole.md) | 全局底栏布局、命令复用、历史补全、输入透传和 GUI 测试页签延迟 |
