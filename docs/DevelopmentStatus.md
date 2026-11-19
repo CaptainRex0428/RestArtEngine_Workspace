@@ -1,3 +1,12 @@
+## 原生 D3D12 DXR 完成（2026-11-19，补充模型）
+
+用户选择为纯 D3D12 补齐完整原生 DXR（阴影/反射/GI）。已让 DXR 与光栅共用同一个 D3D12 device/queue，不再依赖 D3D11 或旧共享 bridge。
+
+- 实现：`HardwareRayTracing` 增加 native 模式（Device5/queue、普通 UAV 输出、独立 fence/allocator）；RHI 新增 `importTexture`；native 管线声明 HardwareTransport/HardwareResolve，硬件图像复制回场景色，Realtime GI 间接光复制到 RHI 纹理后由光照采样；`ProjectSettingsRules` 允许 D3D12 请求硬件光追/GI，UI 标签改为 `D3D12 (native DXR)`。
+- 验证：native self-test 报告 DXR active（硬件预览 + Realtime GI 4/8 samples）；Sandbox native DXR 5 帧 validation 0；Realtime GI 12 帧、Progressive GI 64 samples validation 0；混合 hardware-rt self-test、editor self-test、AA self-test 通过；CTest **30/30**；严格 D3D11 validation 0。
+- 提交 `c017ff8` 已推送；任务 [v1](tasks/2026-11-19-native-dxr/v1.md)，经验 [NativeDxr](experience/NativeDxr.md)。
+- 边界：仍是“DXR 整幅硬件预览替换光栅”语义；DOF/Outline/解析光追、运动重投影、DispatchRays/SBT、异步多帧未迁移 native；DXR 不可用时保留光栅并报告原因。
+
 ## 网格 Asset Details：Slot 材质声明与居中环绕预览（2026-11-19，补充模型）
 
 用户希望打开网格时能声明材质 Slot，并且预览可旋转但始终以物体为中心。
