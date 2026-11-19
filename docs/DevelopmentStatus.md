@@ -1,3 +1,12 @@
+## 阴影抗锯齿：4×4 PCF 与 4096 阴影图（2026-11-19，补充模型）
+
+用户反馈阴影边缘硬阶梯。根因是 2048² 阴影图覆盖 30 世界单位（每 texel≈1.46cm）且默认仅 2×2 PCF；FXAA/TAA 无法恢复阴影图缺失的覆盖率。
+
+- 实现：阴影图 2048→**4096**；新增 `ShadowMapPCF16`（4×4 固定偏移、16 次双线性比较、约 8×8 texel 覆盖）并设为默认；旧 2×2/硬/3×3/PCSS/CSM/GTAO/Contact/Analytic/Disabled 保留；Scene 下拉、RenderFeatures、EditorSmoke 捕获同步。
+- 验证：Debug 构建 0 warning；CTest **30/30**；`--native-d3d12-self-test` 通过；编辑器自测的阴影捕获与 PCF16 断言通过（随后仍是既有 Native Content focus 竞争）；2×2/4×4 对照图已加入公开文档。
+- 提交 `eaf4193`（实现）、`8bbd1c9`（文档）已推送；任务 [v1](tasks/2026-11-19-shadow-aa/v1.md)，经验 [ShadowFiltering](experience/ShadowFiltering.md)。
+- 边界：4096²×2 深度约 128 MiB；未做质量档位、级联动态分辨率、PCSS 时域降噪和局部灯独立阴影图。
+
 ## 抗锯齿完成与启动修复（2026-11-19，补充模型）
 
 续接 Codex 中断的 AA 工作并修复引擎无法打开：FXAA resolve 曾把交换链目标写入跨帧成员 `aaResolvedImage`，原生 D3D12 在加载窗→编辑器窗 resize 时拒绝 `ResizeBuffers`。改为仅 TAA 历史持久，并在 resize 前释放 UI descriptor 借用与延迟对象。
