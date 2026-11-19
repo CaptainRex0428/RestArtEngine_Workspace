@@ -12,7 +12,7 @@
 - **M1 完成**：native/hybrid 自测、Denoiser 三模式 validation 0、CTest 30/30。
 - **M2 SSGI 首版完成**（提交 `1768b21`）：`GlobalIlluminationMethod::ScreenSpace`，Deferred 屏幕追踪 + 上一帧颜色 history，b6/t13、history 资源、D3D11/native D3D12 共享，Project JSON/UI/状态/测试；strict D3D11 与 native D3D12 probe validation 0，截图见任务 m2。限制：Forward/runtime swapchain 未启用、无时域重投影。
 - **M3 DDGI 首版完成**：`GlobalIlluminationMethod::ProbeGrid`，相机目标 probe 网格 → 1024×32 RGBA16F atlas ping-pong，`PSProbeUpdate` 从 G-buffer 更新、Deferred 三线性采样 8 probe；b9/t14/t15、ProbeUpdate pass、Project JSON/UI/状态/测试；native 与 strict D3D11 validation 0，截图见任务 m3。限制：屏幕空间可见性近似、近镜面不参与、Forward/runtime swapchain 未启用。
-- **M4 ReSTIR 首版可运行**：Path tracing 实时采样层，加权 reservoir 直接光 + 每像素路径候选 reservoir indirect；`sampling/restirCandidates/restirDirect/restirIndirect` 配置、UI、JSON、测试；native DXR 与 hybrid DXR validation 0，状态含 ReSTIR 信息。限制：无独立 reservoir 历史/空间 reuse，直接光估计为近似，indirect 亮度选择有偏；完整 spatiotemporal ReSTIR 仍待补。
+- **M4 ReSTIR 首版可运行**：Path tracing 实时采样层，加权 reservoir 直接光 + 每像素路径候选 reservoir indirect；`sampling/restirCandidates/restirDirect/restirIndirect` 配置、UI、JSON、测试；native DXR 与 hybrid DXR validation 0，状态含 ReSTIR 信息。后续 `e7defe8` 加入间接 reservoir 时域历史（u8/t14 + 重投影回读）。限制：直接光仅空间 reservoir，无空间 reuse，直接光估计为近似，indirect 亮度选择有偏；完整 spatiotemporal ReSTIR 仍待补。
 - 待完成：M4 时间/空间 reservoir reuse 与无偏校正、最终四项整体回归；完成前不宣称四项全部完成。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
