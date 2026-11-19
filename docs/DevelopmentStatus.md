@@ -5,8 +5,9 @@
 - 设计已落盘：[RealtimeGiOptions](design/RealtimeGiOptions.md)；当前只有 `PathTracing`（Progressive/Realtime）一种 GI 算法，Realtime 已有 5×5 空间滤波、无运动重投影/降噪。
 - 统一配置模型：`GlobalIlluminationMethod` 增加 ScreenSpace/ProbeGrid；降噪、运动向量选择（CameraOnly/PerObject/Automatic）、采样层（Path/ReSTIR）及 SSGI/DDGI/ReSTIR 参数放入 `GlobalIlluminationSettings`，旧工程缺字段用默认值。
 - 实施顺序：M1 运动向量 + PT 降噪 → M2 SSGI → M3 DDGI → M4 ReSTIR；每阶段独立构建、GPU 截图、自测、CTest、提交后再进入下一阶段。
-- M1 配置层已完成：降噪/运动向量枚举、denoiseIterations、项目 JSON 读写校验、Project Settings 控件与测试；提交 `1bd8e58`。默认仍为 Spatial，渲染行为未变。
-- 仍待实现：运动向量 target、相机/逐物体重投影、temporal denoise pass、SSGI/DDGI/ReSTIR；完成前不宣称任何一项已生效。进度见 [任务 m1](tasks/2026-11-19-realtime-gi/m1.md)。
+- M1 配置层已完成：降噪/运动向量枚举、denoiseIterations、项目 JSON 读写校验、Project Settings 控件与测试；提交 `1bd8e58`。
+- 相机重投影 temporal+spatial 降噪已接入：b8/t12/t13/u5/u6、读写历史图、上一帧 ViewProjection 重投影、法线/深度拒绝与邻域 clamp；`GlobalIlluminationStatus` 报告 effective denoiser/motion vectors；提交 `ba44bad`。native self-test、hybrid hardware-rt self-test、三种 denoiser 模式 validation 0、CTest 30/30。
+- 仍待实现：逐物体运动向量、`denoiseIterations` 多轮 à-trous、拖影基准、SSGI/DDGI/ReSTIR；完成前不宣称 M1 或四项完成。进度见 [任务 m1](tasks/2026-11-19-realtime-gi/m1.md)。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
