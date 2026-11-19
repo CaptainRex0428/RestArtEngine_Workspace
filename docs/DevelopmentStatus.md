@@ -1,3 +1,14 @@
+## 网格 Asset Details：Slot 材质声明与居中环绕预览（2026-11-19，补充模型）
+
+用户希望打开网格时能声明材质 Slot，并且预览可旋转但始终以物体为中心。
+
+- Slot：Asset Details 逐行显示 Slot 名称与默认材质，可切换 `Actor fallback` 或工程／引擎材质；`Save slot materials` 写回网格 `.rasset` 并保留缩略图。旧式无 Slot 网格首次编辑时补一个 `Default` Slot；Engine Content 只读禁用编辑。
+- 预览：`renderScenePreview` 增加 yaw/pitch/zoom，相机目标固定为网格包围盒中心；详情预览支持拖拽环绕、滚轮缩放、双击复位；窗口默认 700×720，多 Slot 可滚动。
+- 安全：保存后 registry／AssetLibrary 重建，重新 `findMesh` 并避免旧 `entry/mesh` 指针；大网格保存会重写整个容器并阻塞 UI，界面有提示。
+- 验证：Debug 构建 0 warning；`--editor-self-test --backend d3d11` **exit 0**（Slot 文本、yaw 像素差、模拟拖拽像素差、既有布局断言）；`MeshPersistenceTests` 新增 Slot 默认材质容器往返；CTest **30/30**；截图见 `artifacts/mesh-final2/`。
+- 提交 `79bf6d0` 已推送；任务 [v1](tasks/2026-11-19-mesh-details-slots/v1.md)，经验 [AssetDetails](experience/AssetDetails.md)。
+- 边界：不支持在详情窗口增删 Slot／重划分三角形区间，不支持拖材质到 Slot 行；保存非增量，398 MB 级网格可能明显停顿。
+
 ## 阴影抗锯齿：4×4 PCF 与 4096 阴影图（2026-11-19，补充模型）
 
 用户反馈阴影边缘硬阶梯。根因是 2048² 阴影图覆盖 30 世界单位（每 texel≈1.46cm）且默认仅 2×2 PCF；FXAA/TAA 无法恢复阴影图缺失的覆盖率。

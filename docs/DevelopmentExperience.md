@@ -23,6 +23,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 | 讨论记录与学习沉淀 | [_TEMPLATE.md](conversations/_TEMPLATE.md)、[AgentEntry](AgentEntry.md#讨论与学习记录必须) | 每次讨论后落盘到 learning／conversations／design／experience，更新索引并推送协作库 |
 | 抗锯齿与交换链借用 | [AntiAliasing.md](experience/AntiAliasing.md) | Off/FXAA/TAA 配置与回退、D3D12 resize 前释放交换链引用与 UI 借用 |
 | 阴影过滤与抗锯齿 | [ShadowFiltering.md](experience/ShadowFiltering.md) | 阴影图 texel 密度、4×4 PCF 固定核、默认质量/开销取舍与对照验证 |
+| 资产详情、Slot 材质与环绕预览 | [AssetDetails.md](experience/AssetDetails.md) | 网格默认材质声明、容器保存/缩略图保留、刷新后指针失效、固定中心环绕相机与输入自测 |
 | 渲染预览与 GPU 取证 | [渲染技能](../../.agents/skills/restarengine-rendering/SKILL.md) | 离屏目标、独立窗口像素、热编译、GPU 资源生命周期 |
 | 隔离测试与交付 | [交付技能](../../.agents/skills/restarengine-delivery/SKILL.md) | 避免真实工程被自测改写、构建锁、有效证据选择 |
 | 续接、资产迁移与历史审计 | [协作经验](AgentDevelopment.md#续接与证据管理经验)、[历史审计](DevelopmentChanges-AfterDevLog02.md) | 模型切换、旧证据失效、GUID／格式迁移 |
