@@ -10,7 +10,9 @@
 - 逐物体运动向量已接入（提交 `23bab37`）：RayTriangle 带上一帧世界位置，u7 输出主表面上一帧位置，temporal resolve 用相机+物体重投影；重建历史键排除 Actor 变换但保留拓扑/材质/光照失效；native self-test 移动 Actor 通过，hybrid stride 回归修复。
 - 多尺度降噪迭代（提交 `1a3dc57`）：`denoiseIterations` 驱动 1–4 轮 5×5 tap，粗尺度权重衰减。
 - **M1 完成**：native/hybrid 自测、Denoiser 三模式 validation 0、CTest 30/30。
-- **M2 SSGI 首版完成**（提交 `1768b21`）：`GlobalIlluminationMethod::ScreenSpace`，Deferred 屏幕追踪 + 上一帧颜色 history，b6/t13、history 资源、D3D11/native D3D12 共享，Project JSON/UI/状态/测试；strict D3D11 与 native D3D12 probe validation 0，截图见任务 m2。限制：Forward/runtime swapchain 未启用、无时域重投影。下一步 M3 DDGI，然后 M4 ReSTIR；二者尚未实现。
+- **M2 SSGI 首版完成**（提交 `1768b21`）：`GlobalIlluminationMethod::ScreenSpace`，Deferred 屏幕追踪 + 上一帧颜色 history，b6/t13、history 资源、D3D11/native D3D12 共享，Project JSON/UI/状态/测试；strict D3D11 与 native D3D12 probe validation 0，截图见任务 m2。限制：Forward/runtime swapchain 未启用、无时域重投影。
+- **M3 DDGI 首版完成**：`GlobalIlluminationMethod::ProbeGrid`，相机目标 probe 网格 → 1024×32 RGBA16F atlas ping-pong，`PSProbeUpdate` 从 G-buffer 更新、Deferred 三线性采样 8 probe；b9/t14/t15、ProbeUpdate pass、Project JSON/UI/状态/测试；native 与 strict D3D11 validation 0，截图见任务 m3。限制：屏幕空间可见性近似、近镜面不参与、Forward/runtime swapchain 未启用。
+- 待实现：M4 ReSTIR DI/GI 及最终全项回归；完成前不宣称四项全部完成。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
