@@ -9,7 +9,8 @@
 - 相机重投影 temporal+spatial 降噪已接入：b8/t12/t13/u5/u6、读写历史图、上一帧 ViewProjection 重投影、法线/深度拒绝与邻域 clamp；`GlobalIlluminationStatus` 报告 effective denoiser/motion vectors；提交 `ba44bad`。native self-test、hybrid hardware-rt self-test、三种 denoiser 模式 validation 0、CTest 30/30。
 - 逐物体运动向量已接入（提交 `23bab37`）：RayTriangle 带上一帧世界位置，u7 输出主表面上一帧位置，temporal resolve 用相机+物体重投影；重建历史键排除 Actor 变换但保留拓扑/材质/光照失效；native self-test 移动 Actor 通过，hybrid stride 回归修复。
 - 多尺度降噪迭代（提交 `1a3dc57`）：`denoiseIterations` 驱动 1–4 轮 5×5 tap，粗尺度权重衰减。
-- **M1 完成**：native/hybrid 自测、Denoiser 三模式 validation 0、CTest 30/30。下一步 M2 SSGI；SSGI/DDGI/ReSTIR 尚未实现。
+- **M1 完成**：native/hybrid 自测、Denoiser 三模式 validation 0、CTest 30/30。
+- **M2 SSGI 首版完成**（提交 `1768b21`）：`GlobalIlluminationMethod::ScreenSpace`，Deferred 屏幕追踪 + 上一帧颜色 history，b6/t13、history 资源、D3D11/native D3D12 共享，Project JSON/UI/状态/测试；strict D3D11 与 native D3D12 probe validation 0，截图见任务 m2。限制：Forward/runtime swapchain 未启用、无时域重投影。下一步 M3 DDGI，然后 M4 ReSTIR；二者尚未实现。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
