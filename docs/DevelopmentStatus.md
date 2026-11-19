@@ -1,3 +1,12 @@
+## 实时 GI 四项扩展立项（2026-11-19，补充模型）
+
+用户要求实现四条实时 GI 路线并做成可配置：现有 Realtime PathTracing 的时域/空域降噪（相机 + 逐物体运动向量）、SSGI、DDGI、ReSTIR DI/GI。
+
+- 设计已落盘：[RealtimeGiOptions](design/RealtimeGiOptions.md)；当前只有 `PathTracing`（Progressive/Realtime）一种 GI 算法，Realtime 已有 5×5 空间滤波、无运动重投影/降噪。
+- 统一配置模型：`GlobalIlluminationMethod` 增加 ScreenSpace/ProbeGrid；降噪、运动向量选择（CameraOnly/PerObject/Automatic）、采样层（Path/ReSTIR）及 SSGI/DDGI/ReSTIR 参数放入 `GlobalIlluminationSettings`，旧工程缺字段用默认值。
+- 实施顺序：M1 运动向量 + PT 降噪 → M2 SSGI → M3 DDGI → M4 ReSTIR；每阶段独立构建、GPU 截图、自测、CTest、提交后再进入下一阶段。
+- 尚未开始代码实现，不宣称任何一项完成。
+
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
 用户截图显示 native DXR + Progressive GI 时 Scene Viewport 右侧有浅色错位竖带。根因：编辑器视口是 scene target 的子矩形，native HardwareResolve 却把 DXR 图像复制到 `(0,0)`；D3D11 旧路径使用 `viewportX/Y` 目标偏移。
