@@ -14,8 +14,8 @@
 - `debugView = 12` — **GI probes**：
   - 正常场景叠加每个 DDGI probe；
   - probe 位置与 `PSProbeUpdate` 一致（`origin + (ix,iy,iz)+0.5`）；
-  - 每个 probe 用 atlas 辐照度着色，青色表示 atlas alpha 无效；
-  - 新增 `VSProbeDebug` / `PSProbeDebug`，一次 RHI draw 绘制所有 billboard sphere；
+  - 每个 probe 用 atlas 辐照度着色的**小圆点**标记；
+  - 新增 `VSProbeDebug` / `PSProbeDebug`，一次 RHI draw 绘制所有 billboard dot；NDC 偏移按 viewport 宽高比校正，避免圆点在宽视口里变成椭圆；
   - 新增 `RenderPassKind::GiDebugOverlay`，在 post/AA 之后写 SceneColor，读 SceneDepth 与 probe atlas；
   - 1024×32 atlas viewport，probe 顶点缓冲每帧按当前网格生成。
 
@@ -27,8 +27,8 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 
 已用 native D3D12 与 strict D3D11 各 6–8 帧验证，validation 0；截图：
 
-- `gi-probe-debug.png`（probe 球体）
-- `gi-indirect-debug-ddgi.png`（DDGI indirect，当前偏暗）
+- `ddgi-raytraced-probes.png`（probe 小圆点；`4e9a8dc` 起圆形、按 viewport 宽高比校正）
+- `gi-indirect-debug-ddgi.png`（DDGI indirect）
 
 ## 当前 DDGI 为什么不正确
 
@@ -74,7 +74,7 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 5. **验证**
    - native/hybrid DDGI 各 8–16 帧，validation 0；
    - Cornell Box / 用户 Sandbox 对比 GI off/on，确认颜色溢出无白斑/条纹；
-   - probe debug view 中球体颜色应随周围几何变化，cyan 数量显著减少。
+   - probe debug view 中圆点颜色应随周围几何变化。
 
 ## 实现结果（f94b313）
 
