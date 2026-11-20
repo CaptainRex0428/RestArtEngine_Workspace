@@ -1,6 +1,6 @@
 # M5：GI Debug 可视化与完整 DDGI
 
-状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），无 DXR 时运行软件光线追踪 fallback；probe debug 使用引擎内置 Sphere 模型的 instanced 真实球体。相关提交 `f94b313`、`26aaf1f`、`2df9527`。
+状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），无 DXR 时运行软件光线追踪 fallback；probe debug 使用引擎内置 Sphere 模型的 instanced 真实球体。相关提交 `f94b313`、`26aaf1f`、`2df9527`、`d311996`。probe grid/spacing/auto-fit 变化会清空 raster probe atlas 和 debug instance cache，并 bump GI epoch 重置 DXR probe history。
 
 ## 已实现：GI debug view
 
@@ -19,6 +19,7 @@
   - `VSProbeDebug` / `PSProbeDebug` 使用 indexed instanced draw；RHI 增加 per-instance vertex attribute 与 `drawIndexedInstanced`；
   - 新增 `RenderPassKind::GiDebugOverlay`，在 post/AA 之后写 SceneColor，读 SceneDepth 与 probe atlas；
   - 1024×32 atlas viewport；sphere mesh 静态缓存，probe instance buffer 按 grid/origin 缓存。
+  - probe grid/spacing/auto-fit 改变时 `probeLayoutChanged` 清空 `probeAtlasValid`、debug sphere instance cache 并递增 `giHistoryEpoch`，避免旧 atlas 映射块状残留。
 
 无编辑器时可：
 
