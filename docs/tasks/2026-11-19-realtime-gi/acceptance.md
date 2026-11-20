@@ -23,14 +23,14 @@
 | DDGI（格点对齐/置信度） | strict D3D11 | 8 | exit 0，validation 0 | `GI effective: probeGrid` |
 | DDGI 完整 DXR（16 rays/probe，irradiance+depth） | native D3D12 | 8 | exit 0，validation 0 | `Ray-traced DDGI`、DXR dispatches 10 |
 | DDGI 完整 DXR（16 rays/probe，irradiance+depth） | hybrid D3D11+DXR | 8 | exit 0，validation 0 | `Ray-traced DDGI`、DXR dispatches 10 |
-| DDGI screen-space fallback | strict D3D11 | 6 | exit 0，validation 0 | `Realtime DDGI (raster fallback)`、DXR dispatches 0 |
-| DDGI DXR-capable backends with hardware RT off | native D3D12 | 3 | exit 0，validation 0 | `GI effective: disabled`，状态提示启用 Hardware ray tracing，无 raster fallback |
+| DDGI software ray-traced fallback | strict D3D11 | 6 | exit 0，validation 0 | `Software ray-traced DDGI`、DXR dispatches 0 |
+| DDGI software ray-traced fallback（hardware RT off） | native D3D12 raster | 6 | exit 0，validation 0 | `Software ray-traced DDGI`、DXR dispatches 0 |
 | ReSTIR | native D3D12 | 8 | exit 0，validation 0 | `Sampling: ReSTIR (direct on, indirect on, candidates 4)` |
 | ReSTIR | hybrid D3D11+DXR | 8 | exit 0，validation 0 | 同上 |
 
 回归：`--native-d3d12-self-test` exit 0；`--hardware-rt-self-test --backend d3d11Dxr` exit 0；CTest 30/30。
 
-截图证据位于本目录：`ssgi-fixed-trace-composite.png`、`ddgi-stabilized-probes.png`、`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-raytraced-probes.png`、`ddgi-raytraced-indirect.png`、`restir-native-d3d12.png`、`restir-temporal-reservoir.png`、`restir-direct-reservoir.png`；首版对照仍保留 `ssgi-native-d3d12.png`、`ssgi-strict-d3d11.png`、`ddgi-native-d3d12.png`、`ddgi-strict-d3d11.png`。
+截图证据位于本目录：`ssgi-fixed-trace-composite.png`、`ssgi-cornell-indirect.png`、`ddgi-stabilized-probes.png`、`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-raytraced-probes.png`、`ddgi-raytraced-indirect.png`、`ddgi-software-cornell-lit.png`、`ddgi-software-cornell-probes.png`、`restir-native-d3d12.png`、`restir-temporal-reservoir.png`、`restir-direct-reservoir.png`；首版对照仍保留 `ssgi-native-d3d12.png`、`ssgi-strict-d3d11.png`、`ddgi-native-d3d12.png`、`ddgi-strict-d3d11.png`。
 
 ## 已知限制（实现首版边界）
 

@@ -18,7 +18,7 @@
 - `b97f305` DDGI 修复：ProbeUpdate pass 使用 1024×32 atlas 专用 viewport（此前沿用 scene viewport，atlas 大部分未写入，表现像完全无效）；增加 `probeAutoFit` 默认开启，用场景包围盒推导 grid center/spacing，旧项目的大 spacing 自动收敛。状态区报告 effective spacing；DDGI on/off 截图 meanAbsRGB≈9.35。
 - `9237cd3` GI debug：viewport debug 模式 11（GI indirect）与 12（DDGI probe 球体，atlas 辐照度着色）；新增 `GiDebugOverlay` pass、probe debug VS/PS、`--debug-view` CLI；native D3D12 与 strict D3D11 验证 0。
 - `f94b313` 完整 DXR DDGI：`HardwareRayTracing` 新增 probe pass（b9 ProbeConstants、u10 irradiance、u11 depth、t16 history），逐 probe 追踪可配置 `probeRayCount` 条光线，输出 irradiance + mean/mean-squared depth atlas，hysteresis 与 view/epoch 重置，Renderer 采样用 Chebyshev visibility + hit ratio 软权重；native/hybrid 各 8 帧 validation 0，strict D3D11 保留屏幕空间 fallback；CTest 30/30。证据见 `local/docs/tasks/2026-11-19-realtime-gi/m5-debug-and-full-ddgi.md`。
-- DDGI fallback 策略修复：DXR-capable 后端（native D3D12 / hybrid）关闭 Hardware ray tracing 时不再静默运行慢速屏幕空间 DDGI，状态区提示启用硬件光追；只有 strict D3D11 或 DXR 不可用适配器保留 raster fallback。native hardware-off 3 帧 exit 0/validation 0，strict D3D11 fallback 仍正常。
+- `26aaf1f` SSGI / 软件 DDGI 修复：SSGI trace 改采样当前 direct-lit colour，composite 补绑 albedo，`GI indirect` 保留 direct 给 trace，厚度加 `0.5×radius` 下限并去掉错误法线拒绝；DDGI 无 DXR 时改为软件光线追踪 fallback（每 probe 8 方向、最多 8 步屏幕空间 march），native D3D12 raster 与 strict D3D11 均显示 `Software ray-traced DDGI`。CTest 30/30，native/hybrid self-test 通过，SSGI/DDGI 验证 0。
 - 项目修正（`86dab47`）：保留 `Projects/PathTracing_CornellBox`（渐进路径追踪示例），删除 `Projects/RayTracing_Simple`；README/EditorGuide/GlobalIllumination/Lighting 恢复 Cornell Box 引用并移除 RayTracing_Simple。当前 Project Manager 示例为 `Sandbox` 与 `PathTracing_CornellBox`。`tools/GenerateCornellBox.cpp` 保留为可选生成工具。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
