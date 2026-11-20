@@ -2,6 +2,6 @@
 
 目标：实现并配置化四条实时 GI 路线——PathTracing 时域/空域降噪（相机 + 逐物体运动向量）、SSGI、DDGI、ReSTIR DI/GI。
 
-设计见 [RealtimeGiOptions](../../design/RealtimeGiOptions.md)。当前状态：M1 完成；M2 SSGI、M3 DDGI、M4 ReSTIR 首版均完成并 GPU 验证（`1768b21`、`f52eb1f`、`0d93c0a`）。四项总验收见 [acceptance](acceptance.md)；质量/无偏限制见各任务记录。
+设计见 [RealtimeGiOptions](../../design/RealtimeGiOptions.md)。当前状态：M1 完成；M2 SSGI、M3 DDGI、M4 ReSTIR 首版完成并 GPU 验证（`1768b21`、`f52eb1f`、`0d93c0a`）；`fa5667f` 修复 SSGI 自反馈散点并改进 DDGI probe 稳定性。SSGI 现为独立 trace/composite + direct history + 时域/空域降噪；DDGI 仍为屏幕空间 probe 更新近似。四项验收见 [acceptance](acceptance.md)。
 
 进度记录：[m1](m1.md) · [m2](m2.md) · [m3](m3.md) · [m4](m4.md) · [acceptance](acceptance.md)。

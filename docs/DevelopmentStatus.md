@@ -14,6 +14,7 @@
 - **M3 DDGI 首版完成**：`GlobalIlluminationMethod::ProbeGrid`，相机目标 probe 网格 → 1024×32 RGBA16F atlas ping-pong，`PSProbeUpdate` 从 G-buffer 更新、Deferred 三线性采样 8 probe；b9/t14/t15、ProbeUpdate pass、Project JSON/UI/状态/测试；native 与 strict D3D11 validation 0，截图见任务 m3。限制：屏幕空间可见性近似、近镜面不参与、Forward/runtime swapchain 未启用。
 - **M4 ReSTIR 首版完成**：Path tracing 实时采样层，direct/indirect reservoir 均有上一帧历史 + 世界位置/ViewProjection 重投影，`restirSpatialReuse` 增加上一帧 3×3 邻域平均；`sampling/restirCandidates/restirDirect/restirIndirect/restirSpatialReuse` 配置、UI、JSON、测试；native DXR 与 hybrid DXR validation 0。限制：直接光估计/indirect 亮度选择非严格无偏，空间 reuse 为估计平均而非正式 reservoir 合并；质量量化未做。
 - **四项首版均完成并 GPU 验证**（M1/M2/M3/M4）；验收记录见 `docs/tasks/2026-11-19-realtime-gi/acceptance.md`。限制：SSGI/DDGI 仅 Deferred/编辑器目标，DDGI 与 ReSTIR 为近似质量，尚未做 Uniform/ReSTIR 量化对比。
+- `fa5667f` 质量修复：SSGI 改为独立 trace/composite，采样 direct-color history 避免自反馈，加入时域重投影/邻域 clamp/3×3 空域滤波/albedo 调制/emitter 拒绝；DDGI 网格原点对齐世界格点、probe 更新 3×3 footprint、alpha 置信度。SSGI/DDGI 在 native D3D12 与 strict D3D11 各 8 帧 validation 0；native/hybrid 回归与 CTest 30/30 通过。DDGI 仍是屏幕空间可见性近似，不是逐 probe DXR。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
