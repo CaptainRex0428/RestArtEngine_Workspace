@@ -1,6 +1,6 @@
 # M5：GI Debug 可视化与完整 DDGI
 
-状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），strict D3D11 保留屏幕空间 fallback；完整 DDGI 提交 `f94b313`。
+状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），strict D3D11 保留屏幕空间 fallback；完整 DDGI 提交 `f94b313`。DXR-capable 后端关闭 Hardware ray tracing 时 DDGI 报告不可用并禁用慢速 fallback。
 
 ## 已实现：GI debug view
 
@@ -81,9 +81,9 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 - `HardwareRayTracing` 增加 probe pass：`b9 ProbeConstants`、`u10` irradiance atlas、`u11` depth atlas、`t16` history atlas；descriptor heap 扩到 18。
 - 每个 atlas 像素一个 probe，按 `probeRayCount`（1–32，默认 16）发射球面 Fibonacci 光线；命中用 `TriangleMaterialAt` + `PathDirectLight` + `PathAreaDirect`，未命中用 `Environment`。
 - 输出 irradiance RGBA16F + depth moments（mean distance / mean squared distance / hit ratio）；history 按 `probeHysteresis` 混合，view/epoch 变化时重置。
-- Renderer：native `importTexture` + `copyTextureRegion`，hybrid shared texture `CopyResource`；Deferred 采样 8 probe，hardware 路径用 Chebyshev visibility 软权重（0.35 + 0.65×visibility×hitRatio），strict D3D11 保留屏幕空间 `ProbeUpdate` fallback。
+- Renderer：native `importTexture` + `copyTextureRegion`，hybrid shared texture `CopyResource`；Deferred 采样 8 probe，hardware 路径用 Chebyshev visibility 软权重（0.35 + 0.65×visibility×hitRatio），strict D3D11 保留屏幕空间 `ProbeUpdate` fallback。DXR-capable 后端（native D3D12/hybrid）关闭 Hardware ray tracing 时禁用 raster DDGI，状态区提示启用硬件光追，避免静默走慢速近似路径。
 - `probeRayCount` 已加入 JSON、UI slider、校验和 CTest。
-- 验证：native DXR DDGI 8 帧 exit 0/validation 0/DXR dispatches 10；hybrid 8 帧 exit 0/validation 0；strict D3D11 6 帧 exit 0/validation 0；CTest 30/30；native/hybrid self-test exit 0；native on/off meanAbsRGB≈4.03。
+- 验证：native DXR DDGI 8 帧 exit 0/validation 0/DXR dispatches 10；hybrid 8 帧 exit 0/validation 0；strict D3D11 6 帧 exit 0/validation 0；native hardware off 3 帧 exit 0，DDGI 报告不可用且无 fallback；CTest 30/30；native/hybrid self-test exit 0；native on/off meanAbsRGB≈4.03。
 - 截图：`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-raytraced-probes.png`、`ddgi-raytraced-indirect.png`。
 - 余留限制：固定球面方向造成 Monte Carlo 噪声；未做 probe relocation；strict D3D11 仍是屏幕空间 fallback。
 

@@ -23,7 +23,8 @@
 | DDGI（格点对齐/置信度） | strict D3D11 | 8 | exit 0，validation 0 | `GI effective: probeGrid` |
 | DDGI 完整 DXR（16 rays/probe，irradiance+depth） | native D3D12 | 8 | exit 0，validation 0 | `Ray-traced DDGI`、DXR dispatches 10 |
 | DDGI 完整 DXR（16 rays/probe，irradiance+depth） | hybrid D3D11+DXR | 8 | exit 0，validation 0 | `Ray-traced DDGI`、DXR dispatches 10 |
-| DDGI screen-space fallback | strict D3D11 | 6 | exit 0，validation 0 | `Realtime DDGI`、DXR dispatches 0 |
+| DDGI screen-space fallback | strict D3D11 | 6 | exit 0，validation 0 | `Realtime DDGI (raster fallback)`、DXR dispatches 0 |
+| DDGI DXR-capable backends with hardware RT off | native D3D12 | 3 | exit 0，validation 0 | `GI effective: disabled`，状态提示启用 Hardware ray tracing，无 raster fallback |
 | ReSTIR | native D3D12 | 8 | exit 0，validation 0 | `Sampling: ReSTIR (direct on, indirect on, candidates 4)` |
 | ReSTIR | hybrid D3D11+DXR | 8 | exit 0，validation 0 | 同上 |
 
