@@ -1,6 +1,6 @@
 # M5：GI Debug 可视化与完整 DDGI
 
-状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），strict D3D11 保留屏幕空间 fallback；完整 DDGI 提交 `f94b313`。DXR-capable 后端关闭 Hardware ray tracing 时 DDGI 报告不可用并禁用慢速 fallback。
+状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），无 DXR 时运行软件光线追踪 fallback；probe debug 使用引擎内置 Sphere 模型的 instanced 真实球体。相关提交 `f94b313`、`26aaf1f`、`2df9527`。
 
 ## 已实现：GI debug view
 
@@ -14,10 +14,11 @@
 - `debugView = 12` — **GI probes**：
   - 正常场景叠加每个 DDGI probe，并保留 DDGI 间接光贡献（`2e6fb59` 起）；
   - probe 位置与 `PSProbeUpdate` 一致（`origin + (ix,iy,iz)+0.5`）；
-  - 每个 probe 用 atlas 辐照度着色的**小圆点**标记；
-  - 新增 `VSProbeDebug` / `PSProbeDebug`，一次 RHI draw 绘制所有 billboard dot；NDC 偏移按 viewport 宽高比校正，避免圆点在宽视口里变成椭圆；
+  - 每个 probe 用**引擎内置 Sphere 模型的真实球体**标记（debug LOD 采样为 425 顶点/2160 索引），instanced 绘制，按 probeSpacing 缩放；
+  - 球体带 NORMAL 输入，用 sceneLights + 固定 key light 做方向性着色，再用 atlas 辐照度染色，可以看到 probe 的位置、受光面和明暗走向；
+  - `VSProbeDebug` / `PSProbeDebug` 使用 indexed instanced draw；RHI 增加 per-instance vertex attribute 与 `drawIndexedInstanced`；
   - 新增 `RenderPassKind::GiDebugOverlay`，在 post/AA 之后写 SceneColor，读 SceneDepth 与 probe atlas；
-  - 1024×32 atlas viewport，probe 顶点缓冲每帧按当前网格生成。
+  - 1024×32 atlas viewport；sphere mesh 静态缓存，probe instance buffer 按 grid/origin 缓存。
 
 无编辑器时可：
 
@@ -27,7 +28,7 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 
 已用 native D3D12 与 strict D3D11 各 6–8 帧验证，validation 0；截图：
 
-- `ddgi-raytraced-probes.png`（probe 小圆点；`4e9a8dc` 起圆形、按 viewport 宽高比校正）
+- `ddgi-probe-spheres.png`（引擎内置 Sphere 模型的 instanced 真实球体，方向性着色）
 - `gi-indirect-debug-ddgi.png`（DDGI indirect）
 
 ## 当前 DDGI 为什么不正确
@@ -74,7 +75,7 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 5. **验证**
    - native/hybrid DDGI 各 8–16 帧，validation 0；
    - Cornell Box / 用户 Sandbox 对比 GI off/on，确认颜色溢出无白斑/条纹；
-   - probe debug view 中圆点颜色应随周围几何变化。
+   - probe debug view 中真实球体的明暗方向与辐照度颜色应随周围几何/光源变化。
 
 ## 实现结果（f94b313）
 
@@ -85,7 +86,7 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 - `probeRayCount` 已加入 JSON、UI slider、校验和 CTest。
 - SSGI 修复：trace 改用当前帧 direct-lit colour 副本；composite 绑定 albedo；`GI indirect` 保留 direct 输出供 trace；厚度增加 `0.5 * radius` 下限，避免小 thickness 拒绝全部样本；去掉错误的法线相似度拒绝。
 - 验证：native DXR DDGI 8 帧 exit 0/validation 0；hybrid 8 帧 exit 0；软件 DDGI fallback 在 native D3D12 raster 与 strict D3D11 各 6–8 帧 exit 0/validation 0；SSGI debug/Lit 在 native D3D12 与 D3D11 validation 0；CTest 30/30；native/hybrid self-test exit 0。
-- 截图：`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-raytraced-probes.png`、`ddgi-raytraced-indirect.png`、`ddgi-software-cornell-lit.png`、`ddgi-software-cornell-probes.png`、`ssgi-cornell-indirect.png`。
+- 截图：`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-probe-spheres.png`、`ddgi-raytraced-indirect.png`、`ddgi-software-cornell-lit.png`、`ddgi-software-cornell-probes.png`、`ssgi-cornell-indirect.png`。
 - 余留限制：固定方向造成 Monte Carlo 噪声；未做 probe relocation；软件 fallback 仍依赖屏幕可见表面且没有硬件 depth/visibility atlas。
 
 ## 参考提交
