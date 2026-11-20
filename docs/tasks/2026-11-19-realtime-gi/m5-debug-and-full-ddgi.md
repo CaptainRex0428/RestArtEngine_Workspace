@@ -85,7 +85,7 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 - 输出 irradiance RGBA16F + depth moments（mean distance / mean squared distance / hit ratio）；history 按 `probeHysteresis` 混合，view/epoch 变化时重置。
 - Renderer：native `importTexture` + `copyTextureRegion`，hybrid shared texture `CopyResource`；Deferred 采样 8 probe，hardware 路径用 Chebyshev visibility 软权重（0.35 + 0.65×visibility×hitRatio）。关闭 Hardware ray tracing 时，native D3D12 raster / strict D3D11 运行**软件光线追踪 fallback**：每个 probe 8 条球面方向、最多 8 步屏幕空间 march，命中采样当前 direct-lit colour；状态显示 `Software ray-traced DDGI`。
 - `probeRayCount` 已加入 JSON、UI slider、校验和 CTest。
-- SSGI 修复：trace 改用当前帧 direct-lit colour 副本；composite 绑定 albedo；`GI indirect` 保留 direct 输出供 trace；厚度增加 `0.5 * radius` 下限，避免小 thickness 拒绝全部样本；去掉错误的法线相似度拒绝。
+- SSGI 修复：trace 改用当前帧 direct-lit colour 副本；composite 绑定 albedo；`GI indirect` 保留 direct 输出供 trace；厚度增加 `0.5 * radius` 下限，避免小 thickness 拒绝全部样本；去掉错误的法线相似度拒绝。SSGI 参数或 GI epoch 变化时丢弃 temporal history，composite 当前帧权重 25%，`GI indirect` debug 不做 temporal 混合（`2fff0f3`）。
 - 验证：native DXR DDGI 8 帧 exit 0/validation 0；hybrid 8 帧 exit 0；软件 DDGI fallback 在 native D3D12 raster 与 strict D3D11 各 6–8 帧 exit 0/validation 0；SSGI debug/Lit 在 native D3D12 与 D3D11 validation 0；CTest 30/30；native/hybrid self-test exit 0。
 - 截图：`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-probe-spheres.png`、`ddgi-raytraced-indirect.png`、`ddgi-software-cornell-lit.png`、`ddgi-software-cornell-probes.png`、`ssgi-cornell-indirect.png`。
 - 余留限制：固定方向造成 Monte Carlo 噪声；未做 probe relocation；软件 fallback 仍依赖屏幕可见表面且没有硬件 depth/visibility atlas。
