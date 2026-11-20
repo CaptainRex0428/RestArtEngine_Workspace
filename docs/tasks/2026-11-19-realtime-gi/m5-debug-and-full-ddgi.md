@@ -12,7 +12,7 @@
   - Path tracing realtime：输出 `indirectLightingBuffer` 并应用当前曝光；
   - GI 关闭/背景：黑色。
 - `debugView = 12` — **GI probes**：
-  - 正常场景叠加每个 DDGI probe；
+  - 正常场景叠加每个 DDGI probe，并保留 DDGI 间接光贡献（`2e6fb59` 起）；
   - probe 位置与 `PSProbeUpdate` 一致（`origin + (ix,iy,iz)+0.5`）；
   - 每个 probe 用 atlas 辐照度着色的**小圆点**标记；
   - 新增 `VSProbeDebug` / `PSProbeDebug`，一次 RHI draw 绘制所有 billboard dot；NDC 偏移按 viewport 宽高比校正，避免圆点在宽视口里变成椭圆；
