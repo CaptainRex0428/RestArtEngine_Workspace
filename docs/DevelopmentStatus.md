@@ -19,7 +19,7 @@
 - `9237cd3` GI debug：viewport debug 模式 11（GI indirect）与 12（DDGI probe 球体，atlas 辐照度着色）；新增 `GiDebugOverlay` pass、probe debug VS/PS、`--debug-view` CLI；native D3D12 与 strict D3D11 验证 0。
 - `f94b313` 完整 DXR DDGI：`HardwareRayTracing` 新增 probe pass（b9 ProbeConstants、u10 irradiance、u11 depth、t16 history），逐 probe 追踪可配置 `probeRayCount` 条光线，输出 irradiance + mean/mean-squared depth atlas，hysteresis 与 view/epoch 重置，Renderer 采样用 Chebyshev visibility + hit ratio 软权重；native/hybrid 各 8 帧 validation 0，strict D3D11 保留屏幕空间 fallback；CTest 30/30。证据见 `local/docs/tasks/2026-11-19-realtime-gi/m5-debug-and-full-ddgi.md`。
 - DDGI fallback 策略修复：DXR-capable 后端（native D3D12 / hybrid）关闭 Hardware ray tracing 时不再静默运行慢速屏幕空间 DDGI，状态区提示启用硬件光追；只有 strict D3D11 或 DXR 不可用适配器保留 raster fallback。native hardware-off 3 帧 exit 0/validation 0，strict D3D11 fallback 仍正常。
-- `5cafa4b`/`9dbdc7b` 删除不再需要的 `Projects/PathTracing_CornellBox` 示例工程，移除 README/EditorGuide/GlobalIllumination/Lighting 中的相关引用；当前 Project Manager 示例为 `Sandbox` 与 `RayTracing_Simple`。`tools/GenerateCornellBox.cpp` 保留为可选生成工具。
+- 项目修正（`86dab47`）：保留 `Projects/PathTracing_CornellBox`（渐进路径追踪示例），删除 `Projects/RayTracing_Simple`；README/EditorGuide/GlobalIllumination/Lighting 恢复 Cornell Box 引用并移除 RayTracing_Simple。当前 Project Manager 示例为 `Sandbox` 与 `PathTracing_CornellBox`。`tools/GenerateCornellBox.cpp` 保留为可选生成工具。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
