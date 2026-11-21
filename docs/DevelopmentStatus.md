@@ -32,6 +32,7 @@
 - 项目修正（`86dab47`）：保留 `Projects/PathTracing_CornellBox`（渐进路径追踪示例），删除 `Projects/RayTracing_Simple`；README/EditorGuide/GlobalIllumination/Lighting 恢复 Cornell Box 引用并移除 RayTracing_Simple。当前 Project Manager 示例为 `Sandbox` 与 `PathTracing_CornellBox`。`tools/GenerateCornellBox.cpp` 保留为可选生成工具。
 - `2df9527` probe debug 真实球体：RHI 增加 per-instance vertex attribute 与 `drawIndexedInstanced`，D3D11/D3D12 均支持；`GI probes` 用引擎内置 Sphere 模型（debug LOD）instanced 绘制真实球体，sceneLights + 固定 key light 方向性着色、probe atlas 辐照度染色，sphere/instance 按 grid/origin 缓存。CTest 30/30，native/hybrid self-test 通过。
 - `d311996` probe grid 更新修复：grid dims／spacing／auto-fit 变化会清空 raster probe atlas validity、debug sphere instance cache 并 bump `giHistoryEpoch`，避免旧 atlas 映射到新网格产生大块红白残留；DXR probe history 同步重置。
+- `0addad7` 软件 DDGI 反馈修复：Deferred 先输出 direct-only，probe update 从 direct copy 追踪（24 步），独立 `DDGI composite` 再把 probe 间接光加回 SceneColor；`GI indirect` debug 也由 composite 输出。消除 probe 采样自身历史造成的红白块/过曝。CTest 30/30，native/hybrid self-test 通过。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
