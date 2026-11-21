@@ -6,7 +6,7 @@
 - 四份只读专项审计：[GI](audit-devlog03-gi.md)（34 主线 + 7 相邻 + 12 条被替换中间方案）、[RHI/DXR](audit-devlog03-rhi-dxr.md)、[AA/阴影/工具](audit-devlog03-quality-tools.md)、[UI/资产](audit-devlog03-ui-assets.md)。
 - 汇总与写作计划：[DevelopmentChanges-DevLog03.md](DevelopmentChanges-DevLog03.md)：117 提交全覆盖核对（108 进专项、16 个归类不展开）、6 节模块方案、B→A 重跑清单、媒体拍摄清单、文档漂移、待确认问题。
 - 底稿已加第 3 期阶段卡（planned）；证据现状全部 B，正文写“现在能”前必须在终点重跑。工作区 GI 修复与 probe 可视化仍在并发修改（`Scene.hlsl`、`SceneRenderer.cpp`、`Rhi.h`、D3D11/12Rhi、`RhiInspection.h`、`tests/RhiInspectionTests.cpp`），未提交改动不算已验证。
-- 待用户确认：终点 commit/标签、对外版本号、发布日期、模块方案 A/B、是否先修公开文档漂移。
+- 2026-11-21 用户确认：终点 = GI 修复提交后再补一组公开文档漂移修复，随后冻结并打 `DevLog03` 标签；对外版本 `v0.4.0`；计划发布日 `2026-11-23`；正文采用方案 A（6 个技术节）。文档漂移修复清单见 [准备文档](DevelopmentChanges-DevLog03.md) §7.1。
 
 ## 实时 GI 四项扩展立项（2026-11-19，补充模型）
 
