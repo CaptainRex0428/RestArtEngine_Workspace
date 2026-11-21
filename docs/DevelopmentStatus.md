@@ -33,6 +33,7 @@
 - `2df9527` probe debug 真实球体：RHI 增加 per-instance vertex attribute 与 `drawIndexedInstanced`，D3D11/D3D12 均支持；`GI probes` 用引擎内置 Sphere 模型（debug LOD）instanced 绘制真实球体，sceneLights + 固定 key light 方向性着色、probe atlas 辐照度染色，sphere/instance 按 grid/origin 缓存。CTest 30/30，native/hybrid self-test 通过。
 - `d311996` probe grid 更新修复：grid dims／spacing／auto-fit 变化会清空 raster probe atlas validity、debug sphere instance cache 并 bump `giHistoryEpoch`，避免旧 atlas 映射到新网格产生大块红白残留；DXR probe history 同步重置。
 - `0addad7` 软件 DDGI 反馈修复：Deferred 先输出 direct-only，probe update 从 direct copy 追踪（24 步），独立 `DDGI composite` 再把 probe 间接光加回 SceneColor；`GI indirect` debug 也由 composite 输出。消除 probe 采样自身历史造成的红白块/过曝。CTest 30/30，native/hybrid self-test 通过。
+- `333c936` DDGI composite 目标修复：AA 开启时 raster 颜色在 `aaSourceImage`，composite 改写入 `rasterDestinationImage`，避免被 AA resolve 覆盖；Lit 下软件 DDGI 不再“看不见”。pipeline tests 覆盖 ProbeComposite 资源与硬件 DDGI 不执行 composite。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
