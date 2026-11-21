@@ -1,6 +1,6 @@
 # M5：GI Debug 可视化与完整 DDGI
 
-状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现（逐 probe 光线追踪 + irradiance/depth atlas + hysteresis + Chebyshev visibility），无 DXR 时运行软件光线追踪 fallback；probe debug 使用引擎内置 Sphere 模型的 instanced 真实球体。相关提交 `f94b313`、`26aaf1f`、`2df9527`、`d311996`。probe grid/spacing/auto-fit 变化会清空 raster probe atlas 和 debug instance cache，并 bump GI epoch 重置 DXR probe history。
+状态：完成。Debug 可视化 `9237cd3`；完整 DDGI 已在 DXR 后端实现，无 DXR 时运行软件光线追踪 fallback；probe debug 使用引擎内置 Sphere 模型的 instanced 真实球体；`eef5db0` 起 probe atlas 改为 SH-L1 入射 radiance（4 texels/probe），接收端按法线做 clamped-cosine 辐照度积分，软件路径使用 `ProbeLinearSource` 提供线性 direct radiance。相关提交 `f94b313`、`26aaf1f`、`2df9527`、`d311996`、`0addad7`、`333c936`、`eef5db0`。probe grid/spacing/auto-fit 变化会清空 raster probe atlas 和 debug instance cache，并 bump GI epoch 重置 DXR probe history。
 
 ## 已实现：GI debug view
 
@@ -82,13 +82,13 @@ RestArtEngine.exe --project <p> --backend d3d12 --frames 8 --debug-view 12 --cap
 
 - `HardwareRayTracing` 增加 probe pass：`b9 ProbeConstants`、`u10` irradiance atlas、`u11` depth atlas、`t16` history atlas；descriptor heap 扩到 18。
 - 每个 atlas 像素一个 probe，按 `probeRayCount`（1–32，默认 16）发射球面 Fibonacci 光线；命中用 `TriangleMaterialAt` + `PathDirectLight` + `PathAreaDirect`，未命中用 `Environment`。
-- 输出 irradiance RGBA16F + depth moments（mean distance / mean squared distance / hit ratio）；history 按 `probeHysteresis` 混合，view/epoch 变化时重置。
-- Renderer：native `importTexture` + `copyTextureRegion`，hybrid shared texture `CopyResource`；Deferred 采样 8 probe，hardware 路径用 Chebyshev visibility 软权重（0.35 + 0.65×visibility×hitRatio）。关闭 Hardware ray tracing 时，native D3D12 raster / strict D3D11 运行**软件光线追踪 fallback**：每个 probe 64 条带 per-probe 旋转的球面方向、最多 **24 步**屏幕空间 march，命中采样当前 direct-lit colour；probe atlas 做邻域混合，接收端对 3×3×3 probe 软滤波消除点状亮斑；软件 composite 使用单位增益，并与硬件路径共用 `BoundProbeIndirect` 按直接光亮度限制间接亮度，避免纯红/纯绿场景过曝；Deferred 先输出 direct-only，`DDGI probe update` 从 direct copy 追踪，独立 `DDGI composite` 再加回 probe 间接光，避免反馈；composite 写入 `rasterDestinationImage`，AA 开启时也进入 AA resolve（`333c936`）；状态显示 `Software ray-traced DDGI`。
+- 输出 SH-L1 入射 radiance（4096×32 RGBA16F，每 probe 4 texels，c0 alpha 为 confidence）+ depth moments（mean distance / mean squared distance / hit ratio）；history 按 `probeHysteresis` 混合，view/epoch 变化时重置。
+- Renderer：native `importTexture` + `copyTextureRegion`，hybrid shared texture `CopyResource`；接收端采样 8 probe，对 SH-L1 系数做三线性插值，按法线计算 `E(N)=π·c0·Y00+(2π/3)·(c1Y1y+c2Y1z+c3Y1x)`，diffuse=`albedo/π·E`；hardware 用 Chebyshev visibility。软件 fallback：`ProbeLinearSource` 从 G-buffer 重算线性 direct radiance（含 shadow/environment），`DDGI probe update` 每 probe 64 条带 per-probe 旋转球面方向、最多 24 步屏幕空间 march，投影到 SH-L1 并写 4 texels；两个后端共用 `DDGI composite` 在线性空间合成后一次 `DisplayColor`，`BoundProbeIndirect` 只作饱和色安全上限；composite 写入 `rasterDestinationImage`，AA 开启时也进入 AA resolve。状态显示 `Software ray-traced DDGI` / `Ray-traced DDGI`。
 - `probeRayCount` 已加入 JSON、UI slider、校验和 CTest。
 - SSGI 修复：trace 改用当前帧 direct-lit colour 副本；composite 绑定 albedo；`GI indirect` 保留 direct 输出供 trace；厚度增加 `0.5 * radius` 下限，避免小 thickness 拒绝全部样本；去掉错误的法线相似度拒绝。SSGI 参数或 GI epoch 变化时丢弃 temporal history，composite 当前帧权重 25%，`GI indirect` debug 不做 temporal 混合（`2fff0f3`）。
 - 验证：native DXR DDGI 8 帧 exit 0/validation 0；hybrid 8 帧 exit 0；软件 DDGI fallback 在 native D3D12 raster 与 strict D3D11 各 6–8 帧 exit 0/validation 0；SSGI debug/Lit 在 native D3D12 与 D3D11 validation 0；CTest 30/30；native/hybrid self-test exit 0。
-- 截图：`ddgi-raytraced-native.png`、`ddgi-raytraced-hybrid.png`、`ddgi-probe-spheres.png`、`ddgi-raytraced-indirect.png`、`ddgi-software-cornell-lit.png`、`ddgi-software-cornell-indirect.png`、`ddgi-software-cornell-probes.png`、`ssgi-cornell-indirect.png`。
-- 余留限制：固定方向造成 Monte Carlo 噪声；未做 probe relocation；软件 fallback 仍依赖屏幕可见表面且没有硬件 depth/visibility atlas。
+- 截图：`ddgi-sh-l1-software-lit.png`、`ddgi-sh-l1-software-indirect.png`、`ddgi-sh-l1-hardware-lit.png`、`ddgi-probe-spheres.png`、`ddgi-software-cornell-lit.png`、`ddgi-software-cornell-indirect.png`、`ddgi-software-cornell-probes.png`、`ssgi-cornell-indirect.png`。
+- 余留限制：SH-L1 是一阶近似，缺少 L2 方向细节；固定方向造成 Monte Carlo 噪声；未做 probe relocation；软件 fallback 仍依赖屏幕可见表面且没有硬件 depth/visibility atlas。
 
 ## 参考提交
 
