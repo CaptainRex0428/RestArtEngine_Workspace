@@ -35,6 +35,7 @@
 - `0addad7` 软件 DDGI 反馈修复：Deferred 先输出 direct-only，probe update 从 direct copy 追踪（24 步），独立 `DDGI composite` 再把 probe 间接光加回 SceneColor；`GI indirect` debug 也由 composite 输出。消除 probe 采样自身历史造成的红白块/过曝。CTest 30/30，native/hybrid self-test 通过。
 - `333c936` DDGI composite 目标修复：AA 开启时 raster 颜色在 `aaSourceImage`，composite 改写入 `rasterDestinationImage`，避免被 AA resolve 覆盖；Lit 下软件 DDGI 不再“看不见”。pipeline tests 覆盖 ProbeComposite 资源与硬件 DDGI 不执行 composite。
 - `b097159` 软件 DDGI 平滑：probe 方向 8→64 并加入 per-probe 旋转，probe atlas 与上一帧邻域混合，接收端 3×3×3 软滤波；消除大漫反射面上的点状/岛状亮斑，保留低频颜色 bleed。native D3D12/D3D11、DXR 回归 validation 0；CTest 30/30，native/hybrid self-test 通过。
+- `39c52ec`／`2297926` DDGI 饱和色能量补偿：软件 composite 去掉 `×2` 增益，新增 `BoundProbeIndirect` 按直接光亮度限制间接亮度，并同时用于硬件 DDGI；纯红/纯绿场景不再被 probe 间接光推成自发光盒子。这是显示空间近似的补偿，DDGI 本身仍是低频率、有偏的 probe 近似。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
