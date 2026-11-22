@@ -39,7 +39,7 @@
 - `eef5db0` DDGI SH-L1 严格入射辐照度：probe atlas 改为 4096×32、每 probe 4 texels 的 SH-L1 入射 radiance；DXR 用线性 radiance 投影，软件路径新增 `ProbeLinearSource` 提供线性 direct radiance；接收端对 8 个 probe 做 SH-L1 插值并按法线计算 `E(N)` 与 `albedo/π·E`，两个后端共用线性空间 composite 后一次 `DisplayColor`。本轮验证：native D3D12/D3D11 software DDGI、DXR DDGI、probe/indirect debug validation 0；CTest 30/30；native/hybrid self-test 通过。
 - `587b921` DDGI SH 阶数可配置：新增 `probeShOrder`（1/2）、UI、JSON 校验和 ProbeConstants layout；atlas 扩到 9216×32，L1 写 4 texels、L2 写 9；DXR 与软件 fallback 都按所选阶数投影，接收端支持 L1/L2 clamped-cosine 辐照度；切换时自动失效 atlas/history 并调整写 viewport。L1/L2 × native/D3D11/DXR/hybrid validation 0，ProjectSettingsTests/CTest 30/30。
 - `77046e6` DDGI probe filter：两个后端在 composite 前增加 3×3×3 Gaussian SH 系数邻域滤波，消除大墙面残留的低频块状/岛状明暗斑；L1/L2、D3D11/D3D12/DXR validation 0，CTest 30/30。
-- SSGI v2（`34b5e67`、`e672b08`、`cdbd3ea`）：线性 HDR direct source、cosine 4-ray 半分辨率 trace、前向 depth march + front-face/thickness 可见性、off-screen 环境 fallback、per-object previous-world motion G-buffer（t16）、线性空间 composite 与一帧 previous-indirect 二次反弹。native D3D12 + strict D3D11 validation 0，CTest 30/30；剩余：屏幕空间可见性、只有一次额外反弹、无间接镜面。
+- SSGI v2（`34b5e67`、`e672b08`、`cdbd3ea`、`e554fe3`）：线性 HDR direct source、cosine 4-ray 半分辨率 trace、前向 depth march + front-face/thickness 可见性、off-screen 环境 fallback、per-object previous-world motion G-buffer（t16）、线性空间 composite、一帧 previous-indirect 二次反弹，以及 `indirectSpecular` 半分辨率 SSR（roughness 抖动、Fresnel/roughness 衰减、Environment miss fallback）。native D3D12 + strict D3D11 validation 0，CTest 30/30；剩余：屏幕空间可见性、只有一次额外 diffuse bounce、rough specular 是近似。
 
 ## 原生 DXR 编辑器视口错位修复（2026-11-19，补充模型）
 
