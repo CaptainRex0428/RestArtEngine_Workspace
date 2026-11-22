@@ -1,6 +1,16 @@
 # SSGI P0 优化规划：DXR 反射 / DDGI fallback
 
-状态：规划中，未实现。
+状态：P0 已实现（native D3D12 DXR 反射 + 无 DXR 时 DDGI probe fallback）；hybrid 的 DXR 反射仍走 SSR fallback。
+
+## 已落地实现（`42cbf37`）
+
+- `HardwareRayTracing.hlsl` 新增 `ResolveReflection`，由 `traceOptions.x > 1.5` 的 reflection-only dispatch 调用，写入共享 `indirectLightingOutput`；
+- `Frame::reflectionOnly` + `traceOptions.x=2`，C++ 在 reflection-only 模式跳过 path resolve；
+- native D3D12 的 HardwareTransport 将 reflection 结果复制到 `nativeIndirectCopy`，SSGI composite 以 t21 采样；
+- SSGI 与 DXR 解耦：硬件反射只在 `native12` + ScreenSpace + reflections + indirectSpecular 时启用，跳过 `HardwareResolve`；
+- DXR 关闭时 SSGI pipeline 增加低分辨率 `ProbeUpdate`/`ProbeFilter`，`ScreenSpaceTrace`/`ScreenSpaceSpecular` 的 miss 使用 `ProbeIrradiance`；
+- hybrid DXR 的 SSGI 仍走屏空间 SSR（不引入共享反射纹理拷贝）。
+
 
 ## 目标
 
