@@ -28,3 +28,5 @@
 技术来源见 [DDGI 原论文](https://research.nvidia.com/publication/2019-05_dynamic-diffuse-global-illumination-ray-traced-irradiance-fields)、[Lumen 技术文档](https://dev.epicgames.com/documentation/en-us/unreal-engine/lumen-technical-details-in-unreal-engine)、[ReSTIR GI 原论文](https://research.nvidia.com/publication/2021-06_restir-gi-path-resampling-real-time-path-tracing)。上一轮空间质量测量见[探针格纹验收](../tasks/2026-11-23-gi-review/v4.md)。
 
 11 月 25 日补查了 v5 对照图中固定在天花板上的弧形亮斑。分通道及屏蔽单个供光体的 GPU 实验将其定位到左侧灰浆球的屏幕空间漫反射。半径决定亮区范围，离散步进影响条带。见[诊断对照](../tasks/2026-11-23-gi-review/v6.md)。
+
+已修复漫反射步段和射程边界造成的半月弧。原机位、原追踪预算下的外弧落差从 6.31 降到 1.73，配对消融确认左球仍有供光。见[修复记录](../tasks/2026-11-23-gi-review/v7.md)。

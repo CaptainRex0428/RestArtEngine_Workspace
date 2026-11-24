@@ -8,6 +8,7 @@
 - [v4 DXR 探针白斑、曲面黑斑与格纹复核](v4.md)
 - [v5 SSGI 与 DDGI 时域稳定、DXR 硬件反射去噪](v5.md)
 - [v6 天花板弧形光斑的分通道和供光体对照](v6.md)
+- [v7 SSGI 天花板弧带修复与能量验证](v7.md)
 - [可复用经验](../../experience/RealtimeGiVerification.md)
 
 v5 已通过 Cornell 静置和灯光阶跃的 GPU 验证。剩余限制包括屏幕可见域、薄壁／低密度探针漏光、低迟滞和高增益下的残余波动，以及场景变动时的探针整体重置。公开技术契约在引擎 `docs/GlobalIllumination.md`。
