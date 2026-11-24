@@ -4,6 +4,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 
 | 主题 | 经验入口 | 使用时机 |
 | --- | --- | --- |
+| Rider 与 Windows C++ 工具链 | [RiderMsBuild.md](experience/RiderMsBuild.md) | MSB4019、实际 MSBuild 实例、个人覆盖层、开源项目的干净检出构建 |
 | 实时 GI 颜色传递与预算 | [RealtimeGiVerification.md](experience/RealtimeGiVerification.md) | 接收面掩模、signed SH、显示域、光栅与 DXR 计时边界 |
 | 原生帧检查、离线资源与程序诊断 | [NativeDiagnostics.md](experience/NativeDiagnostics.md) | Draw时固定常量、异步原FrameID、深度整层copy、UI安全退役、候选事务、JSON容量压力与计时/内存口径 |
 | 引擎与工程加载反馈 | [LoadingProgress.md](experience/LoadingProgress.md) | 可选观察者、真实资源计数、初始化回调安全、进度完成语义与实际加载页 |
