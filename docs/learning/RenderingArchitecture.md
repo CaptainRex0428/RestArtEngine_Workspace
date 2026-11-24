@@ -236,3 +236,7 @@ class IRenderBackend {
 - 本笔记基于 `14a6b0d` 源码与 2026-11-10 的构建/CTest 记录（Debug 构建通过、CTest 22/22）。
 - 未在本轮重新运行 GPU 画面验证；编辑器自测受桌面前台焦点限制，未取得通过。
 - 文中“未实现”项（RHI 资源/命令、材质模板、变体、跨后端）均不是现有能力。
+
+## DDGI 与金属倒影
+
+DDGI 探针提供适合漫反射的辐照度。金属材质也能反映周围场景，清晰倒影需要根据相机、表面法线和粗糙度采样反射方向的入射辐亮度。两项可以在同一帧合成。原论文也将 DDGI 与独立的光泽反射追踪组合展示。[DDGI 原论文](https://research.nvidia.com/publication/2019-05_dynamic-diffuse-global-illumination-ray-traced-irradiance-fields)
