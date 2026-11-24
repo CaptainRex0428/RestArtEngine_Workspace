@@ -26,3 +26,5 @@
 建议后续先验收固定 120 帧、供光墙离开视野、移动遮挡物、编辑灯光与材质，分别记录接收面亮度波动、达到新稳态的时间、残影和 GPU 毫秒。验收相机至少包括当前报告的 Cornell 天花板和一处薄壁，两者分别容易暴露闪烁和漏光。
 
 技术来源见 [DDGI 原论文](https://research.nvidia.com/publication/2019-05_dynamic-diffuse-global-illumination-ray-traced-irradiance-fields)、[Lumen 技术文档](https://dev.epicgames.com/documentation/en-us/unreal-engine/lumen-technical-details-in-unreal-engine)、[ReSTIR GI 原论文](https://research.nvidia.com/publication/2021-06_restir-gi-path-resampling-real-time-path-tracing)。上一轮空间质量测量见[探针格纹验收](../tasks/2026-11-23-gi-review/v4.md)。
+
+11 月 25 日补查了 v5 对照图中固定在天花板上的弧形亮斑。分通道及屏蔽单个供光体的 GPU 实验将其定位到左侧灰浆球的屏幕空间漫反射。半径决定亮区范围，离散步进影响条带。见[诊断对照](../tasks/2026-11-23-gi-review/v6.md)。
