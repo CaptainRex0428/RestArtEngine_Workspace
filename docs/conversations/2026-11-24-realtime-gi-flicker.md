@@ -33,4 +33,6 @@
 
 ### DDGI 模式下的金属倒影
 
-当前 Deferred 的 DXR 探针和逐像素 DXR 镜面由不同分支调度。选择 DDGI 时只有前者工作，接收器按金属度衰减探针漫反射。Cornell 的环境强度为 0，纯金属球仍有直接灯光高光。让 DDGI 提供漫反射并独立运行 DXR 镜面或屏幕空间反射，是可以实现的组合。本次核对了源码与场景配置。[原理](../learning/RenderingArchitecture.md#ddgi-与金属倒影)
+接入前，Deferred 的 DXR 探针和逐像素 DXR 镜面由不同分支调度。选择 DDGI 时只有前者工作，接收器按金属度衰减探针漫反射。Cornell 的环境强度为 0，纯金属球仍有直接灯光高光。讨论中确定由 DDGI 提供漫反射，再独立运行 DXR 镜面或屏幕空间反射。[原理](../learning/RenderingArchitecture.md#ddgi-与金属倒影)
+
+2026-11-25 用户要求整理论文并实现上述组合。正常编辑器已能切换反射和保存请求。原论文的探针方法、独立镜面、SSR 与本引擎的具体差异整理在公开文档 `docs/GlobalIllumination.md` 的“论文与方法”小节。[三后端实测及限制](../tasks/2026-11-23-gi-review/v8.md)

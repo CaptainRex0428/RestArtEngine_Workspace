@@ -240,3 +240,5 @@ class IRenderBackend {
 ## DDGI 与金属倒影
 
 DDGI 探针提供适合漫反射的辐照度。金属材质也能反映周围场景，清晰倒影需要根据相机、表面法线和粗糙度采样反射方向的入射辐亮度。两项可以在同一帧合成。原论文也将 DDGI 与独立的光泽反射追踪组合展示。[DDGI 原论文](https://research.nvidia.com/publication/2019-05_dynamic-diffuse-global-illumination-ray-traced-irradiance-fields)
+
+2026-11-25 引擎将两项接入 Deferred。SSR 只能查询相机当前见到的第一层表面，DXR 可查询场景几何。当前这两条反射通道只计算一次场景倒影；探针辅助高阶粗糙反射的做法另见生产化 DDGI 论文第 4.4 节。原始资料、当前近似和配置已集中到引擎 `docs/GlobalIllumination.md`。[生产化 DDGI](https://jcgt.org/published/0010/02/01/) · [本轮验证](../tasks/2026-11-23-gi-review/v8.md)

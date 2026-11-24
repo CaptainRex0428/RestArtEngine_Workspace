@@ -4,7 +4,7 @@
 
 ## SSGI／DDGI 计算、显示与性能档位（2026-11-23／24）
 
-DDGI 模式的金属倒影仍需接入独立镜面通道。[当前调度与材质表现](conversations/2026-11-24-realtime-gi-flicker.md#ddgi-模式下的金属倒影)
+2026-11-25 已在 Deferred DDGI 接入独立 SSR／DXR 金属反射，探针漫反射和镜面可以分别开启。Cornell 两颗金属球的倒影随左墙材质换色，三种 Windows 后端配置通过像素验收。见[组合、性能和边界](tasks/2026-11-23-gi-review/v8.md)及[之前的调度诊断](conversations/2026-11-24-realtime-gi-flicker.md#ddgi-模式下的金属倒影)。
 
 ### 实时 GI 实现待办（2026-11-24）
 
