@@ -4,6 +4,8 @@
 
 ## SSGI／DDGI 计算、显示与性能档位（2026-11-23／24）
 
+2026-11-25 已进一步降低软件 SSGI／DDGI 在首帧和转动镜头时的天花颗粒，并修复斜视角下 SSR 金属球倒影内部暗环。[逐像素画质与 GPU 成本](tasks/2026-11-23-gi-review/v10.md)
+
 2026-11-25 软件探针支持步段交点复核与当帧空间滤波；SSGI 软件路径已用同帧几何重建改善冷启动与改灯响应。[Cornell 首帧、GPU 开销和适用边界](tasks/2026-11-23-gi-review/v9.md)
 
 2026-11-25 已在 Deferred DDGI 接入独立 SSR／DXR 金属反射，探针漫反射和镜面可以分别开启。Cornell 两颗金属球的倒影随左墙材质换色，三种 Windows 后端配置通过像素验收。见[组合、性能和边界](tasks/2026-11-23-gi-review/v8.md)及[之前的调度诊断](conversations/2026-11-24-realtime-gi-flicker.md#ddgi-模式下的金属倒影)。
