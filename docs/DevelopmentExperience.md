@@ -4,15 +4,30 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 
 | 主题 | 经验入口 | 使用时机 |
 | --- | --- | --- |
+| Rider 与 Windows C++ 工具链 | [RiderMsBuild.md](experience/RiderMsBuild.md) | MSB4019、实际 MSBuild 实例、个人覆盖层、开源项目的干净检出构建 |
+| 实时 GI 颜色传递与预算 | [RealtimeGiVerification.md](experience/RealtimeGiVerification.md) | 接收面掩模、signed SH、显示域、光栅与 DXR 计时边界 |
+| 原生帧检查、离线资源与程序诊断 | [NativeDiagnostics.md](experience/NativeDiagnostics.md) | Draw时固定常量、异步原FrameID、深度整层copy、UI安全退役、候选事务、JSON容量压力与计时/内存口径 |
+| 引擎与工程加载反馈 | [LoadingProgress.md](experience/LoadingProgress.md) | 可选观察者、真实资源计数、初始化回调安全、进度完成语义与实际加载页 |
+| 实际RHI切片、附件与生命周期 | [RhiMigration.md](experience/RhiMigration.md) | 真实执行／像素等价、逐Draw常量、附件加载、候选发布、DX12多队列UI与最小化退役、native边界和失败恢复 |
+| 后端选择、严格模式与混合光追 | [BackendSelection.md](experience/BackendSelection.md) | 区分主模式／Feature、初始化门控、请求与实际状态、编辑依赖／重启状态、CLI覆盖、旧字段兼容与真实GPU验证 |
+| Pass/Graph/RHI与帧捕获演进 | [概念澄清](learning/PassGraphRhiRelationship.md)、[Inspector提案](design/FrameInspectorEvolution.md)、[RenderDoc工具边界](conversations/2026-11-18-renderdoc-tool-boundary.md) | 区分逻辑阶段/资源依赖/后端命令，理解DX11-DXR互操作、外部抓帧、自研快照与回放边界 |
 | 相机、投影与多视图 | [Camera.md](experience/Camera.md) | 统一矩阵/射线、正交与固定画幅、Camera Actor保存与手势事务、工具预览历史隔离 |
 | 多材质Slot、UV与来源身份 | [MeshAttributes.md](experience/MeshAttributes.md) | 导入面材质、UV接缝、重导入/场景绑定、可选属性缓存和详情可见性 |
 | 灯光组件与共享GPU照明 | [Lighting.md](experience/Lighting.md) | 新旧灯光来源、常量反射、GI历史、有限阴影与多矩形MIS验证 |
+| 实时 GI 方案 | [讨论](conversations/2026-11-19-realtime-gi-options.md)、[设计](design/RealtimeGiOptions.md)、[任务](tasks/2026-11-19-realtime-gi/README.md) | 现有 PathTracing Realtime；SSGI／DDGI／ReSTIR／时域降噪等方案的成本、依赖、配置模型与里程碑 |
 | Path Tracing 示例、面光源与视角 | [PathTracingExamples.md](experience/PathTracingExamples.md) | Cornell Box 构图、矩形发光、MIS、防止反射测试伪阳性、场景初始视角 |
 | 资产重导入、删除与引用一致性 | [AssetLifecycle.md](experience/AssetLifecycle.md) | 稳定 GUID 的几何替换、文件与内存同步、场景／Undo 引用和 legacy fallback 保护 |
 | 编辑器底栏、命令与文本焦点 | [EditorConsole.md](experience/EditorConsole.md) | 全局底栏布局、命令复用、历史补全、输入透传和 GUI 测试页签延迟 |
 | 原生浮窗、场景目标与输入 | [NativeFloatingWindows.md](experience/NativeFloatingWindows.md) | 面板被主窗口截断、跨窗拾取偏移、主窗口最小化与外浮生命周期 |
 | 大网格性能、缓存与测量 | [MeshPerformance.md](experience/MeshPerformance.md) | 导入后卡顿、保存无响应、拾取耗时、几何／持久化缓存失效或性能对比 |
 | 并行开发、片段提交与证据 | [Integration.md](experience/Integration.md) | 共享工作区、多任务同文件、独立提交验收 |
+| 渲染架构学习（RHI/PSO/G-Buffer/CBuffer） | [RenderingArchitecture.md](learning/RenderingArchitecture.md) | 理解 RHI 边界、Pass 图与资源流、延迟渲染、常量打包与源码阅读路线 |
+| 材质模板与 Shader 编写方案 | [MaterialTemplateSystem.md](design/MaterialTemplateSystem.md) | 材质参数 Schema、模板 API、代码生成/变体缓存与 RHI 职责划分 |
+| 讨论记录与学习沉淀 | [_TEMPLATE.md](conversations/_TEMPLATE.md)、[AgentEntry](AgentEntry.md#讨论与学习记录必须) | 每次讨论后落盘到 learning／conversations／design／experience，更新索引并推送协作库 |
+| 抗锯齿与交换链借用 | [AntiAliasing.md](experience/AntiAliasing.md) | Off/FXAA/TAA 配置与回退、D3D12 resize 前释放交换链引用与 UI 借用 |
+| 阴影过滤与抗锯齿 | [ShadowFiltering.md](experience/ShadowFiltering.md) | 阴影图 texel 密度、4×4 PCF 固定核、默认质量/开销取舍与对照验证 |
+| 原生 D3D12 DXR | [NativeDxr.md](experience/NativeDxr.md)、[讨论](conversations/2026-11-19-native-d3d12-dxr.md) | 共用光栅 Device5/queue、普通 UAV 输出、RHI import/copy、样本状态与 DXR 资源状态解耦 |
+| 资产详情、Slot 材质与环绕预览 | [AssetDetails.md](experience/AssetDetails.md) | 网格默认材质声明、容器保存/缩略图保留、刷新后指针失效、固定中心环绕相机与输入自测 |
 | 渲染预览与 GPU 取证 | [渲染技能](../../.agents/skills/restarengine-rendering/SKILL.md) | 离屏目标、独立窗口像素、热编译、GPU 资源生命周期 |
 | RHI 后处理迁移 | [RhiPostProcessing.md](experience/RhiPostProcessing.md) | 多源绑定、原生纹理导入、阶段归属、文件化 shader 与重载失效、回退验证 |
 | 编辑器全流程自测 | [EditorSmoke.md](experience/EditorSmoke.md) | 非前台会话的窗口激活、测试夹具重入、滚动断言、Project Settings disabled 作用域 |

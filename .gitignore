@@ -16,6 +16,19 @@
 /docs/experience/**
 !/docs/experience/**/
 !/docs/experience/**/*.md
+# Learning notes, conversation records and design proposals: Markdown only.
+!/docs/learning/
+/docs/learning/**
+!/docs/learning/**/
+!/docs/learning/**/*.md
+!/docs/conversations/
+/docs/conversations/**
+!/docs/conversations/**/
+!/docs/conversations/**/*.md
+!/docs/design/
+/docs/design/**
+!/docs/design/**/
+!/docs/design/**/*.md
 !/scripts/
 /scripts/*
 !/scripts/Sync-Workspace.ps1

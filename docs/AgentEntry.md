@@ -24,6 +24,19 @@ Codex 负责协作编排；具体模型/provider 属于本机 `~/.codex/` 配置
 
 需求与进度入口为 [`local/docs/DevelopmentStatus.md`](DevelopmentStatus.md)，分派、文件归属和验收标准为 [`local/docs/AgentDevelopment.md`](AgentDevelopment.md)。复杂任务按实际依赖自动分派子 agent，简单修改直接处理；渲染使用已有专项角色，其他领域按需增加。具体能力受当前客户端工具限制，不能把普通子 agent 读取角色文件说成原生角色已加载。
 
+## 讨论与学习记录（必须）
+
+每次实质性讨论（架构、原理、方案、排障、工具链取舍）都要落盘，不能只留在聊天里；不产生代码的讨论同样适用。
+
+| 内容 | 位置 |
+|---|---|
+| 原理／概念学习 | `local/docs/learning/<主题>.md` |
+| 讨论过程与结论 | `local/docs/conversations/YYYY-MM-DD-<slug>.md`，从 [_TEMPLATE.md](conversations/_TEMPLATE.md) 起稿 |
+| 可复用判断／踩坑 | `local/docs/experience/<主题>.md`，并在 [DevelopmentExperience.md](DevelopmentExperience.md) 建索引 |
+| 未实现的设计／提案 | `local/docs/design/<主题>.md`，明确标注“提案，未实现” |
+
+收尾必须：写入文档 → 更新经验索引或 [DevelopmentStatus.md](DevelopmentStatus.md) → `git -C local add/commit` → 推送 `origin/main` → 用 `git -C local status -sb` 与远端 HEAD 确认已同步。记录随协作库 Git 跨机同步，不依赖本机聊天历史；凭据、本机绝对路径和私人配置不得写入。
+
 ## 核心渲染开发
 
 核心渲染、手写 Shader、Pass／管线、渲染特性及跨平台后端任务，使用 [`.agents/skills/restarengine-rendering/SKILL.md`](../../.agents/skills/restarengine-rendering/SKILL.md)。四条要求、验收及设计状态见 [`docs/RenderingDevelopment.md`](../../docs/RenderingDevelopment.md)：工程结构清晰、Shader 热编译可靠、参数实时反馈、便于扩展与移植。
@@ -41,6 +54,7 @@ Windows、Linux、macOS 均纳入首轮架构；图形后端范围为 DX11、DX1
 ## UE 材质参考
 
 需要在 Unreal Editor 中制作参考材质、对照截图或参考资产时，使用 [`.agents/skills/ue-material-agent/SKILL.md`](../../.agents/skills/ue-material-agent/SKILL.md)。该 skill 由 Codex 本机 skill 补充进协作库，只操作 UE 资产，不修改 RestArtEngine 的 `.rasset` 材质与 HLSL；引擎材质仍走渲染／主 agent 流程。OpenAI `.system` 内置 skill 不进协作库。
+
 ## 知乎连载
 
 触发词：写知乎、下一期、阶段总结、把这阶段写成分享。
