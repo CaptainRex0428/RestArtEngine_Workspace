@@ -1,3 +1,13 @@
+## 引擎主线同步：新 Rhi 与原生 D3D12（2026-11-26，补充模型）
+
+引擎仓分叉：本地 50 个提交（RHI 契约校验、DX12 共享后处理链、工程开关、editor smoke 修复）对远端 61 个提交（新 `Rhi`/`D3D11Rhi`/`D3D12Rhi`、原生 D3D12 主后端、新 AA、SSGI/DDGI/SSR、Rider 工具链）。用户确认以远端为主线。
+
+- `master` 对齐 `380a447`；本地整条链归档在 `archive/dx12-shared-post-2026-11-12`，合并尝试归档在 `archive/merge-attempt-71b327f`。
+- 本地 `--dx12-post` 共享后处理链、纹理/资产实验线不再进入主线；远端的新 AA/GI/原生 D3D12 已覆盖对应能力。
+- 移植到主线：`app/EditorSmoke.cpp` 的 `forceForegroundWindow`（`AttachThreadInput` + `SwitchToThisWindow` 兜底）与 `TwoSidedSerialization` 夹具清理；长列表滚动问题远端已自行修复。
+- 验证：Debug x64 构建通过；`--native-d3d12-self-test` PASS（材质/相机预览、热编译、resize、Inspector、GC、DXR GI）。
+- `--editor-self-test` 仍未通过：前台被《三角洲行动》窗口占用（foreground pid 属于 DeltaForceClient），Windows 前台锁使后台测试无法激活 native Content；诊断显示 content HWND 可见且未最小化。需在前台空闲时重跑，或决定前台被外部占用时跳过该断言。
+
 ## Rider 原生 C++ 工具链（2026-11-24）
 
 开源项目的 Premake 入口已接入 VS 2022 C++ 工具链检测。当前工作区从 Rider 构建、跨盘干净检出使用生成配置从命令行构建，两个 Debug x64 解决方案均为 0 错误。验收口径和现有告警见[构建任务](tasks/2026-11-24-rider-msbuild/README.md)。
