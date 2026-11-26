@@ -15,6 +15,7 @@ Codex 与 DeepSeek 共用此索引，任务开始按问题查阅，收尾按 [�
 | 并行开发、片段提交与证据 | [Integration.md](experience/Integration.md) | 共享工作区、多任务同文件、独立提交验收 |
 | 渲染预览与 GPU 取证 | [渲染技能](../../.agents/skills/restarengine-rendering/SKILL.md) | 离屏目标、独立窗口像素、热编译、GPU 资源生命周期 |
 | RHI 后处理迁移 | [RhiPostProcessing.md](experience/RhiPostProcessing.md) | 多源绑定、原生纹理导入、阶段归属、文件化 shader 与重载失效、回退验证 |
+| 编辑器全流程自测 | [EditorSmoke.md](experience/EditorSmoke.md) | 非前台会话的窗口激活、测试夹具重入、滚动断言、Project Settings disabled 作用域 |
 | 隔离测试与交付 | [交付技能](../../.agents/skills/restarengine-delivery/SKILL.md) | 避免真实工程被自测改写、构建锁、有效证据选择 |
 | 续接、资产迁移与历史审计 | [协作经验](AgentDevelopment.md#续接与证据管理经验)、[历史审计](DevelopmentChanges-AfterDevLog02.md) | 模型切换、旧证据失效、GUID／格式迁移 |
 
