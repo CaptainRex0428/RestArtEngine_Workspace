@@ -12,6 +12,7 @@
 - [v8 DDGI 配合独立金属反射、论文对照与 GPU 验收](v8.md)
 - [v9 软件 DDGI 色斑与 SSGI 首帧响应](v9.md)
 - [v10 软件 GI 的可见颗粒与金属球倒影缺口](v10.md)
+- [v11 屏幕 GI 自适应更新、世界空间体素 GI 与动态画面验收](v11.md)
 - [可复用经验](../../experience/RealtimeGiVerification.md)
 
 v5 已通过 Cornell 静置和灯光阶跃的 GPU 验证。剩余限制包括屏幕可见域、薄壁／低密度探针漏光、低迟滞和高增益下的残余波动，以及场景变动时的探针整体重置。公开技术契约在引擎 `docs/GlobalIllumination.md`。
